@@ -82,7 +82,7 @@ falta, e falta repetida limita novas assinaturas.
 > sessão, `M` vira algumas tarefas, `L` pede divisão. O status percorre
 > `Draft` → `Ready` → `Live`.
 
-### US01 — Criar conta com e-mail institucional · `Must Have` · `M` · Status: `Draft`
+### US01 — Criar conta com e-mail institucional · `Must Have` · `M` · Status: `Ready`
 
 **Como** estudante ou servidor da UTFPR, **eu quero** criar uma conta com o meu
 e-mail institucional **para que** eu só divida carro com gente de dentro da
@@ -106,7 +106,7 @@ universidade.
 
 ---
 
-### US02 — Entrar e sair da plataforma · `Must Have` · `S` · Status: `Draft`
+### US02 — Entrar e sair da plataforma · `Must Have` · `S` · Status: `Ready`
 
 **Como** usuário cadastrado, **eu quero** entrar e sair da plataforma **para
 que** as minhas caronas e os meus dados fiquem acessíveis só para mim.
@@ -128,7 +128,7 @@ que** as minhas caronas e os meus dados fiquem acessíveis só para mim.
 
 ---
 
-### US03 — Cadastrar veículo e passar a oferecer carona · `Must Have` · `S` · Status: `Draft`
+### US03 — Cadastrar veículo e passar a oferecer carona · `Must Have` · `S` · Status: `Ready`
 
 **Como** passageiro que também dirige, **eu quero** cadastrar o meu veículo
 **para que** eu possa publicar rotas e os passageiros saibam qual carro procurar.
@@ -149,7 +149,7 @@ que** as minhas caronas e os meus dados fiquem acessíveis só para mim.
 
 ---
 
-### US04 — Publicar uma rota fixa · `Must Have` · `M` · Status: `Draft`
+### US04 — Publicar uma rota fixa · `Must Have` · `M` · Status: `Ready`
 
 **Como** motorista, **eu quero** publicar de uma vez o trajeto que faço toda
 semana **para que** eu não precise combinar carona de novo a cada viagem.
