@@ -60,3 +60,17 @@ falta, e falta repetida limita novas assinaturas.
 | **Rateio sugerido** | Valor por passageiro que o motorista informa como sugestão de divisão de combustível. Informativo. | **Pagamento** — nada é cobrado nem processado na plataforma. |
 
 ---
+
+## 👤 3. Atores e Permissões
+
+> ⚠️ A coluna **"Não pode"** vira Guard na rota e regra de acesso no BaaS
+> (ex.: RLS no Supabase).
+
+| Ator | Quem é | Pode | Não pode |
+| :--- | :----- | :--- | :------- |
+| **Visitante** | Quem ainda não entrou na plataforma. | Ver a página inicial, buscar rotas e ver campus, dias, horário e vagas livres. Criar conta e entrar. | Ver o nome, a foto, o contato ou o ponto de encontro de qualquer pessoa. Assinar rota, reservar vaga, publicar rota, avaliar. |
+| **Passageiro** | Usuário autenticado com e-mail institucional. Todo usuário nasce passageiro. | Assinar rotas com vaga, liberar a vaga em uma viagem, reservar vaga avulsa, ver a própria agenda e o próprio histórico, ver a reputação e o veículo dos motoristas, avaliar quem viajou com ele, editar o próprio perfil, cadastrar um veículo e virar motorista. | Publicar rota sem veículo cadastrado. Assinar a própria rota. Ver o histórico ou as faltas de outro passageiro. Editar ou cancelar rota de terceiro. Avaliar quem não viajou com ele. Assinar rota nova enquanto estiver suspenso. |
+| **Motorista** | Passageiro que cadastrou um veículo. Acumula os dois papéis. | Tudo o que o passageiro pode, mais: publicar rota fixa, editar campos que não afetam viagens confirmadas, encerrar a própria rota, cancelar uma viagem da própria rota, ver quem ocupa as vagas das próprias viagens, marcar ausência no ponto de encontro. | Ocupar vaga na própria rota. Ver a lista de passageiros de rota de terceiro. Remover falta ou avaliação já registrada. Editar dia ou horário de rota com viagem já confirmada. |
+| **Administrador** | Integrante da equipe responsável pela moderação da plataforma. | Ver denúncias, suspender um usuário por prazo determinado com justificativa registrada, encerrar rota denunciada. | Editar PRD do negócio dentro do produto: criar, assinar ou avaliar rota em nome de outra pessoa. Apagar histórico de viagem. Alterar falta ou avaliação de terceiro. |
+
+---
