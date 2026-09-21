@@ -12,8 +12,8 @@
 
 ## 🎯 1. Visão Geral e Objetivo
 
-**O problema:** quem estuda na UTFPR faz quase sempre o *mesmo* trajeto, nos
-*mesmos* dias, no *mesmo* horário — casa ↔ campus, semana após semana. Hoje essa
+**O problema:** quem estuda na UTFPR faz quase sempre o _mesmo_ trajeto, nos
+_mesmos_ dias, no _mesmo_ horário — casa ↔ campus, semana após semana. Hoje essa
 combinação acontece em grupos de WhatsApp: a cada viagem alguém repete "alguém
 vai pro campus às 18h?", as vagas são acertadas por ordem de quem viu a mensagem
 primeiro, e não há registro de quem combinou o quê. O resultado é carro andando
@@ -45,19 +45,19 @@ falta, e falta repetida limita novas assinaturas.
 > Os termos do negócio, como a comunidade fala. É daqui que o `architecture.md`
 > deriva os nomes das entidades.
 
-| Termo | Significa | Não confundir com |
-| :---- | :-------- | :---------------- |
-| **Rota fixa** | O compromisso recorrente publicado pelo motorista: origem, destino, dias da semana, horário de saída e número de vagas. É um molde, não acontece em si. | **Viagem** — a rota é o molde; a viagem é a ocorrência dele em uma data. |
-| **Viagem** | A ocorrência de uma rota fixa em uma data específica (ex.: a rota "Centro → Campus, seg/qua/sex 18h" na quarta-feira 23/09). É o que de fato acontece. | **Rota fixa** — cancelar uma viagem não encerra a rota. |
-| **Assinatura** | O vínculo do passageiro com uma rota fixa. Garante uma vaga em **todas** as viagens futuras daquela rota, sem pedido novo a cada semana. | **Reserva avulsa** — a assinatura é recorrente; a reserva vale para uma viagem só. |
-| **Vaga** | Um lugar no veículo em uma viagem. Ocupada por assinatura ou por reserva avulsa. | **Assento físico** — o produto não escolhe onde a pessoa senta. |
-| **Liberação** | O passageiro assinante avisa que não vai em uma viagem específica. A vaga dele volta a ficar disponível **naquela viagem**; a assinatura continua. | **Cancelar assinatura** — liberar é para um dia; cancelar encerra o vínculo inteiro. |
-| **Reserva avulsa** | A tomada de uma vaga liberada, válida para uma única viagem, por quem não assina a rota. | **Assinatura** — não se repete na semana seguinte. |
-| **Falta** | Liberação feita perto demais da saída, ou ausência no ponto de encontro. Fica no histórico do passageiro. | **Liberação com antecedência** — essa não gera falta. |
-| **Ponto de encontro** | O local combinado de embarque, descrito em texto pelo motorista na rota. | **Endereço residencial** — o produto nunca expõe endereço de casa. |
-| **Campus** | Uma unidade da UTFPR. Toda rota fixa tem um campus em uma das pontas. | **Destino** — o campus pode ser a origem (volta) ou o destino (ida). |
-| **Motorista** | Quem dirige e publica a rota. É sempre também um usuário da plataforma, com veículo cadastrado. | **Dono do veículo** — o produto não registra propriedade, só quem dirige. |
-| **Rateio sugerido** | Valor por passageiro que o motorista informa como sugestão de divisão de combustível. Informativo. | **Pagamento** — nada é cobrado nem processado na plataforma. |
+| Termo                 | Significa                                                                                                                                               | Não confundir com                                                                    |
+| :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------- |
+| **Rota fixa**         | O compromisso recorrente publicado pelo motorista: origem, destino, dias da semana, horário de saída e número de vagas. É um molde, não acontece em si. | **Viagem** — a rota é o molde; a viagem é a ocorrência dele em uma data.             |
+| **Viagem**            | A ocorrência de uma rota fixa em uma data específica (ex.: a rota "Centro → Campus, seg/qua/sex 18h" na quarta-feira 23/09). É o que de fato acontece.  | **Rota fixa** — cancelar uma viagem não encerra a rota.                              |
+| **Assinatura**        | O vínculo do passageiro com uma rota fixa. Garante uma vaga em **todas** as viagens futuras daquela rota, sem pedido novo a cada semana.                | **Reserva avulsa** — a assinatura é recorrente; a reserva vale para uma viagem só.   |
+| **Vaga**              | Um lugar no veículo em uma viagem. Ocupada por assinatura ou por reserva avulsa.                                                                        | **Assento físico** — o produto não escolhe onde a pessoa senta.                      |
+| **Liberação**         | O passageiro assinante avisa que não vai em uma viagem específica. A vaga dele volta a ficar disponível **naquela viagem**; a assinatura continua.      | **Cancelar assinatura** — liberar é para um dia; cancelar encerra o vínculo inteiro. |
+| **Reserva avulsa**    | A tomada de uma vaga liberada, válida para uma única viagem, por quem não assina a rota.                                                                | **Assinatura** — não se repete na semana seguinte.                                   |
+| **Falta**             | Liberação feita perto demais da saída, ou ausência no ponto de encontro. Fica no histórico do passageiro.                                               | **Liberação com antecedência** — essa não gera falta.                                |
+| **Ponto de encontro** | O local combinado de embarque, descrito em texto pelo motorista na rota.                                                                                | **Endereço residencial** — o produto nunca expõe endereço de casa.                   |
+| **Campus**            | Uma unidade da UTFPR. Toda rota fixa tem um campus em uma das pontas.                                                                                   | **Destino** — o campus pode ser a origem (volta) ou o destino (ida).                 |
+| **Motorista**         | Quem dirige e publica a rota. É sempre também um usuário da plataforma, com veículo cadastrado.                                                         | **Dono do veículo** — o produto não registra propriedade, só quem dirige.            |
+| **Rateio sugerido**   | Valor por passageiro que o motorista informa como sugestão de divisão de combustível. Informativo.                                                      | **Pagamento** — nada é cobrado nem processado na plataforma.                         |
 
 ---
 
@@ -66,12 +66,12 @@ falta, e falta repetida limita novas assinaturas.
 > ⚠️ A coluna **"Não pode"** vira Guard na rota e regra de acesso no BaaS
 > (ex.: RLS no Supabase).
 
-| Ator | Quem é | Pode | Não pode |
-| :--- | :----- | :--- | :------- |
-| **Visitante** | Quem ainda não entrou na plataforma. | Ver a página inicial, buscar rotas e ver campus, dias, horário e vagas livres. Criar conta e entrar. | Ver o nome, a foto, o contato ou o ponto de encontro de qualquer pessoa. Assinar rota, reservar vaga, publicar rota, avaliar. |
-| **Passageiro** | Usuário autenticado com e-mail institucional. Todo usuário nasce passageiro. | Assinar rotas com vaga, liberar a vaga em uma viagem, reservar vaga avulsa, ver a própria agenda e o próprio histórico, ver a reputação e o veículo dos motoristas, avaliar quem viajou com ele, editar o próprio perfil, cadastrar um veículo e virar motorista. | Publicar rota sem veículo cadastrado. Assinar a própria rota. Ver o histórico ou as faltas de outro passageiro. Editar ou cancelar rota de terceiro. Avaliar quem não viajou com ele. Assinar rota nova enquanto estiver suspenso. |
-| **Motorista** | Passageiro que cadastrou um veículo. Acumula os dois papéis. | Tudo o que o passageiro pode, mais: publicar rota fixa, editar campos que não afetam viagens confirmadas, encerrar a própria rota, cancelar uma viagem da própria rota, ver quem ocupa as vagas das próprias viagens, marcar ausência no ponto de encontro. | Ocupar vaga na própria rota. Ver a lista de passageiros de rota de terceiro. Remover falta ou avaliação já registrada. Editar dia ou horário de rota com viagem já confirmada. |
-| **Administrador** | Integrante da equipe responsável pela moderação da plataforma. | Ver denúncias, suspender um usuário por prazo determinado com justificativa registrada, encerrar rota denunciada. | Editar PRD do negócio dentro do produto: criar, assinar ou avaliar rota em nome de outra pessoa. Apagar histórico de viagem. Alterar falta ou avaliação de terceiro. |
+| Ator              | Quem é                                                                       | Pode                                                                                                                                                                                                                                                              | Não pode                                                                                                                                                                                                                           |
+| :---------------- | :--------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Visitante**     | Quem ainda não entrou na plataforma.                                         | Ver a página inicial, buscar rotas e ver campus, dias, horário e vagas livres. Criar conta e entrar.                                                                                                                                                              | Ver o nome, a foto, o contato ou o ponto de encontro de qualquer pessoa. Assinar rota, reservar vaga, publicar rota, avaliar.                                                                                                      |
+| **Passageiro**    | Usuário autenticado com e-mail institucional. Todo usuário nasce passageiro. | Assinar rotas com vaga, liberar a vaga em uma viagem, reservar vaga avulsa, ver a própria agenda e o próprio histórico, ver a reputação e o veículo dos motoristas, avaliar quem viajou com ele, editar o próprio perfil, cadastrar um veículo e virar motorista. | Publicar rota sem veículo cadastrado. Assinar a própria rota. Ver o histórico ou as faltas de outro passageiro. Editar ou cancelar rota de terceiro. Avaliar quem não viajou com ele. Assinar rota nova enquanto estiver suspenso. |
+| **Motorista**     | Passageiro que cadastrou um veículo. Acumula os dois papéis.                 | Tudo o que o passageiro pode, mais: publicar rota fixa, editar campos que não afetam viagens confirmadas, encerrar a própria rota, cancelar uma viagem da própria rota, ver quem ocupa as vagas das próprias viagens, marcar ausência no ponto de encontro.       | Ocupar vaga na própria rota. Ver a lista de passageiros de rota de terceiro. Remover falta ou avaliação já registrada. Editar dia ou horário de rota com viagem já confirmada.                                                     |
+| **Administrador** | Integrante da equipe responsável pela moderação da plataforma.               | Ver denúncias, suspender um usuário por prazo determinado com justificativa registrada, encerrar rota denunciada.                                                                                                                                                 | Editar PRD do negócio dentro do produto: criar, assinar ou avaliar rota em nome de outra pessoa. Apagar histórico de viagem. Alterar falta ou avaliação de terceiro.                                                               |
 
 ---
 
@@ -312,7 +312,7 @@ alguém liberou **para que** eu resolva a carona de um dia específico.
 
 ---
 
-### US11 — Gerenciar a minha rota · `Must Have` · `M` · Status: `Draft`
+### US11 — Gerenciar a minha rota · `Must Have` · `M` · Status: `Ready`
 
 **Como** motorista, **eu quero** ajustar ou encerrar a rota que publiquei **para
 que** ela reflita a minha realidade quando o semestre ou a rotina mudam.
@@ -336,7 +336,7 @@ que** ela reflita a minha realidade quando o semestre ou a rotina mudam.
 
 ---
 
-### US12 — Cancelar uma viagem · `Must Have` · `S` · Status: `Draft`
+### US12 — Cancelar uma viagem · `Must Have` · `S` · Status: `Ready`
 
 **Como** motorista, **eu quero** avisar que não vou fazer o trajeto em um dia
 específico **para que** ninguém fique esperando no ponto.
@@ -357,7 +357,7 @@ específico **para que** ninguém fique esperando no ponto.
 
 ---
 
-### US13 — Ver quem embarca e registrar ausência · `Must Have` · `M` · Status: `Draft`
+### US13 — Ver quem embarca e registrar ausência · `Must Have` · `M` · Status: `Ready`
 
 **Como** motorista, **eu quero** ver quem tem vaga na viagem de hoje e marcar
 quem não apareceu **para que** o combinado tenha consequência.
@@ -512,26 +512,26 @@ basta.
 
 ## 🛡️ 5. Regras de Negócio (Constraints)
 
-| ID | Regra |
-| :-- | :---- |
-| RN01 | Só cria conta quem tem e-mail de domínio institucional da UTFPR, e a conta só fica ativa depois que o e-mail é verificado. |
-| RN02 | Publicar rota exige um veículo cadastrado com modelo, cor e placa. Sem veículo, o usuário é apenas passageiro. |
-| RN03 | Toda rota fixa tem um campus da UTFPR em uma das pontas, de 1 a 5 dias da semana, de 1 a 4 vagas, um horário de saída e um ponto de encontro descrito em texto. |
-| RN04 | A assinatura ocupa uma vaga em todas as viagens futuras da rota e só pode ser criada se houver vaga livre no momento da confirmação. |
-| RN05 | Um passageiro não pode ter duas assinaturas ativas que coincidam em dia da semana com menos de 60 minutos entre os horários de saída. |
-| RN06 | O motorista da rota não pode assiná-la nem reservar vaga avulsa nela. |
-| RN07 | Liberar a vaga devolve o lugar apenas na viagem escolhida. A assinatura permanece ativa para as demais viagens da rota. |
-| RN08 | Vaga liberada fica disponível como reserva avulsa até o horário de saída da viagem, por ordem de confirmação. A reserva avulsa vale para aquela viagem apenas. |
-| RN09 | Gera falta no histórico do passageiro: liberar a vaga com menos de 2 horas para a saída, ou ser marcado como ausente pelo motorista depois da viagem. |
-| RN10 | Três faltas em 30 dias suspendem o passageiro por 7 dias para novas assinaturas e reservas. As assinaturas já ativas continuam valendo. |
-| RN11 | O motorista pode cancelar uma viagem a qualquer momento antes da saída, informando o motivo. Cancelamento com menos de 2 horas fica registrado no histórico dele. |
-| RN12 | Encerrar a rota fixa encerra as assinaturas para as viagens futuras dela. As viagens já realizadas permanecem no histórico de todos os participantes. |
-| RN13 | Dia da semana e horário de saída não podem ser alterados em rota que já tenha viagem futura com vaga ocupada: é preciso encerrar a rota e publicar outra. |
-| RN14 | A avaliação só existe entre pessoas que participaram da mesma viagem concluída, uma por par e por viagem, dentro de 7 dias após a viagem. |
-| RN15 | Viagem concluída é imutável: ocupação, falta, cancelamento e avaliação registrados não podem ser editados nem apagados por ninguém, inclusive pelo administrador. |
-| RN16 | O rateio é um valor sugerido e informativo. A plataforma não recebe, não intermedeia e não processa pagamento. |
+| ID   | Regra                                                                                                                                                                        |
+| :--- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RN01 | Só cria conta quem tem e-mail de domínio institucional da UTFPR, e a conta só fica ativa depois que o e-mail é verificado.                                                   |
+| RN02 | Publicar rota exige um veículo cadastrado com modelo, cor e placa. Sem veículo, o usuário é apenas passageiro.                                                               |
+| RN03 | Toda rota fixa tem um campus da UTFPR em uma das pontas, de 1 a 5 dias da semana, de 1 a 4 vagas, um horário de saída e um ponto de encontro descrito em texto.              |
+| RN04 | A assinatura ocupa uma vaga em todas as viagens futuras da rota e só pode ser criada se houver vaga livre no momento da confirmação.                                         |
+| RN05 | Um passageiro não pode ter duas assinaturas ativas que coincidam em dia da semana com menos de 60 minutos entre os horários de saída.                                        |
+| RN06 | O motorista da rota não pode assiná-la nem reservar vaga avulsa nela.                                                                                                        |
+| RN07 | Liberar a vaga devolve o lugar apenas na viagem escolhida. A assinatura permanece ativa para as demais viagens da rota.                                                      |
+| RN08 | Vaga liberada fica disponível como reserva avulsa até o horário de saída da viagem, por ordem de confirmação. A reserva avulsa vale para aquela viagem apenas.               |
+| RN09 | Gera falta no histórico do passageiro: liberar a vaga com menos de 2 horas para a saída, ou ser marcado como ausente pelo motorista depois da viagem.                        |
+| RN10 | Três faltas em 30 dias suspendem o passageiro por 7 dias para novas assinaturas e reservas. As assinaturas já ativas continuam valendo.                                      |
+| RN11 | O motorista pode cancelar uma viagem a qualquer momento antes da saída, informando o motivo. Cancelamento com menos de 2 horas fica registrado no histórico dele.            |
+| RN12 | Encerrar a rota fixa encerra as assinaturas para as viagens futuras dela. As viagens já realizadas permanecem no histórico de todos os participantes.                        |
+| RN13 | Dia da semana e horário de saída não podem ser alterados em rota que já tenha viagem futura com vaga ocupada: é preciso encerrar a rota e publicar outra.                    |
+| RN14 | A avaliação só existe entre pessoas que participaram da mesma viagem concluída, uma por par e por viagem, dentro de 7 dias após a viagem.                                    |
+| RN15 | Viagem concluída é imutável: ocupação, falta, cancelamento e avaliação registrados não podem ser editados nem apagados por ninguém, inclusive pelo administrador.            |
+| RN16 | O rateio é um valor sugerido e informativo. A plataforma não recebe, não intermedeia e não processa pagamento.                                                               |
 | RN17 | Nome completo, contato e ponto de encontro exato de uma viagem são visíveis apenas ao motorista dela e a quem tem vaga confirmada nela. Visitante não vê dado pessoal algum. |
-| RN18 | As viagens de uma rota são geradas para as próximas 4 semanas e avançam conforme o tempo passa. |
+| RN18 | As viagens de uma rota são geradas para as próximas 4 semanas e avançam conforme o tempo passa.                                                                              |
 
 ---
 
@@ -595,9 +595,9 @@ basta.
 
 ## 🛠️ 8. Histórico
 
-| Data | Versão | O que mudou |
-| :--- | :----- | :---------- |
-| 20/09/2026 | 1.0.0 | Versão inicial: visão, glossário, atores, US01–US19, RN01–RN18, fora de escopo e requisitos não funcionais. |
+| Data       | Versão | O que mudou                                                                                                 |
+| :--------- | :----- | :---------------------------------------------------------------------------------------------------------- |
+| 20/09/2026 | 1.0.0  | Versão inicial: visão, glossário, atores, US01–US19, RN01–RN18, fora de escopo e requisitos não funcionais. |
 
 ---
 
