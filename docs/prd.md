@@ -378,3 +378,134 @@ quem não apareceu **para que** o combinado tenha consequência.
 **Regras relacionadas:** RN09, RN15, RN17
 
 ---
+
+### US14 — Ver a minha reputação e as minhas faltas · `Should Have` · `S` · Status: `Draft`
+
+**Como** passageiro, **eu quero** ver quantas faltas eu tenho e como estou
+avaliado **para que** eu saiba onde estou antes de ser recusado por alguém.
+
+**Critérios de aceite:**
+
+- [ ] **Dado** que já viajei e tenho avaliações, **quando** abro o meu perfil,
+      **então** vejo a minha nota média, o número de viagens concluídas e as
+      faltas dos últimos 30 dias.
+- [ ] **Dado** que nunca viajei, **quando** abro o meu perfil, **então** vejo o
+      estado vazio explicando que a reputação começa depois da primeira viagem,
+      e não uma nota zero.
+- [ ] **Dado** que estou suspenso por faltas, **quando** abro o meu perfil,
+      **então** vejo até que data a suspensão vale e o que ela impede.
+- [ ] **Dado** que abro o perfil de outro passageiro, **quando** a tela carrega,
+      **então** vejo a nota média e o número de viagens dele, mas não as faltas.
+
+**Regras relacionadas:** RN09, RN10, RN17
+
+---
+
+### US15 — Avaliar quem viajou comigo · `Should Have` · `M` · Status: `Draft`
+
+**Como** participante de uma viagem concluída, **eu quero** avaliar quem viajou
+comigo **para que** a reputação de quem cumpre o combinado valha alguma coisa.
+
+**Critérios de aceite:**
+
+- [ ] **Dado** que a viagem foi concluída há menos de sete dias, **quando** dou
+      uma nota e um comentário opcional, **então** a avaliação entra na média da
+      pessoa e não pode mais ser editada.
+- [ ] **Dado** que já avaliei aquela pessoa naquela viagem, **quando** volto à
+      tela, **então** vejo a minha avaliação registrada e nenhum formulário novo.
+- [ ] **Dado** que passaram mais de sete dias da viagem, **quando** abro o
+      histórico, **então** a opção de avaliar não aparece mais.
+- [ ] **Dado** que não participei daquela viagem, **quando** tento avaliar
+      alguém dela, **então** a operação é recusada.
+
+**Regras relacionadas:** RN14, RN15
+
+---
+
+### US16 — Informar o rateio sugerido · `Should Have` · `S` · Status: `Draft`
+
+**Como** motorista, **eu quero** informar quanto sugiro por passageiro **para
+que** a divisão de combustível seja combinada antes da viagem, e não dentro do
+carro.
+
+**Critérios de aceite:**
+
+- [ ] **Dado** que informo um valor por passageiro na rota, **quando** salvo,
+      **então** o valor aparece no detalhe da rota e nas viagens futuras dela.
+- [ ] **Dado** que não informo valor nenhum, **quando** publico, **então** a rota
+      aparece como "a combinar" e continua válida.
+- [ ] **Dado** que abro o detalhe de uma rota com rateio, **quando** a tela
+      carrega, **então** vejo o aviso de que o valor é sugestão e de que o
+      pagamento acontece fora da plataforma.
+
+**Regras relacionadas:** RN16
+
+---
+
+### US17 — Consultar a minha agenda sem internet · `Should Have` · `M` · Status: `Draft`
+
+**Como** passageiro a caminho do ponto de encontro, **eu quero** abrir a agenda
+mesmo sem sinal **para que** eu consiga conferir horário e local na rua.
+
+**Critérios de aceite:**
+
+- [ ] **Dado** que já abri a agenda com conexão, **quando** abro de novo sem
+      internet, **então** vejo as viagens dos próximos dias com horário e ponto
+      de encontro, marcadas como informação possivelmente desatualizada.
+- [ ] **Dado** que estou sem internet, **quando** tento liberar uma vaga,
+      **então** vejo que a ação precisa de conexão e nada é registrado pela
+      metade.
+- [ ] **Dado** que nunca abri a agenda com conexão, **quando** abro sem
+      internet, **então** vejo a tela de sem conexão, e não uma tela em branco.
+- [ ] **Dado** que a conexão volta, **quando** a agenda é atualizada, **então**
+      o aviso de dado desatualizado some.
+
+**Regras relacionadas:** RN17
+
+---
+
+### US18 — Ser avisado quando a minha viagem muda · `Could Have` · `M` · Status: `Draft`
+
+**Como** passageiro com vaga confirmada, **eu quero** ser avisado quando a viagem
+for cancelada ou alterada **para que** eu não descubra no ponto de encontro.
+
+**Critérios de aceite:**
+
+- [ ] **Dado** que o motorista cancela uma viagem minha, **quando** o
+      cancelamento é gravado, **então** recebo um aviso com a data, o motivo e o
+      caminho para procurar outra rota.
+- [ ] **Dado** que o motorista altera o ponto de encontro de uma viagem minha,
+      **quando** a alteração é gravada, **então** recebo o aviso com o ponto
+      antigo e o novo.
+- [ ] **Dado** que não autorizei notificações no navegador, **quando** algo
+      muda, **então** o aviso aparece na agenda ao abrir o aplicativo, e a
+      informação não se perde.
+
+**Regras relacionadas:** RN11, RN12
+
+---
+
+### US19 — Denunciar um comportamento e moderar · `Could Have` · `M` · Status: `Draft`
+
+**Como** usuário que passou por um problema sério em uma carona, **eu quero**
+denunciar **para que** a comunidade não fique sem recurso quando a reputação não
+basta.
+
+**Critérios de aceite:**
+
+- [ ] **Dado** que participei de uma viagem concluída, **quando** denuncio um
+      participante dela informando o motivo, **então** a denúncia entra na fila
+      de moderação e recebo a confirmação de que foi registrada.
+- [ ] **Dado** que sou administrador, **quando** abro a fila, **então** vejo as
+      denúncias abertas com viagem, denunciante, denunciado e motivo.
+- [ ] **Dado** que sou administrador e suspendo alguém, **quando** informo o
+      prazo e a justificativa, **então** a suspensão passa a valer, a
+      justificativa fica registrada e o usuário é avisado.
+- [ ] **Dado** que não há denúncia aberta, **quando** o administrador abre a
+      fila, **então** vê o estado vazio, e não uma tabela sem linhas.
+- [ ] **Dado** que sou passageiro comum, **quando** tento abrir a fila de
+      moderação pelo endereço direto, **então** sou barrado.
+
+**Regras relacionadas:** RN14, RN15, RN17
+
+---
