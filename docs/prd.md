@@ -509,3 +509,61 @@ basta.
 **Regras relacionadas:** RN14, RN15, RN17
 
 ---
+
+## 🛡️ 5. Regras de Negócio (Constraints)
+
+| ID | Regra |
+| :-- | :---- |
+| RN01 | Só cria conta quem tem e-mail de domínio institucional da UTFPR, e a conta só fica ativa depois que o e-mail é verificado. |
+| RN02 | Publicar rota exige um veículo cadastrado com modelo, cor e placa. Sem veículo, o usuário é apenas passageiro. |
+| RN03 | Toda rota fixa tem um campus da UTFPR em uma das pontas, de 1 a 5 dias da semana, de 1 a 4 vagas, um horário de saída e um ponto de encontro descrito em texto. |
+| RN04 | A assinatura ocupa uma vaga em todas as viagens futuras da rota e só pode ser criada se houver vaga livre no momento da confirmação. |
+| RN05 | Um passageiro não pode ter duas assinaturas ativas que coincidam em dia da semana com menos de 60 minutos entre os horários de saída. |
+| RN06 | O motorista da rota não pode assiná-la nem reservar vaga avulsa nela. |
+| RN07 | Liberar a vaga devolve o lugar apenas na viagem escolhida. A assinatura permanece ativa para as demais viagens da rota. |
+| RN08 | Vaga liberada fica disponível como reserva avulsa até o horário de saída da viagem, por ordem de confirmação. A reserva avulsa vale para aquela viagem apenas. |
+| RN09 | Gera falta no histórico do passageiro: liberar a vaga com menos de 2 horas para a saída, ou ser marcado como ausente pelo motorista depois da viagem. |
+| RN10 | Três faltas em 30 dias suspendem o passageiro por 7 dias para novas assinaturas e reservas. As assinaturas já ativas continuam valendo. |
+| RN11 | O motorista pode cancelar uma viagem a qualquer momento antes da saída, informando o motivo. Cancelamento com menos de 2 horas fica registrado no histórico dele. |
+| RN12 | Encerrar a rota fixa encerra as assinaturas para as viagens futuras dela. As viagens já realizadas permanecem no histórico de todos os participantes. |
+| RN13 | Dia da semana e horário de saída não podem ser alterados em rota que já tenha viagem futura com vaga ocupada: é preciso encerrar a rota e publicar outra. |
+| RN14 | A avaliação só existe entre pessoas que participaram da mesma viagem concluída, uma por par e por viagem, dentro de 7 dias após a viagem. |
+| RN15 | Viagem concluída é imutável: ocupação, falta, cancelamento e avaliação registrados não podem ser editados nem apagados por ninguém, inclusive pelo administrador. |
+| RN16 | O rateio é um valor sugerido e informativo. A plataforma não recebe, não intermedeia e não processa pagamento. |
+| RN17 | Nome completo, contato e ponto de encontro exato de uma viagem são visíveis apenas ao motorista dela e a quem tem vaga confirmada nela. Visitante não vê dado pessoal algum. |
+| RN18 | As viagens de uma rota são geradas para as próximas 4 semanas e avançam conforme o tempo passa. |
+
+---
+
+## 🚫 6. Fora de Escopo (Non-goals)
+
+> O que o produto deliberadamente **não** faz neste semestre — o `Won't Have`
+> do MoSCoW, com o motivo de cada corte.
+
+- **Pagamento dentro da plataforma** (cobrança, split, carteira). Envolve meio de
+  pagamento e responsabilidade financeira sobre dinheiro de terceiros, que a
+  equipe não tem como sustentar em um semestre. O rateio fica informativo
+  (RN16).
+- **Mapa com o veículo em tempo real.** Exige rastreamento contínuo de
+  localização — custo de privacidade alto para um ganho que o ponto de encontro
+  descrito em texto já resolve.
+- **Chat interno entre motorista e passageiros.** O contato liberado após a
+  confirmação já resolve a comunicação, e um chat exigiria moderação de conteúdo
+  que o produto não tem como oferecer.
+- **Caronas intermunicipais ou de viagem longa.** O recorte da equipe é o
+  deslocamento diário casa ↔ campus; rota longa tem outras regras (parada,
+  bagagem, custo) que diluiriam o produto.
+- **Cadastro de quem não pertence à UTFPR.** A confiança do produto vem de ser
+  uma comunidade fechada (RN01).
+- **Aplicativo publicado em loja (Play Store / App Store).** A experiência
+  instalável pelo navegador cobre o uso no celular sem o custo de publicação e
+  revisão de loja.
+- **Escolha de assento no veículo.** Com no máximo 4 vagas, a combinação
+  acontece naturalmente dentro do carro.
+- **Importação automática da grade de aulas do sistema acadêmico.** A equipe não
+  tem acesso autorizado aos dados institucionais.
+- **Rota com mais de um campus ou com paradas intermediárias formais.** Uma
+  ponta é o campus, a outra é o bairro; qualquer parada é combinada entre as
+  pessoas, fora do sistema.
+
+---
