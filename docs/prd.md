@@ -567,3 +567,46 @@ basta.
   pessoas, fora do sistema.
 
 ---
+
+## ⚙️ 7. Requisitos Não Funcionais (Qualidade)
+
+- **Mobile-first de verdade.** O uso principal acontece no celular, na rua, a
+  caminho do ponto de encontro. Toda tela funciona em 360 px de largura sem
+  rolagem horizontal, e os alvos de toque não exigem precisão de mouse.
+- **Experiência instalável.** O aplicativo pode ser instalado na tela inicial do
+  celular e abre em modo próprio, com ícone, cor de tema e tela de abertura.
+- **Tolerância a rede ruim.** A agenda dos próximos dias fica consultável sem
+  conexão. Qualquer ação que exija rede e falhe avisa explicitamente — nunca
+  falha em silêncio nem finge que gravou.
+- **Nenhuma tela em branco.** Toda lista tem três estados desenhados: carregando,
+  vazia e com erro. Estado vazio sempre oferece o próximo passo.
+- **Retorno visível em toda gravação.** Toda operação que altera dado mostra
+  estado de carregamento e termina em mensagem de sucesso ou de erro, sempre.
+- **Privacidade por padrão.** Nenhum endereço residencial é armazenado. Dado
+  pessoal só aparece para quem tem vaga confirmada na mesma viagem (RN17).
+- **Acessibilidade.** Navegação completa por teclado, foco sempre visível, e
+  contraste mínimo AA nos textos e nos botões principais.
+- **Português do Brasil.** Interface, datas, horários e mensagens de erro em
+  pt-BR, com datas e horas no formato brasileiro.
+- **Mensagem de erro em linguagem de gente.** Nenhum código técnico ou texto de
+  servidor chega à tela do usuário.
+
+---
+
+## 🛠️ 8. Histórico
+
+| Data | Versão | O que mudou |
+| :--- | :----- | :---------- |
+| 20/09/2026 | 1.0.0 | Versão inicial: visão, glossário, atores, US01–US19, RN01–RN18, fora de escopo e requisitos não funcionais. |
+
+---
+
+## ❓ 9. Dúvidas em aberto
+
+- O prazo de 2 horas para liberação sem falta precisa de ajuste depois de testar
+  com gente de verdade? O número foi escolhido por ser tempo suficiente para
+  outra pessoa reorganizar o dia.
+- A geração de viagens para 4 semanas à frente é suficiente para o horizonte de
+  um semestre letivo, ou vale estender para o fim do semestre?
+- A suspensão de 7 dias por 3 faltas é dura demais para quem depende da carona
+  para chegar na aula?
