@@ -174,7 +174,7 @@ semana **para que** eu não precise combinar carona de novo a cada viagem.
 
 ---
 
-### US05 — Procurar rotas por campus, dia e horário · `Must Have` · `M` · Status: `Draft`
+### US05 — Procurar rotas por campus, dia e horário · `Must Have` · `M` · Status: `Ready`
 
 **Como** passageiro, **eu quero** filtrar as rotas pelo campus, pelo dia da
 semana e pela faixa de horário **para que** eu encontre a que serve para a minha
@@ -221,7 +221,7 @@ como é o trajeto **para que** eu decida com informação, e não no escuro.
 
 ---
 
-### US07 — Assinar uma vaga recorrente · `Must Have` · `M` · Status: `Draft`
+### US07 — Assinar uma vaga recorrente · `Must Have` · `M` · Status: `Ready`
 
 **Como** passageiro autenticado, **eu quero** assinar a rota **para que** eu
 tenha vaga garantida em todas as viagens dela, sem pedir de novo toda semana.
@@ -270,7 +270,7 @@ estar.
 
 ---
 
-### US09 — Liberar a minha vaga em uma viagem · `Must Have` · `S` · Status: `Draft`
+### US09 — Liberar a minha vaga em uma viagem · `Must Have` · `S` · Status: `Ready`
 
 **Como** passageiro assinante, **eu quero** avisar que não vou em um dia
 específico **para que** o lugar não vá vazio e eu não perca a assinatura.
