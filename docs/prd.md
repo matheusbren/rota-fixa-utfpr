@@ -1,8 +1,8 @@
 # 📄 Product Requirements Document (PRD)
 
 **Projeto:** Rota Fixa UTFPR
-**Versão:** 1.0.0
-**Última atualização:** 20/09/2026
+**Versão:** 1.1.0
+**Última atualização:** 30/09/2026
 
 > 🤖 **Este documento é a fonte da verdade sobre o QUE o produto faz.** Regra de
 > negócio que não estiver aqui não existe — nem para a equipe, nem para a IA.
@@ -241,6 +241,10 @@ tenha vaga garantida em todas as viagens dela, sem pedir de novo toda semana.
       **então** não existe botão de assinar.
 - [ ] **Dado** que estou suspenso por faltas, **quando** tento assinar, **então**
       vejo até que data estou suspenso e a operação é recusada.
+- [ ] **Dado** que estou no detalhe de uma rota com vaga, **quando** vou
+      assinar, **então** vejo, antes de confirmar, que posso liberar a vaga de
+      um único dia sem perder a assinatura, e sem falta se avisar com mais de
+      duas horas de antecedência.
 
 **Regras relacionadas:** RN04, RN05, RN06, RN10, RN17, RN18
 
@@ -286,6 +290,9 @@ específico **para que** o lugar não vá vazio e eu não perca a assinatura.
       a falta aparece no meu histórico.
 - [ ] **Dado** que a viagem já saiu, **quando** tento liberar, **então** vejo que
       não é mais possível e nada muda.
+- [ ] **Dado** que tenho vaga em uma viagem que ainda não saiu, **quando** vejo
+      essa viagem na agenda, **então** vejo até que horário posso liberar a vaga
+      sem gerar falta.
 
 **Regras relacionadas:** RN07, RN09, RN10
 
@@ -598,6 +605,7 @@ basta.
 | Data       | Versão | O que mudou                                                                                                 |
 | :--------- | :----- | :---------------------------------------------------------------------------------------------------------- |
 | 20/09/2026 | 1.0.0  | Versão inicial: visão, glossário, atores, US01–US19, RN01–RN18, fora de escopo e requisitos não funcionais. |
+| 30/09/2026 | 1.1.0  | Pontos de desistência do protótipo (Atividade 05): novos critérios de aceite em US07 e US09.                |
 
 ---
 
