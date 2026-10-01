@@ -174,7 +174,7 @@ O `package.json` da raiz declara os subprojetos e concentra os comandos:
 
 ```json
 {
-  "name": "[nome-do-projeto]",
+  "name": "rota-fixa-utfpr",
   "private": true,
   "workspaces": ["apps/*"],
   "scripts": {
@@ -198,9 +198,64 @@ O `package.json` da raiz declara os subprojetos e concentra os comandos:
 
 ### Organização interna do app (`apps/web/src/app/` — feature-driven)
 
-[decidido na entrevista: `core/` (singletons: guards, interceptors, services de
-dados), `shared/` (componentes burros, pipes), `features/` (uma pasta por
-domínio) — com a regra de dependência: features não importam umas das outras.]
+```text
+apps/web/src/
+├── environments/        # environment.ts e environment.development.ts (§5.3)
+└── app/
+    ├── app.config.ts    # provideRouter, provideHttpClient, LOCALE_ID, service worker
+    ├── app.routes.ts    # o mapa do §4
+    ├── core/            # a fundação — existe uma vez no app
+    │   ├── models/      # interfaces do §5.1 (FixedRoute, Trip, Subscription…)
+    │   ├── data/        # Services de dados + mapeadores (§2.1)
+    │   ├── auth/        # AuthService, authGuard, guestGuard, adminGuard
+    │   ├── http/        # authInterceptor, errorInterceptor
+    │   └── layout/      # casca do app: top-bar, bottom-nav, side-nav, offline-page
+    ├── shared/          # caixa de ferramentas — não conhece domínio
+    │   ├── ui/          # componentes burros (só input()/output())
+    │   ├── pipes/       # weekdays, fare, first-name
+    │   └── validators/  # validadores de formulário reutilizáveis
+    └── features/        # o negócio — uma pasta por domínio
+        ├── auth/        # entrar, criar conta
+        ├── agenda/      # agenda da semana, liberar vaga
+        ├── search/      # procurar rotas, detalhe, assinar, reserva avulsa
+        ├── driver/      # publicar e gerenciar rota, cancelar viagem, embarque
+        ├── profile/     # perfil, veículo, reputação
+        └── moderation/  # denúncias e suspensão (US19, Could Have)
+```
+
+**Regra de dependência** — é a que o revisor de código confere:
+
+- `features/` importa de `core/` e de `shared/`. **Uma feature não importa de
+  outra**: se duas precisam da mesma peça, ela sobe para `shared/` (se for
+  visual) ou para `core/` (se for dado ou regra).
+- `shared/` não importa de `features/` nem de `core/data/` — só de
+  `core/models/` (para tipar o `input()`).
+- `core/` não importa de `features/`.
+- Cada feature expõe as próprias rotas num `<feature>.routes.ts`, carregado
+  com `loadChildren` (lazy loading por domínio).
+
+**Do Mapa de Componentes (Figma, Atividade 05) para as pastas.** Caixa que
+aparece em telas de mais de um domínio sobe para `shared/ui/`; caixa de um
+domínio só fica na feature; caixa da moldura do app vai para `core/layout/`.
+Os seletores são os do mapa.
+
+| Onde mora | Componentes (`app-…`) | Por quê |
+| :-------- | :-------------------- | :------ |
+| `core/layout/` | `top-bar`, `bottom-nav`, `side-nav`, `offline-page` | Moldura do app: uma instância, presente em quase toda tela |
+| `shared/ui/` | `route-plate`, `weekday-strip`, `seat-meter`, `status-tag`, `trip-list`, `form-field`, `banner`, `offline-banner` | Aparecem em dois ou mais domínios (ex.: `route-plate` na busca, no detalhe e em minhas rotas) |
+| `features/auth/` | `sign-in`, `sign-up`, `brand-hero` | Só existem antes de entrar |
+| `features/agenda/` | `agenda`, `week-board`, `trip-card`, `release-seat-dialog` | Só na agenda (o `week-board` é a agenda no desktop largo) |
+| `features/search/` | `route-search`, `search-filters`, `route-list`, `route-detail`, `driver-card`, `contact-card`, `subscribe-panel` | Encontrar uma rota e decidir assinar |
+| `features/driver/` | `route-form`, `direction-toggle`, `seat-stepper`, `my-routes`, `trip-row`, `cancel-trip-dialog`, `trip-boarding`, `trip-summary`, `passenger-list`, `passenger-row` | Tudo o que só o motorista vê |
+| `features/profile/` | `profile`, `user-card`, `vehicle-form` | Perfil próprio e de terceiros |
+
+> 📌 **Pasta nasce com a história.** A árvore acima é o contrato, não uma lista
+> para criar agora: cada pasta aparece quando a primeira história que precisa
+> dela é implementada. Pasta vazia o agente lê como código que existe.
+
+> 📌 **Botão não vira componente.** Botões usam a classe `btn` do DaisyUI com
+> o tema `rota-fixa`; os estados (carregando, desabilitado com motivo) são os
+> do `design-tokens.md`.
 
 ---
 
@@ -210,7 +265,54 @@ domínio) — com a regra de dependência: features não importam umas das outra
 > `withComponentInputBinding()`, parâmetros de rota via Signal `input()`,
 > rotas filhas para hierarquia de layout, Functional Guards e Resolvers.
 
-[mapa inicial de rotas nasce aqui; cada história nova preenche uma linha no §6]
+**Configuração** (em `app.config.ts`): `provideRouter(routes,
+withComponentInputBinding())` — o parâmetro da URL chega na página como
+`input()` com o mesmo nome (`routeId = input.required<string>()`), sem
+`ActivatedRoute` (IDs 16–17).
+
+**Hierarquia de layout** (ID18): duas cascas, com as telas como rotas filhas.
+
+- **Casca pública** — sem barra de navegação: `/entrar` e `/criar-conta`.
+- **Casca do app** (`core/layout/`) — `top-bar` e `bottom-nav` no celular,
+  `side-nav` a partir de `lg`. Todas as outras telas são filhas dela.
+
+**Mapa inicial** — as telas do protótipo viram rotas. Toda rota de feature é
+carregada só quando a pessoa entra nela (`loadChildren` / `loadComponent`).
+
+| URL | Tela (`app-…`) | Feature | Acesso | Resolver |
+| :-- | :------------- | :------ | :----- | :------- |
+| `/` | — | — | redireciona para `/agenda` | — |
+| `/entrar` | `sign-in` | `auth` | `guestGuard` | — |
+| `/criar-conta` | `sign-up` | `auth` | `guestGuard` | — |
+| `/agenda` | `agenda` | `agenda` | `authGuard` | — |
+| `/rotas` | `route-search` | `search` | público (visitante vê sem dado pessoal — RN17) | — |
+| `/rotas/:routeId` | `route-detail` | `search` | público, com as partes pessoais só para quem tem vaga | `fixedRouteResolver` |
+| `/minhas-rotas` | `my-routes` | `driver` | `authGuard` | — |
+| `/minhas-rotas/nova` | `route-form` | `driver` | `authGuard` (sem veículo, a tela convida a cadastrar — US03) | — |
+| `/minhas-rotas/:routeId/editar` | `route-form` | `driver` | `authGuard` + dono da rota | `fixedRouteResolver` |
+| `/viagens/:tripId/embarque` | `trip-boarding` | `driver` | `authGuard` + motorista da viagem | `tripResolver` |
+| `/perfil` | `profile` | `profile` | `authGuard` | — |
+| `/perfil/:userId` | `profile` | `profile` | `authGuard` | — |
+| `/moderacao` | — (US19) | `moderation` | `authGuard` + `adminGuard` | — |
+| `/sem-conexao` | `offline-page` | `core/layout` | público | — |
+| `**` | — | — | redireciona para `/rotas` | — |
+
+**Guards e resolvers** — funções (`CanActivateFn`, `ResolveFn`), nunca
+classes (ID19), em `core/auth/` e ao lado da feature que os usa:
+
+- `authGuard`: sem sessão, leva para `/entrar?voltar=<url pedida>` e, depois
+  de entrar, devolve a pessoa à tela pedida (US02).
+- `guestGuard`: com sessão, `/entrar` e `/criar-conta` levam para `/agenda`.
+- `adminGuard`: só o papel administrador passa (US19).
+- "Dono da rota" e "motorista da viagem" são guards da feature `driver`.
+  **Guard é conforto de navegação, não segurança:** a regra de verdade é a
+  RLS do Supabase na E3 (PRD §3, coluna "Não pode").
+- Resolver busca o dado pelo Service antes da tela abrir; se o registro não
+  existe (ou a rota foi encerrada), volta para a lista com aviso em vez de
+  abrir tela vazia.
+
+> 📌 As folhas de **liberar vaga** e **cancelar viagem** são diálogos sobre a
+> tela de origem, não rotas: fechar o diálogo não pode mudar a URL.
 
 ---
 
