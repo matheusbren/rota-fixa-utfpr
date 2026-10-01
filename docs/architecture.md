@@ -325,7 +325,54 @@ classes (ID19), em `core/auth/` e ao lado da feature que os usa:
 
 | Termo PRD (PT-BR) | Entidade/Tabela (EN) | Atributos principais |
 | :---------------- | :------------------- | :------------------- |
-| | | |
+| Usuário (passageiro, motorista, administrador) | `users` · `User` | id, email, fullName, phone, role (`member` \| `admin`), createdAt |
+| Veículo | `vehicles` · `Vehicle` | id, ownerId, model, color, plate |
+| Campus | `campuses` · `Campus` | id, name, city |
+| Rota fixa | `fixed_routes` · `FixedRoute` | id, driverId, campusId, direction (`to_campus` \| `from_campus`), neighborhood, meetingPoint, weekdays, departureTime, seats, suggestedFareCents, status (`active` \| `closed`), closedAt, createdAt |
+| Viagem | `trips` · `Trip` | id, routeId, departsAt, status (`scheduled` \| `cancelled` \| `completed`), cancelReason, cancelledAt, cancelledLate |
+| Assinatura | `subscriptions` · `Subscription` | id, routeId, passengerId, status (`active` \| `ended`), createdAt, endedAt |
+| Liberação | `seat_releases` · `SeatRelease` | id, tripId, subscriptionId, late, createdAt |
+| Reserva avulsa | `bookings` · `Booking` | id, tripId, passengerId, createdAt |
+| Falta | `absences` · `Absence` | id, userId, tripId, kind (`late_release` \| `no_show`), createdAt |
+| Avaliação | `ratings` · `Rating` | id, tripId, raterId, rateeId, score (1 a 5), comment, createdAt |
+| Denúncia | `reports` · `Report` | id, tripId, reporterId, reportedId, reason, status (`open` \| `closed`), createdAt |
+| Suspensão | `suspensions` · `Suspension` | id, userId, cause (`absences` \| `moderation`), justification, startsAt, endsAt, createdBy |
+| Aviso de mudança (US18) | `notifications` · `Notification` | id, userId, tripId, kind, message, readAt, createdAt |
+| Motorista | papel, não tabela | é o `users` que tem `vehicles`; aparece como `driverId` na rota |
+| Passageiro | papel, não tabela | é o `users` com `subscriptions` ou `bookings`; aparece como `passengerId` |
+| Visitante | não tem registro | quem não tem sessão; tratado pelos guards e pela RLS |
+| Ponto de encontro | atributo | `FixedRoute.meetingPoint` (texto livre; nunca endereço de casa — PRD §7) |
+| Rateio sugerido | atributo | `FixedRoute.suggestedFareCents` em centavos; vazio = "a combinar" (RN16) |
+| Vaga | calculada, não tabela | vagas livres da viagem = `seats` − assinaturas ativas sem liberação naquela viagem − reservas avulsas |
+| Agenda | consulta, não tabela | viagens futuras em que a pessoa é motorista, assinante sem liberação ou dona de reserva avulsa |
+| Histórico | consulta, não tabela | viagens concluídas ou canceladas da pessoa, com as faltas dela |
+
+**Convenções do modelo**
+
+- **Nomes:** tabela em inglês, no plural e em snake_case (`fixed_routes`);
+  modelo TypeScript no singular e em PascalCase (`FixedRoute`); campo em
+  camelCase no modelo e no `db.json` (`driverId`) e em snake_case na tabela do
+  Supabase (`driver_id`). A conversão é mecânica e mora só no mapeador do
+  Service (§2.1).
+- **Por que `FixedRoute` e não `Route`:** `Route` e `Routes` já são tipos do
+  roteador do Angular. Nas telas, o prefixo `route-` dos seletores do Figma
+  (`app-route-detail`) sempre quer dizer rota fixa.
+- **Coleções do json-server:** as chaves do `db.json` são os nomes das
+  tabelas (`fixed_routes`, `trips`…), então a URL da E2 já é a da E3
+  (`/fixed_routes`).
+- **Identificadores:** `id` é string nas duas fases — o json-server da linha 1
+  gera string, e o Supabase usa `uuid`. O `id` de `users` na E3 é o mesmo do
+  usuário do Supabase Auth.
+- **Tempo:** instante em ISO 8601 com fuso (`2026-10-14T18:00:00-03:00`),
+  `timestamptz` no Supabase. `departureTime` da rota é só a hora (`18:00`);
+  `departsAt` da viagem é a data e a hora. `weekdays` é a lista de dias no
+  padrão ISO (1 = segunda … 7 = domingo).
+- **Dinheiro:** inteiro em centavos, para não somar erro de ponto flutuante.
+- **Nada se apaga** do que o PRD declara imutável (RN15): viagem concluída,
+  falta, avaliação e cancelamento mudam de `status`, nunca saem da tabela.
+- **Geração de viagens (RN18):** na E2 o `FixedRouteService` cria as viagens
+  das próximas 4 semanas ao publicar a rota; na E3 isso vai para uma função
+  no banco, agendada. A forma da tabela `trips` não muda.
 
 ### 📊 5.2. Diagrama ER (Mermaid)
 
@@ -334,7 +381,143 @@ classes (ID19), em `core/auth/` e ao lado da feature que os usa:
 
 ```mermaid
 erDiagram
+    USERS ||--o| VEHICLES : "dirige"
+    USERS ||--o{ FIXED_ROUTES : "publica"
+    CAMPUSES ||--o{ FIXED_ROUTES : "é ponta de"
+    FIXED_ROUTES ||--o{ TRIPS : "gera"
+    FIXED_ROUTES ||--o{ SUBSCRIPTIONS : "recebe"
+    USERS ||--o{ SUBSCRIPTIONS : "assina"
+    SUBSCRIPTIONS ||--o{ SEAT_RELEASES : "libera"
+    TRIPS ||--o{ SEAT_RELEASES : "devolve vaga em"
+    TRIPS ||--o{ BOOKINGS : "recebe"
+    USERS ||--o{ BOOKINGS : "reserva"
+    TRIPS ||--o{ ABSENCES : "registra"
+    USERS ||--o{ ABSENCES : "acumula"
+    TRIPS ||--o{ RATINGS : "permite"
+    USERS ||--o{ RATINGS : "avalia"
+    TRIPS ||--o{ REPORTS : "origina"
+    USERS ||--o{ REPORTS : "denuncia"
+    USERS ||--o{ SUSPENSIONS : "cumpre"
+    USERS ||--o{ NOTIFICATIONS : "recebe"
+    TRIPS ||--o{ NOTIFICATIONS : "motiva"
+
+    USERS {
+        uuid id PK
+        string email
+        string full_name
+        string phone
+        string role
+        timestamptz created_at
+    }
+    VEHICLES {
+        uuid id PK
+        uuid owner_id FK
+        string model
+        string color
+        string plate
+    }
+    CAMPUSES {
+        uuid id PK
+        string name
+        string city
+    }
+    FIXED_ROUTES {
+        uuid id PK
+        uuid driver_id FK
+        uuid campus_id FK
+        string direction
+        string neighborhood
+        string meeting_point
+        array weekdays
+        time departure_time
+        int seats
+        int suggested_fare_cents
+        string status
+        timestamptz closed_at
+        timestamptz created_at
+    }
+    TRIPS {
+        uuid id PK
+        uuid route_id FK
+        timestamptz departs_at
+        string status
+        string cancel_reason
+        timestamptz cancelled_at
+        boolean cancelled_late
+    }
+    SUBSCRIPTIONS {
+        uuid id PK
+        uuid route_id FK
+        uuid passenger_id FK
+        string status
+        timestamptz created_at
+        timestamptz ended_at
+    }
+    SEAT_RELEASES {
+        uuid id PK
+        uuid trip_id FK
+        uuid subscription_id FK
+        boolean late
+        timestamptz created_at
+    }
+    BOOKINGS {
+        uuid id PK
+        uuid trip_id FK
+        uuid passenger_id FK
+        timestamptz created_at
+    }
+    ABSENCES {
+        uuid id PK
+        uuid user_id FK
+        uuid trip_id FK
+        string kind
+        timestamptz created_at
+    }
+    RATINGS {
+        uuid id PK
+        uuid trip_id FK
+        uuid rater_id FK
+        uuid ratee_id FK
+        int score
+        string comment
+        timestamptz created_at
+    }
+    REPORTS {
+        uuid id PK
+        uuid trip_id FK
+        uuid reporter_id FK
+        uuid reported_id FK
+        string reason
+        string status
+        timestamptz created_at
+    }
+    SUSPENSIONS {
+        uuid id PK
+        uuid user_id FK
+        string cause
+        string justification
+        timestamptz starts_at
+        timestamptz ends_at
+        uuid created_by FK
+    }
+    NOTIFICATIONS {
+        uuid id PK
+        uuid user_id FK
+        uuid trip_id FK
+        string kind
+        string message
+        timestamptz read_at
+        timestamptz created_at
+    }
 ```
+
+> 📌 **Restrições que o diagrama não desenha** e que viram restrição no banco
+> na E3: uma avaliação por par e por viagem (`trip_id`, `rater_id`,
+> `ratee_id` únicos — RN14); uma liberação por assinatura e por viagem
+> (`trip_id`, `subscription_id` únicos); uma reserva avulsa por pessoa e por
+> viagem; `seats` de 1 a 4 e `weekdays` com 1 a 5 dias (RN03); `score` de 1 a
+> 5. O diagrama tem nomes em snake_case porque mostra as tabelas do Supabase;
+> no código os mesmos campos aparecem em camelCase (§5.1).
 
 ### 🔒 5.3. Segredos e ambientes
 
