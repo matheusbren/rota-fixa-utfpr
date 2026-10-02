@@ -27,7 +27,7 @@
 | Fluxos da IA | `.agents/workflows/` | PRD, backlog, design, architecture, setup, ciclo por Issue, ciclo por tarefa, tutor |
 | Agentes (subagentes) | `.agents/agents/` (cascas em `.claude/`, `.cursor/`, `.opencode/`) | Implementador, revisores, auditor final e tutor |
 | Ficha da disciplina | `docs/checklist.md` | Regras do projeto, IDs e entregas |
-| Protótipo (Stitch/Figma) | [link público] | Telas, jornadas e hierarquia visual (ID1) |
+| Protótipo (Stitch/Figma) | [Figma](https://www.figma.com/design/7LUuKjXUh2FhHPhXC0XAvY/Rota-Fixa-UTFPR) | Telas, jornadas e hierarquia visual (ID1) |
 | MCPs da IDE | [ex.: Figma, Supabase, Context7] | Contexto exato do projeto para o agente (ID32) |
 
 ---
@@ -44,7 +44,7 @@
   `@if`/`@switch`, `@for` com `track`, `@defer`, signals (writable/computed) como
   fonte de estado, `model()` para two-way, `effect()` para efeitos colaterais,
   `input()`/`output()`, `inject()`, Pipes para formatação.
-- **Framework CSS:** [Tailwind, PrimeNG, …] (ID5)
+- **Framework CSS:** Tailwind CSS 4 + DaisyUI 5, com o tema próprio `rota-fixa` (ID5). Tokens completos em [design-tokens.md](design-tokens.md); o resumo para o Tailwind está na §2.2.
 - **Dados (em duas fases):** **json-server** no MVP (E2) → **[Supabase, PocketBase, …]** na E3, com autenticação (JWT) e CRUD reais (IDs 21–22). A troca atinge só os Services (§2.1).
 - **PWA:** `manifest.webmanifest` — ícones, cores de tema, splash, standalone, offline (ID3)
 - **Testes e lint:** [ferramenta do gerador] + comandos exatos de suíte e lint (ID33). O linter não vem no `ng new`: o setup instala o oficial (`ng add angular-eslint`), mais Prettier e `eslint-config-prettier` na raiz.
@@ -64,6 +64,45 @@
   RxJS e signals (ID25).
 - **Formulários Reativos** com validação, mensagens claras e submit
   desabilitado quando inválido (ID24).
+
+### 🎨 2.2. Design Tokens (base do Tailwind)
+
+> A fonte da verdade dos tokens é o [`design-tokens.md`](design-tokens.md), com a
+> paleta completa, espaçamento, raios, estados de botão, breakpoints e identidade
+> PWA. Aqui fica só o que o setup precisa para configurar o Tailwind e o tema do
+> DaisyUI. No Tailwind 4, o antigo `tailwind.config.js` virou o bloco `@theme` do
+> CSS global: cada token abaixo vira uma variável ali.
+
+**Cores principais da marca**
+
+| Token | Hex | Variável no `@theme` | Classe de exemplo |
+| :---- | :-- | :------------------- | :---------------- |
+| `primaria` | `#F5B800` | `--color-primaria` | `bg-primaria` |
+| `texto-sobre-primaria` | `#1D2226` | `--color-texto-sobre-primaria` | `text-texto-sobre-primaria` |
+| `fundo` | `#EDEFEA` | `--color-fundo` | `bg-fundo` |
+| `superficie` | `#FFFFFF` | `--color-superficie` | `bg-superficie` |
+| `superficie-escura` | `#1D2226` | `--color-superficie-escura` | `bg-superficie-escura` |
+| `texto` | `#1D2226` | `--color-texto` | `text-texto` |
+| `texto-suave` | `#545B61` | `--color-texto-suave` | `text-texto-suave` |
+| `borda` | `#CDD2CB` | `--color-borda` | `border-borda` |
+| `perigo` | `#B3261E` | `--color-perigo` | `bg-perigo` |
+| `sucesso` | `#1B6E43` | `--color-sucesso` | `text-sucesso` |
+
+**Famílias de fontes**
+
+| Papel | Família | Variável no `@theme` |
+| :---- | :------ | :------------------- |
+| Toda a interface: títulos, horários, texto e botões | Overpass, pesos 400, 600, 700, 800 e 900 | `--font-sans` |
+| Ícones | Material Symbols Rounded | fonte de ícones, carregada à parte |
+
+**Tema do DaisyUI (`rota-fixa`):** `primary` = `primaria`, `primary-content` =
+`texto-sobre-primaria`, `base-100` = `superficie`, `base-200` = `fundo`,
+`base-content` = `texto`, `neutral` = `superficie-escura`, `error` = `perigo`,
+`success` = `sucesso`; raio de botão e campo 8 px (`--radius-field`) e de caixa
+12 px (`--radius-box`).
+
+**Breakpoints:** os padrões do Tailwind (`sm` 640, `md` 768, `lg` 1024 e `xl`
+1280 px), sem configuração extra.
 
 ---
 
