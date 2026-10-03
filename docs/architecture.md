@@ -28,7 +28,7 @@
 | Agentes (subagentes) | `.agents/agents/` (cascas em `.claude/`, `.cursor/`, `.opencode/`) | Implementador, revisores, auditor final e tutor |
 | Ficha da disciplina | `docs/checklist.md` | Regras do projeto, IDs e entregas |
 | Protótipo (Stitch/Figma) | [Figma](https://www.figma.com/design/7LUuKjXUh2FhHPhXC0XAvY/Rota-Fixa-UTFPR) | Telas, jornadas e hierarquia visual (ID1) |
-| MCPs da IDE | [ex.: Figma, Supabase, Context7] | Contexto exato do projeto para o agente (ID32) |
+| MCPs da IDE | GitHub (Issues e PRs) e Context7 (documentação atual de Angular, json-server e Supabase), configurados na ferramenta de cada integrante, fora do repositório | Contexto exato do projeto para o agente (ID32); toda versão e todo padrão registrados aqui foram conferidos na documentação atual, não na memória do modelo |
 
 ---
 
@@ -610,7 +610,7 @@ erDiagram
 
 | Data | Versão | O que mudou |
 | :--- | :----- | :---------- |
-| | 1.0.0 | Versão inicial via `/utf-architecture` |
+| 01/10/2026 | 1.0.0 | Versão inicial (Atividade 06): stack Angular 22+, json-server → Supabase, camada de dados, estrutura core/shared/features, rotas, glossário técnico, diagrama ER e segredos |
 
 ---
 
