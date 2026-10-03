@@ -521,15 +521,37 @@ erDiagram
 
 ### 🔒 5.3. Segredos e ambientes
 
-> Chaves do BaaS: a *anon key* pública vive em `environment.ts` (é pública por
-> design — a segurança vem das regras de acesso do BaaS, ex.: RLS no Supabase);
-> **service keys e segredos nunca entram no repositório**.
+> 🚨 **No front não existe segredo.** O app inteiro é baixado pelo navegador:
+> tudo o que estiver em `environment.ts` qualquer pessoa lê no DevTools.
+> Por isso o `environment` guarda **endereço e chave pública**, nunca segredo.
+> No Supabase, a chave que vai para o app é a **publishable**
+> (`sb_publishable_…`, enviada no cabeçalho `apikey`); a proteção dos dados vem
+> da Row Level Security, escrita a partir da coluna "Não pode" do PRD §3. A
+> **secret key** (`sb_secret_…`) e a senha do banco **nunca** entram no
+> repositório nem no app.
 
-| Fase | App roda em | Dados |
-| :--- | :--- | :--- |
-| **Local (E2/MVP)** | `ng serve` | json-server (`db.json` local) |
-| **Local (E3)** | `ng serve` | [BaaS — projeto de dev] |
-| **Produção (E3)** | [Vercel/Render] | [BaaS — projeto de produção] |
+| Fase | App roda em | Dados | `environment` |
+| :--- | :--- | :--- | :--- |
+| **Local (E2/MVP)** | `npm start` (`ng serve`) em `http://localhost:4200` | json-server: `npm run api`, `db.json` na raiz, `http://localhost:3000` | `apiUrl: 'http://localhost:3000'` |
+| **Local (E3)** | `npm start` | Supabase, o mesmo projeto da produção (ver abaixo) | `apiUrl` = URL do projeto + `/rest/v1`, `supabaseUrl`, `supabasePublishableKey` |
+| **Produção (E3)** | Vercel, publicado a partir da `main` | Supabase, projeto `rota-fixa-utfpr` | os mesmos campos, em `environment.ts` |
+
+**Regras**
+
+- Dois arquivos, gerados pelo Angular: `environment.development.ts` (usado no
+  `ng serve`) e `environment.ts` (usado no build de produção). Os dois têm os
+  mesmos campos; só os valores mudam. Os Services leem `environment.apiUrl` e
+  nunca escrevem URL à mão.
+- Não usamos `.env` no app: no Angular ele não esconderia nada, só daria a
+  falsa impressão de que esconde.
+- Credencial de ferramenta (token do GitHub, chave do Context7, acesso ao
+  painel do Supabase) fica na configuração de cada pessoa, fora do
+  repositório. `git status` depois de configurar qualquer ferramenta não pode
+  mostrar arquivo novo de configuração.
+- **Adiado, e escrito como adiado:** separar um projeto Supabase de
+  desenvolvimento e outro de produção. Na E3 começamos com um só (o plano
+  gratuito basta para a turma testar); decidiremos se vale separar quando
+  configurarmos o deploy na Vercel.
 
 ---
 
