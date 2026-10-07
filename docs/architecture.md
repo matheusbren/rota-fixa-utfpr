@@ -1,8 +1,8 @@
 # 🛠️ Architecture / SSD
 
 **Projeto:** Rota Fixa UTFPR
-**Versão:** 1.0.0
-**Última atualização:** 01/10/2026
+**Versão:** 1.0.1
+**Última atualização:** 07/10/2026
 
 > 🤖 **O `prd.md` responde _o quê_ o produto faz. Este responde _onde as coisas
 > moram e como se chamam_.** Detalhe de tela — rota, componente, contrato —
@@ -415,8 +415,9 @@ classes (ID19), em `core/auth/` e ao lado da feature que os usa:
 
 ### 📊 5.2. Diagrama ER (Mermaid)
 
-> As tabelas do BaaS e seus relacionamentos — o mesmo diagrama vai renderizado
-> no README, como a ficha exige.
+> As tabelas do BaaS e seus relacionamentos. **O diagrama mora só aqui:** o
+> README aponta para esta seção em vez de copiá-lo, para que uma entidade nova
+> não deixe duas versões do modelo — e o agente escolhendo uma no chute.
 
 ```mermaid
 erDiagram
@@ -611,6 +612,7 @@ erDiagram
 | Data | Versão | O que mudou |
 | :--- | :----- | :---------- |
 | 01/10/2026 | 1.0.0 | Versão inicial (Atividade 06): stack Angular 22+, json-server → Supabase, camada de dados, estrutura core/shared/features, rotas, glossário técnico, diagrama ER e segredos |
+| 07/10/2026 | 1.0.1 | Revisão cruzada da Entrega 1: o diagrama ER deixa de ser copiado no README e passa a morar só na §5.2 |
 
 ---
 
