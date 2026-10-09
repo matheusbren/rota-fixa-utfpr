@@ -1,8 +1,8 @@
 # 🛠️ Architecture / SSD
 
 **Projeto:** Rota Fixa UTFPR
-**Versão:** 1.0.0
-**Última atualização:** 01/10/2026
+**Versão:** 1.0.1
+**Última atualização:** 07/10/2026
 
 > 🤖 **O `prd.md` responde _o quê_ o produto faz. Este responde _onde as coisas
 > moram e como se chamam_.** Detalhe de tela — rota, componente, contrato —
@@ -385,6 +385,7 @@ classes (ID19), em `core/auth/` e ao lado da feature que os usa:
 | Vaga | calculada, não tabela | vagas livres da viagem = `seats` − assinaturas ativas sem liberação naquela viagem − reservas avulsas |
 | Agenda | consulta, não tabela | viagens futuras em que a pessoa é motorista, assinante sem liberação ou dona de reserva avulsa |
 | Histórico | consulta, não tabela | viagens concluídas ou canceladas da pessoa, com as faltas dela |
+| Reputação | calculada, não tabela | nota média dos `ratings` recebidos (`rateeId`) e número de viagens concluídas; as faltas dos últimos 30 dias só aparecem para a própria pessoa (US14, RN17) |
 
 **Convenções do modelo**
 
@@ -402,6 +403,10 @@ classes (ID19), em `core/auth/` e ao lado da feature que os usa:
 - **Identificadores:** `id` é string nas duas fases — o json-server da linha 1
   gera string, e o Supabase usa `uuid`. O `id` de `users` na E3 é o mesmo do
   usuário do Supabase Auth.
+- **Conta pendente (US01, RN01):** na E3 a verificação do e-mail mora no
+  Supabase Auth (`email_confirmed_at` do usuário de autenticação), fora das
+  tabelas do app. Na E2 o `db.json` simula com o campo `emailVerified`
+  (boolean) em `users`, que o `AuthService` confere ao entrar.
 - **Tempo:** instante em ISO 8601 com fuso (`2026-10-14T18:00:00-03:00`),
   `timestamptz` no Supabase. `departureTime` da rota é só a hora (`18:00`);
   `departsAt` da viagem é a data e a hora. `weekdays` é a lista de dias no
@@ -415,8 +420,9 @@ classes (ID19), em `core/auth/` e ao lado da feature que os usa:
 
 ### 📊 5.2. Diagrama ER (Mermaid)
 
-> As tabelas do BaaS e seus relacionamentos — o mesmo diagrama vai renderizado
-> no README, como a ficha exige.
+> As tabelas do BaaS e seus relacionamentos. **O diagrama mora só aqui:** o
+> README aponta para esta seção em vez de copiá-lo, para que uma entidade nova
+> não deixe duas versões do modelo — e o agente escolhendo uma no chute.
 
 ```mermaid
 erDiagram
@@ -611,6 +617,7 @@ erDiagram
 | Data | Versão | O que mudou |
 | :--- | :----- | :---------- |
 | 01/10/2026 | 1.0.0 | Versão inicial (Atividade 06): stack Angular 22+, json-server → Supabase, camada de dados, estrutura core/shared/features, rotas, glossário técnico, diagrama ER e segredos |
+| 07/10/2026 | 1.0.1 | Revisão cruzada da Entrega 1: o diagrama ER deixa de ser copiado no README e passa a morar só na §5.2 |
 
 ---
 
