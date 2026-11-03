@@ -1,0 +1,11 @@
+# Dependências (recriadas com `npm install` na raiz)
+node_modules/
+
+# Build e cache
+dist/
+build/
+.angular/
+coverage/
+
+# Ambiente local
+.env

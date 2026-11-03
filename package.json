@@ -1,0 +1,13 @@
+{
+  "name": "rota-fixa-utfpr",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "start": "npm run start -w apps/web",
+    "build": "npm run build -w apps/web",
+    "test":  "npm run test -w apps/web",
+    "lint":  "npm run lint -w apps/web",
+    "format": "prettier --write .",
+    "api":   "json-server db.json"
+  }
+}
