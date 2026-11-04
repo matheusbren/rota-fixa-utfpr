@@ -1,8 +1,8 @@
 # 🛠️ Architecture / SSD
 
 **Projeto:** Rota Fixa UTFPR
-**Versão:** 1.0.1
-**Última atualização:** 07/10/2026
+**Versão:** 1.1.0
+**Última atualização:** 03/11/2026
 
 > 🤖 **O `prd.md` responde _o quê_ o produto faz. Este responde _onde as coisas
 > moram e como se chamam_.** Detalhe de tela — rota, componente, contrato —
@@ -152,36 +152,104 @@
 > DaisyUI. No Tailwind 4, o antigo `tailwind.config.js` virou o bloco `@theme` do
 > CSS global: cada token abaixo vira uma variável ali.
 
-**Cores principais da marca**
+**Onde cada token mora.** O DaisyUI tem um mecanismo próprio de tema, então as
+cores que ele já tem um papel para entram no bloco `@plugin "daisyui/theme"` (tema
+`rota-fixa`) com o nome do DaisyUI; as que ele não tem viram variável no bloco
+`@theme` do Tailwind. Nenhuma cor é declarada nos dois lugares. Os nomes estão em
+inglês porque viram classe (`bg-primary`); a tabela completa, com o nome antigo do
+Figma, está no `design-tokens.md`.
+
+**Cores no tema do DaisyUI (`rota-fixa`)**
+
+| Token | Hex | Variável do tema | Classe de exemplo |
+| :---- | :-- | :--------------- | :---------------- |
+| `primary` | `#F5B800` | `--color-primary` | `btn-primary`, `bg-primary` |
+| `text-on-primary` | `#1D2226` | `--color-primary-content` | `text-primary-content` |
+| `surface` | `#FFFFFF` | `--color-base-100` | `bg-base-100` |
+| `background` | `#EDEFEA` | `--color-base-200` | `bg-base-200` |
+| `border` | `#CDD2CB` | `--color-base-300` | `border-base-300` |
+| `text` | `#1D2226` | `--color-base-content` | `text-base-content` |
+| `surface-dark` | `#1D2226` | `--color-neutral` | `bg-neutral` |
+| `text-on-dark` | `#FFFFFF` | `--color-neutral-content` | `text-neutral-content` |
+| `danger` | `#B3261E` | `--color-error` (texto branco em `--color-error-content`) | `btn-error`, `bg-error` |
+| `success` | `#1B6E43` | `--color-success` (texto branco em `--color-success-content`) | `bg-success` |
+
+Raio de caixa 12 px (`--radius-box`), de botão e campo 8 px (`--radius-field`) e de
+etiqueta 4 px (`--radius-selector`); borda de 1 px e `--depth: 0` (sem sombra).
+
+**Cores no `@theme` (o DaisyUI não tem papel para elas)**
 
 | Token | Hex | Variável no `@theme` | Classe de exemplo |
 | :---- | :-- | :------------------- | :---------------- |
-| `primaria` | `#F5B800` | `--color-primaria` | `bg-primaria` |
-| `texto-sobre-primaria` | `#1D2226` | `--color-texto-sobre-primaria` | `text-texto-sobre-primaria` |
-| `fundo` | `#EDEFEA` | `--color-fundo` | `bg-fundo` |
-| `superficie` | `#FFFFFF` | `--color-superficie` | `bg-superficie` |
-| `superficie-escura` | `#1D2226` | `--color-superficie-escura` | `bg-superficie-escura` |
-| `texto` | `#1D2226` | `--color-texto` | `text-texto` |
-| `texto-suave` | `#545B61` | `--color-texto-suave` | `text-texto-suave` |
-| `borda` | `#CDD2CB` | `--color-borda` | `border-borda` |
-| `perigo` | `#B3261E` | `--color-perigo` | `bg-perigo` |
-| `sucesso` | `#1B6E43` | `--color-sucesso` | `text-sucesso` |
+| `primary-hover` | `#DCA400` | `--color-primary-hover` | `hover:bg-primary-hover` |
+| `surface-dark-active` | `#30383E` | `--color-surface-dark-active` | `bg-surface-dark-active` |
+| `text-muted` | `#545B61` | `--color-text-muted` | `text-text-muted` |
+| `danger-hover` | `#921F18` | `--color-danger-hover` | `hover:bg-danger-hover` |
+| `danger-soft` | `#FBE9E7` | `--color-danger-soft` | `bg-danger-soft` |
+| `success-soft` | `#E3F1E8` | `--color-success-soft` | `bg-success-soft` |
+| `disabled` | `#DCDFDA` | `--color-disabled` | `bg-disabled` |
+| `text-disabled` | `#80867F` | `--color-text-disabled` | `text-text-disabled` |
+| `focus` | `#1D2226` | `--color-focus` | `ring-focus` |
 
-**Famílias de fontes**
+**Fonte, tipografia e raios no `@theme`**
 
-| Papel | Família | Variável no `@theme` |
-| :---- | :------ | :------------------- |
-| Toda a interface: títulos, horários, texto e botões | Overpass, pesos 400, 600, 700, 800 e 900 | `--font-sans` |
-| Ícones | Material Symbols Rounded | fonte de ícones, carregada à parte |
-
-**Tema do DaisyUI (`rota-fixa`):** `primary` = `primaria`, `primary-content` =
-`texto-sobre-primaria`, `base-100` = `superficie`, `base-200` = `fundo`,
-`base-content` = `texto`, `neutral` = `superficie-escura`, `error` = `perigo`,
-`success` = `sucesso`; raio de botão e campo 8 px (`--radius-field`) e de caixa
-12 px (`--radius-box`).
+| Papel | Valor | Variável no `@theme` |
+| :---- | :---- | :------------------- |
+| Toda a interface: títulos, horários, texto e botões | Overpass, pesos 400, 600, 700, 800 e 900 (Google Fonts, no `index.html`) | `--font-sans` |
+| Ícones | Material Symbols Rounded (Google Fonts, no `index.html`) | fonte de ícones, sem variável |
+| Escala de texto | `display`, `time`, `title-1`, `title-2`, `body`, `body-strong`, `label`, `caption`, `tab`, `button` (tamanhos no `design-tokens.md`) | `--text-<token>`, com `--line-height` e `--font-weight` |
+| Raios | `radius-sm` 4 px, `radius-md` 8 px, `radius-lg` 12 px | `--radius-sm`, `--radius-md`, `--radius-lg` (`rounded-full` já é do Tailwind) |
 
 **Breakpoints:** os padrões do Tailwind (`sm` 640, `md` 768, `lg` 1024 e `xl`
 1280 px), sem configuração extra.
+
+### 🧾 2.3. O que o setup decidiu (Atividade 07)
+
+> O `/utf-setup` gerou o app a partir deste documento. O que o documento não
+> dizia, o setup decidiu, e a equipe ratificou aqui, na mesma branch do PR de
+> manutenção. O `package-lock.json` guarda a versão exata de cada pacote; esta
+> tabela registra a linha que vale para o semestre.
+
+| Ferramenta | Versão | Observação |
+| :--------- | :----- | :--------- |
+| Angular (core, router, forms, service-worker) | 22.2 | standalone e zoneless, como a §2 pede |
+| Angular CLI e `@angular/build` | 22.2 | o `@angular/build` é quem compila, serve e roda os testes |
+| TypeScript | 6.0 | o modo `strict` já vem ligado nesta linha |
+| Vitest + jsdom | 5.1 + 30.1 | o jsdom é o navegador simulado em que os testes rodam, no terminal |
+| Tailwind CSS + `@tailwindcss/postcss` | 4.3 | entra pelo PostCSS (`apps/web/.postcssrc.json`), como o `ng new --style=tailwind` gera |
+| DaisyUI | 5.7 | com `themes: false`: só o tema `rota-fixa` existe, inclusive no modo escuro do aparelho |
+| json-server | 1.0.0-beta.15 | a linha 1 da §2; instalado na raiz, onde está o `db.json` |
+| ESLint + angular-eslint + typescript-eslint | 10.14 + 22.6 + 8.72.1 | o typescript-eslint fica na mesma versão que o angular-eslint usa; os dois sobem juntos, senão nasce um `node_modules` dentro de `apps/web` |
+| Prettier + eslint-config-prettier | 3.9 + 10.1 | na raiz, valendo para o repositório inteiro |
+
+- **Opções do `ng new`:** `--style=tailwind --routing --ssr=false --zoneless
+  --ai-config=none --test-runner=vitest`, com `--skip-git` e `--skip-install`.
+  Sem SSR porque o deploy na Vercel é de site estático e o MVP não precisa de
+  renderização no servidor.
+- **Nomes de arquivo:** o guia de estilo 2025 do gerador da linha 22 (`app.ts`,
+  `app.html`, `app.css`, sem o sufixo `.component`). É o padrão que a §2 deixou
+  para o setup ratificar.
+- **Formatação:** o `.prettierrc` do gerador subiu para a raiz (100 colunas,
+  aspas simples, parser `angular` no HTML), junto com o `.editorconfig`
+  (2 espaços, `end_of_line = lf`). O `eslint-config-prettier` é o último item
+  do `apps/web/eslint.config.js`.
+- **Lint:** a configuração recomendada do angular-eslint (`recommended` e
+  `stylistic` do typescript-eslint no TypeScript; `templateRecommended` e
+  `templateAccessibility` nos templates), com o prefixo `app` nos seletores.
+- **Caminhos `$schema`:** no `angular.json` e no `ngsw-config.json` apontam para
+  o `node_modules` da raiz (`../../node_modules/...`): com workspaces, não existe
+  `node_modules` em `apps/web`.
+- **Tema:** tokens com nomes em inglês (§2.2 e `design-tokens.md` 1.1.0), tema
+  `rota-fixa` como padrão e botões e campos com 48 px pelo `--size-field`.
+- **PWA:** `ng add @angular/pwa`, com o service worker registrado só fora do
+  modo de desenvolvimento; manifest com a identidade do `design-tokens.md` e três
+  ícones (192, 512 e 512 maskable) no lugar dos oito do gerador. O `dataGroup`
+  da agenda sem conexão (US17) não entra no setup: chega com a história.
+- **Proteção das branches:** o ruleset `branches protegidas` passou a exigir o
+  check `explicacao`. A proteção por API que o `/utf-setup` oferece foi recusada,
+  para manter o ruleset com 0 aprovações decidido na Atividade 03.
+- **Arquivos do gerador mantidos:** `apps/web/.gitignore` e `apps/web/.vscode/`
+  (extensões recomendadas e tarefas do VS Code).
 
 ---
 
@@ -618,6 +686,7 @@ erDiagram
 | :--- | :----- | :---------- |
 | 01/10/2026 | 1.0.0 | Versão inicial (Atividade 06): stack Angular 22+, json-server → Supabase, camada de dados, estrutura core/shared/features, rotas, glossário técnico, diagrama ER e segredos |
 | 07/10/2026 | 1.0.1 | Revisão cruzada da Entrega 1: o diagrama ER deixa de ser copiado no README e passa a morar só na §5.2 |
+| 03/11/2026 | 1.1.0 | Atividade 07: tokens com nomes em inglês e tema do DaisyUI (§2.2); decisões do setup ratificadas (§2.3) |
 
 ---
 

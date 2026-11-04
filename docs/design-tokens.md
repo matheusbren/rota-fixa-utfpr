@@ -1,8 +1,8 @@
 # 🎨 Tokens de Design
 
 **Projeto:** Rota Fixa UTFPR
-**Versão:** 1.0.0
-**Última atualização:** 29/09/2026
+**Versão:** 1.1.0
+**Última atualização:** 03/11/2026
 
 > 🤖 **Este documento existe para a IA parar de inventar um botão diferente a cada
 > tela.** Não é um design system — é o mínimo que dá à prototipagem assistida algo a
@@ -28,35 +28,52 @@
 
 ## Paleta
 
-Nome semântico, nunca `azul-2` — a cor muda, o papel dela não. No Figma, cada
-token é uma variável da coleção "Tokens Rota Fixa" (`cor/<token>`).
+Nome semântico, nunca `blue-2` — a cor muda, o papel dela não. Os nomes estão em
+inglês porque viram classe no código (`bg-primary`), e código é em inglês
+(architecture.md §2). As cores que o DaisyUI já tem um papel para recebem o nome do
+DaisyUI na classe (o tema `rota-fixa` faz a ligação); as outras viram variável no
+bloco `@theme` do `styles.css`.
 
-| Token | Valor | Onde se usa |
-| --- | --- | --- |
-| `primaria` | `#F5B800` | ação principal (Entrar, Assinar, Publicar) e faixa amarela da barra do app |
-| `primaria-hover` | `#DCA400` | ação principal com o ponteiro em cima |
-| `texto-sobre-primaria` | `#1D2226` | texto e ícone em cima da primária |
-| `fundo` | `#EDEFEA` | fundo das telas (cinza de calçada) |
-| `superficie` | `#FFFFFF` | fundo de placa, painel e campo |
-| `superficie-escura` | `#1D2226` | barra do app, menu lateral, dia em que a rota roda |
-| `superficie-escura-ativa` | `#30383E` | item ativo do menu lateral |
-| `texto` | `#1D2226` | texto padrão (asfalto) |
-| `texto-suave` | `#545B61` | legenda, apoio |
-| `texto-sobre-escuro` | `#FFFFFF` | texto sobre a superfície escura |
-| `borda` | `#CDD2CB` | contorno de placa, campo e divisória |
-| `perigo` | `#B3261E` | erro, falta, cancelar e encerrar |
-| `perigo-hover` | `#921F18` | botão de perigo com o ponteiro em cima |
-| `perigo-suave` | `#FBE9E7` | fundo de aviso de falta ou erro |
-| `sucesso` | `#1B6E43` | confirmação, vaga garantida |
-| `sucesso-suave` | `#E3F1E8` | fundo de aviso de sucesso |
-| `desabilitado` | `#DCDFDA` | fundo de controle inativo |
-| `texto-desabilitado` | `#80867F` | texto de controle inativo |
-| `foco` | `#1D2226` | anel de foco do teclado |
+| Token | Valor | Classe no código | Onde se usa |
+| --- | --- | --- | --- |
+| `primary` | `#F5B800` | `bg-primary`, `btn-primary` (DaisyUI `primary`) | ação principal (Entrar, Assinar, Publicar) e faixa amarela da barra do app |
+| `primary-hover` | `#DCA400` | `bg-primary-hover` | ação principal com o ponteiro em cima |
+| `text-on-primary` | `#1D2226` | `text-primary-content` (DaisyUI `primary-content`) | texto e ícone em cima da primária |
+| `background` | `#EDEFEA` | `bg-base-200` (DaisyUI `base-200`) | fundo das telas (cinza de calçada) |
+| `surface` | `#FFFFFF` | `bg-base-100` (DaisyUI `base-100`) | fundo de placa, painel e campo |
+| `surface-dark` | `#1D2226` | `bg-neutral` (DaisyUI `neutral`) | barra do app, menu lateral, dia em que a rota roda |
+| `surface-dark-active` | `#30383E` | `bg-surface-dark-active` | item ativo do menu lateral |
+| `text` | `#1D2226` | `text-base-content` (DaisyUI `base-content`) | texto padrão (asfalto) |
+| `text-muted` | `#545B61` | `text-text-muted` | legenda, apoio |
+| `text-on-dark` | `#FFFFFF` | `text-neutral-content` (DaisyUI `neutral-content`) | texto sobre a superfície escura |
+| `border` | `#CDD2CB` | `border-base-300` (DaisyUI `base-300`) | contorno de placa, campo e divisória |
+| `danger` | `#B3261E` | `bg-error`, `btn-error` (DaisyUI `error`) | erro, falta, cancelar e encerrar |
+| `danger-hover` | `#921F18` | `bg-danger-hover` | botão de perigo com o ponteiro em cima |
+| `danger-soft` | `#FBE9E7` | `bg-danger-soft` | fundo de aviso de falta ou erro |
+| `success` | `#1B6E43` | `bg-success` (DaisyUI `success`) | confirmação, vaga garantida |
+| `success-soft` | `#E3F1E8` | `bg-success-soft` | fundo de aviso de sucesso |
+| `disabled` | `#DCDFDA` | `bg-disabled` | fundo de controle inativo |
+| `text-disabled` | `#80867F` | `text-text-disabled` | texto de controle inativo |
+| `focus` | `#1D2226` | `ring-focus`, `outline-focus` | anel de foco do teclado |
 
-Contraste (WCAG) dos pares usados em texto: `texto` sobre `fundo` 13,9:1;
-`texto-suave` sobre `fundo` 6,0:1; `texto-sobre-primaria` sobre `primaria` 9,0:1;
-branco sobre `perigo` 6,5:1; branco sobre `sucesso` 6,3:1; `perigo` sobre
-`perigo-suave` 5,6:1; `sucesso` sobre `sucesso-suave` 5,4:1. Todos passam AA.
+O texto sobre `danger` e sobre `success` é branco (`#FFFFFF`): no tema, `error-content`
+e `success-content`.
+
+No Figma, as variáveis da coleção "Tokens Rota Fixa" mantêm os nomes da versão
+1.0.0, em português (`cor/<nome>`). A correspondência: `primaria` → `primary`,
+`primaria-hover` → `primary-hover`, `texto-sobre-primaria` → `text-on-primary`,
+`fundo` → `background`, `superficie` → `surface`, `superficie-escura` →
+`surface-dark`, `superficie-escura-ativa` → `surface-dark-active`, `texto` → `text`,
+`texto-suave` → `text-muted`, `texto-sobre-escuro` → `text-on-dark`, `borda` →
+`border`, `perigo` → `danger`, `perigo-hover` → `danger-hover`, `perigo-suave` →
+`danger-soft`, `sucesso` → `success`, `sucesso-suave` → `success-soft`,
+`desabilitado` → `disabled`, `texto-desabilitado` → `text-disabled`, `foco` →
+`focus`.
+
+Contraste (WCAG) dos pares usados em texto: `text` sobre `background` 13,9:1;
+`text-muted` sobre `background` 6,0:1; `text-on-primary` sobre `primary` 9,0:1;
+branco sobre `danger` 6,5:1; branco sobre `success` 6,3:1; `danger` sobre
+`danger-soft` 5,6:1; `success` sobre `success-soft` 5,4:1. Todos passam AA.
 O par desabilitado fica abaixo de propósito: controle inativo não entra na regra.
 
 ## Escala de espaçamento
@@ -79,45 +96,49 @@ lista e entre campos de um formulário; alvo de toque nunca menor que 44 px
 
 ### Raios
 
-| Token | Valor | Onde se usa |
-| --- | --- | --- |
-| `raio-sm` | 4 px | dia na faixa de dias, etiqueta |
-| `raio-md` | 8 px | botão, campo, aviso |
-| `raio-lg` | 12 px | placa de horário, painel, folha e modal |
-| `raio-pilula` | 999 px | indicador de vaga, avatar |
+| Token | Valor | Classe no código | Onde se usa |
+| --- | --- | --- | --- |
+| `radius-sm` | 4 px | `rounded-sm`; no tema, `--radius-selector` | dia na faixa de dias, etiqueta |
+| `radius-md` | 8 px | `rounded-md`; no tema, `--radius-field` | botão, campo, aviso |
+| `radius-lg` | 12 px | `rounded-lg`; no tema, `--radius-box` | placa de horário, painel, folha e modal |
+| `radius-full` | 999 px | `rounded-full` | indicador de vaga, avatar |
 
-Sem sombra: a separação entre superfícies vem da borda de 1 px (`borda`).
+Sem sombra: a separação entre superfícies vem da borda de 1 px (`border`).
 
 ## Tipografia
 
 Família única: **Overpass** (Google Fonts). Horários sempre com algarismos
 tabulares (`tabular-nums`). Ícones: Material Symbols Rounded.
 
-| Token | Família · tamanho · peso | Papel |
-| --- | --- | --- |
-| `display` | Overpass · 56/60 · 900 (Black) | horário em destaque no detalhe da rota, marca na tela de entrada |
-| `horario` | Overpass · 40/44 · 900 (Black) | horário de saída na placa |
-| `titulo-1` | Overpass · 28/34 · 800 (ExtraBold) | título da tela |
-| `titulo-2` | Overpass · 20/26 · 800 (ExtraBold) | seção, cabeçalho de dia |
-| `texto` | Overpass · 16/24 · 400 (Regular) | texto corrido |
-| `texto-forte` | Overpass · 16/24 · 600 (SemiBold) | informação principal de uma linha (lugar, nome) |
-| `rotulo` | Overpass · 14/20 · 600 (SemiBold) | rótulo de campo, faixa de dias, etiqueta |
-| `legenda` | Overpass · 13/18 · 400 (Regular) | apoio, ajuda de campo |
-| `aba` | Overpass · 12/16 · 600 (SemiBold) | rótulo da barra de abas no celular |
-| `botao` | Overpass · 16/20 · 700 (Bold) | texto de botão |
+| Token | Família · tamanho · peso | Classe no código | Papel |
+| --- | --- | --- | --- |
+| `display` | Overpass · 56/60 · 900 (Black) | `text-display` | horário em destaque no detalhe da rota, marca na tela de entrada |
+| `time` | Overpass · 40/44 · 900 (Black) | `text-time` | horário de saída na placa |
+| `title-1` | Overpass · 28/34 · 800 (ExtraBold) | `text-title-1` | título da tela |
+| `title-2` | Overpass · 20/26 · 800 (ExtraBold) | `text-title-2` | seção, cabeçalho de dia |
+| `body` | Overpass · 16/24 · 400 (Regular) | `text-body` | texto corrido |
+| `body-strong` | Overpass · 16/24 · 600 (SemiBold) | `text-body-strong` | informação principal de uma linha (lugar, nome) |
+| `label` | Overpass · 14/20 · 600 (SemiBold) | `text-label` | rótulo de campo, faixa de dias, etiqueta |
+| `caption` | Overpass · 13/18 · 400 (Regular) | `text-caption` | apoio, ajuda de campo |
+| `tab` | Overpass · 12/16 · 600 (SemiBold) | `text-tab` | rótulo da barra de abas no celular |
+| `button` | Overpass · 16/20 · 700 (Bold) | `text-button` | texto de botão |
+
+Nomes anteriores (versão 1.0.0): `horario` → `time`, `titulo-1` → `title-1`,
+`titulo-2` → `title-2`, `texto` → `body`, `texto-forte` → `body-strong`, `rotulo` →
+`label`, `legenda` → `caption`, `aba` → `tab`, `botao` → `button`.
 
 ## Estados de botão
 
 Quatro tipos: **primária** (amarela, texto asfalto), **secundária** (branca, borda
-de 2 px em `texto`), **perigo** (vermelha, texto branco) e **texto** (sublinhado,
-sem fundo). Altura 48 px, `raio-md`, texto no token `botao`.
+de 2 px em `text`), **perigo** (vermelha, texto branco) e **texto** (sublinhado,
+sem fundo). Altura 48 px, `radius-md`, texto no token `button`.
 
 | Estado | Aparência |
 | --- | --- |
 | normal | cores do tipo, como acima |
-| hover | primária vai para `primaria-hover`; secundária e texto ganham fundo `fundo`; perigo vai para `perigo-hover` |
-| foco (teclado) | anel de 3 px na cor `foco`, afastado 2 px do botão; sobre superfície escura o anel é `primaria`. O contorno nunca é removido sem o anel no lugar |
-| desabilitado | fundo `desabilitado`, texto `texto-desabilitado`, sem hover; o motivo aparece em texto perto do botão (ex.: "Liberar a vaga precisa de conexão.") |
+| hover | primária vai para `primary-hover`; secundária e texto ganham fundo `background`; perigo vai para `danger-hover` |
+| foco (teclado) | anel de 3 px na cor `focus`, afastado 2 px do botão; sobre superfície escura o anel é `primary`. O contorno nunca é removido sem o anel no lugar |
+| desabilitado | fundo `disabled`, texto `text-disabled`, sem hover; o motivo aparece em texto perto do botão (ex.: "Liberar a vaga precisa de conexão.") |
 | carregando | mantém a largura, mostra o ícone girando e o verbo no gerúndio ("Assinando…", "Publicando…") e bloqueia um segundo clique |
 
 ## Breakpoints (Mobile-First)
@@ -141,8 +162,8 @@ Os valores abaixo alimentam o `manifest.webmanifest` no `/utf-setup` (ID3).
 | --- | --- |
 | Nome (`name`) | Rota Fixa UTFPR |
 | Nome curto (`short_name`) | Rota Fixa |
-| Cor de tema (`theme_color`) | `#1D2226` (`superficie-escura`, a cor da barra do app) |
-| Cor de fundo (`background_color`) | `#EDEFEA` (`fundo`, a cor da tela de abertura) |
+| Cor de tema (`theme_color`) | `#1D2226` (`surface-dark`, a cor da barra do app) |
+| Cor de fundo (`background_color`) | `#EDEFEA` (`background`, a cor da tela de abertura) |
 | Ícone | placa amarela (`#F5B800`) com o trajeto em asfalto: ponto vazado (bairro), linha e ponto cheio (campus). Tamanhos 192 px, 512 px e 512 px maskable, com o desenho dentro da zona segura de 80% |
 | Modo de exibição (`display`) | `standalone` |
 | Orientação (`orientation`) | `portrait` |

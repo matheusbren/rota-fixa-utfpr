@@ -1,0 +1,30 @@
+{
+  "name": "Rota Fixa UTFPR",
+  "short_name": "Rota Fixa",
+  "theme_color": "#1D2226",
+  "background_color": "#EDEFEA",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "./",
+  "start_url": "/agenda",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512x512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
