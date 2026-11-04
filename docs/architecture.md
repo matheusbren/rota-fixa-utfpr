@@ -152,33 +152,53 @@
 > DaisyUI. No Tailwind 4, o antigo `tailwind.config.js` virou o bloco `@theme` do
 > CSS global: cada token abaixo vira uma variável ali.
 
-**Cores principais da marca**
+**Onde cada token mora.** O DaisyUI tem um mecanismo próprio de tema, então as
+cores que ele já tem um papel para entram no bloco `@plugin "daisyui/theme"` (tema
+`rota-fixa`) com o nome do DaisyUI; as que ele não tem viram variável no bloco
+`@theme` do Tailwind. Nenhuma cor é declarada nos dois lugares. Os nomes estão em
+inglês porque viram classe (`bg-primary`); a tabela completa, com o nome antigo do
+Figma, está no `design-tokens.md`.
+
+**Cores no tema do DaisyUI (`rota-fixa`)**
+
+| Token | Hex | Variável do tema | Classe de exemplo |
+| :---- | :-- | :--------------- | :---------------- |
+| `primary` | `#F5B800` | `--color-primary` | `btn-primary`, `bg-primary` |
+| `text-on-primary` | `#1D2226` | `--color-primary-content` | `text-primary-content` |
+| `surface` | `#FFFFFF` | `--color-base-100` | `bg-base-100` |
+| `background` | `#EDEFEA` | `--color-base-200` | `bg-base-200` |
+| `border` | `#CDD2CB` | `--color-base-300` | `border-base-300` |
+| `text` | `#1D2226` | `--color-base-content` | `text-base-content` |
+| `surface-dark` | `#1D2226` | `--color-neutral` | `bg-neutral` |
+| `text-on-dark` | `#FFFFFF` | `--color-neutral-content` | `text-neutral-content` |
+| `danger` | `#B3261E` | `--color-error` (texto branco em `--color-error-content`) | `btn-error`, `bg-error` |
+| `success` | `#1B6E43` | `--color-success` (texto branco em `--color-success-content`) | `bg-success` |
+
+Raio de caixa 12 px (`--radius-box`), de botão e campo 8 px (`--radius-field`) e de
+etiqueta 4 px (`--radius-selector`); borda de 1 px e `--depth: 0` (sem sombra).
+
+**Cores no `@theme` (o DaisyUI não tem papel para elas)**
 
 | Token | Hex | Variável no `@theme` | Classe de exemplo |
 | :---- | :-- | :------------------- | :---------------- |
-| `primaria` | `#F5B800` | `--color-primaria` | `bg-primaria` |
-| `texto-sobre-primaria` | `#1D2226` | `--color-texto-sobre-primaria` | `text-texto-sobre-primaria` |
-| `fundo` | `#EDEFEA` | `--color-fundo` | `bg-fundo` |
-| `superficie` | `#FFFFFF` | `--color-superficie` | `bg-superficie` |
-| `superficie-escura` | `#1D2226` | `--color-superficie-escura` | `bg-superficie-escura` |
-| `texto` | `#1D2226` | `--color-texto` | `text-texto` |
-| `texto-suave` | `#545B61` | `--color-texto-suave` | `text-texto-suave` |
-| `borda` | `#CDD2CB` | `--color-borda` | `border-borda` |
-| `perigo` | `#B3261E` | `--color-perigo` | `bg-perigo` |
-| `sucesso` | `#1B6E43` | `--color-sucesso` | `text-sucesso` |
+| `primary-hover` | `#DCA400` | `--color-primary-hover` | `hover:bg-primary-hover` |
+| `surface-dark-active` | `#30383E` | `--color-surface-dark-active` | `bg-surface-dark-active` |
+| `text-muted` | `#545B61` | `--color-text-muted` | `text-text-muted` |
+| `danger-hover` | `#921F18` | `--color-danger-hover` | `hover:bg-danger-hover` |
+| `danger-soft` | `#FBE9E7` | `--color-danger-soft` | `bg-danger-soft` |
+| `success-soft` | `#E3F1E8` | `--color-success-soft` | `bg-success-soft` |
+| `disabled` | `#DCDFDA` | `--color-disabled` | `bg-disabled` |
+| `text-disabled` | `#80867F` | `--color-text-disabled` | `text-text-disabled` |
+| `focus` | `#1D2226` | `--color-focus` | `ring-focus` |
 
-**Famílias de fontes**
+**Fonte, tipografia e raios no `@theme`**
 
-| Papel | Família | Variável no `@theme` |
-| :---- | :------ | :------------------- |
-| Toda a interface: títulos, horários, texto e botões | Overpass, pesos 400, 600, 700, 800 e 900 | `--font-sans` |
-| Ícones | Material Symbols Rounded | fonte de ícones, carregada à parte |
-
-**Tema do DaisyUI (`rota-fixa`):** `primary` = `primaria`, `primary-content` =
-`texto-sobre-primaria`, `base-100` = `superficie`, `base-200` = `fundo`,
-`base-content` = `texto`, `neutral` = `superficie-escura`, `error` = `perigo`,
-`success` = `sucesso`; raio de botão e campo 8 px (`--radius-field`) e de caixa
-12 px (`--radius-box`).
+| Papel | Valor | Variável no `@theme` |
+| :---- | :---- | :------------------- |
+| Toda a interface: títulos, horários, texto e botões | Overpass, pesos 400, 600, 700, 800 e 900 (Google Fonts, no `index.html`) | `--font-sans` |
+| Ícones | Material Symbols Rounded (Google Fonts, no `index.html`) | fonte de ícones, sem variável |
+| Escala de texto | `display`, `time`, `title-1`, `title-2`, `body`, `body-strong`, `label`, `caption`, `tab`, `button` (tamanhos no `design-tokens.md`) | `--text-<token>`, com `--line-height` e `--font-weight` |
+| Raios | `radius-sm` 4 px, `radius-md` 8 px, `radius-lg` 12 px | `--radius-sm`, `--radius-md`, `--radius-lg` (`rounded-full` já é do Tailwind) |
 
 **Breakpoints:** os padrões do Tailwind (`sm` 640, `md` 768, `lg` 1024 e `xl`
 1280 px), sem configuração extra.
