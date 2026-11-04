@@ -1,8 +1,8 @@
 # 🛠️ Architecture / SSD
 
 **Projeto:** Rota Fixa UTFPR
-**Versão:** 1.0.1
-**Última atualização:** 07/10/2026
+**Versão:** 1.1.0
+**Última atualização:** 03/11/2026
 
 > 🤖 **O `prd.md` responde _o quê_ o produto faz. Este responde _onde as coisas
 > moram e como se chamam_.** Detalhe de tela — rota, componente, contrato —
@@ -202,6 +202,54 @@ etiqueta 4 px (`--radius-selector`); borda de 1 px e `--depth: 0` (sem sombra).
 
 **Breakpoints:** os padrões do Tailwind (`sm` 640, `md` 768, `lg` 1024 e `xl`
 1280 px), sem configuração extra.
+
+### 🧾 2.3. O que o setup decidiu (Atividade 07)
+
+> O `/utf-setup` gerou o app a partir deste documento. O que o documento não
+> dizia, o setup decidiu, e a equipe ratificou aqui, na mesma branch do PR de
+> manutenção. O `package-lock.json` guarda a versão exata de cada pacote; esta
+> tabela registra a linha que vale para o semestre.
+
+| Ferramenta | Versão | Observação |
+| :--------- | :----- | :--------- |
+| Angular (core, router, forms, service-worker) | 22.2 | standalone e zoneless, como a §2 pede |
+| Angular CLI e `@angular/build` | 22.2 | o `@angular/build` é quem compila, serve e roda os testes |
+| TypeScript | 6.0 | o modo `strict` já vem ligado nesta linha |
+| Vitest + jsdom | 5.1 + 30.1 | o jsdom é o navegador simulado em que os testes rodam, no terminal |
+| Tailwind CSS + `@tailwindcss/postcss` | 4.3 | entra pelo PostCSS (`apps/web/.postcssrc.json`), como o `ng new --style=tailwind` gera |
+| DaisyUI | 5.7 | com `themes: false`: só o tema `rota-fixa` existe, inclusive no modo escuro do aparelho |
+| json-server | 1.0.0-beta.15 | a linha 1 da §2; instalado na raiz, onde está o `db.json` |
+| ESLint + angular-eslint + typescript-eslint | 10.14 + 22.6 + 8.72.1 | o typescript-eslint fica na mesma versão que o angular-eslint usa; os dois sobem juntos, senão nasce um `node_modules` dentro de `apps/web` |
+| Prettier + eslint-config-prettier | 3.9 + 10.1 | na raiz, valendo para o repositório inteiro |
+
+- **Opções do `ng new`:** `--style=tailwind --routing --ssr=false --zoneless
+  --ai-config=none --test-runner=vitest`, com `--skip-git` e `--skip-install`.
+  Sem SSR porque o deploy na Vercel é de site estático e o MVP não precisa de
+  renderização no servidor.
+- **Nomes de arquivo:** o guia de estilo 2025 do gerador da linha 22 (`app.ts`,
+  `app.html`, `app.css`, sem o sufixo `.component`). É o padrão que a §2 deixou
+  para o setup ratificar.
+- **Formatação:** o `.prettierrc` do gerador subiu para a raiz (100 colunas,
+  aspas simples, parser `angular` no HTML), junto com o `.editorconfig`
+  (2 espaços, `end_of_line = lf`). O `eslint-config-prettier` é o último item
+  do `apps/web/eslint.config.js`.
+- **Lint:** a configuração recomendada do angular-eslint (`recommended` e
+  `stylistic` do typescript-eslint no TypeScript; `templateRecommended` e
+  `templateAccessibility` nos templates), com o prefixo `app` nos seletores.
+- **Caminhos `$schema`:** no `angular.json` e no `ngsw-config.json` apontam para
+  o `node_modules` da raiz (`../../node_modules/...`): com workspaces, não existe
+  `node_modules` em `apps/web`.
+- **Tema:** tokens com nomes em inglês (§2.2 e `design-tokens.md` 1.1.0), tema
+  `rota-fixa` como padrão e botões e campos com 48 px pelo `--size-field`.
+- **PWA:** `ng add @angular/pwa`, com o service worker registrado só fora do
+  modo de desenvolvimento; manifest com a identidade do `design-tokens.md` e três
+  ícones (192, 512 e 512 maskable) no lugar dos oito do gerador. O `dataGroup`
+  da agenda sem conexão (US17) não entra no setup: chega com a história.
+- **Proteção das branches:** o ruleset `branches protegidas` passou a exigir o
+  check `explicacao`. A proteção por API que o `/utf-setup` oferece foi recusada,
+  para manter o ruleset com 0 aprovações decidido na Atividade 03.
+- **Arquivos do gerador mantidos:** `apps/web/.gitignore` e `apps/web/.vscode/`
+  (extensões recomendadas e tarefas do VS Code).
 
 ---
 
@@ -638,6 +686,7 @@ erDiagram
 | :--- | :----- | :---------- |
 | 01/10/2026 | 1.0.0 | Versão inicial (Atividade 06): stack Angular 22+, json-server → Supabase, camada de dados, estrutura core/shared/features, rotas, glossário técnico, diagrama ER e segredos |
 | 07/10/2026 | 1.0.1 | Revisão cruzada da Entrega 1: o diagrama ER deixa de ser copiado no README e passa a morar só na §5.2 |
+| 03/11/2026 | 1.1.0 | Atividade 07: tokens com nomes em inglês e tema do DaisyUI (§2.2); decisões do setup ratificadas (§2.3) |
 
 ---
 
