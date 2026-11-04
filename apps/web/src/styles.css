@@ -1,4 +1,89 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
-@plugin "daisyui";
+@plugin "daisyui" {
+  /* Sem os temas prontos (light/dark): só o rota-fixa vale, inclusive no modo escuro do aparelho. */
+  themes: false;
+}
+
+/*
+ * Tema rota-fixa — transcrito do docs/design-tokens.md (architecture.md §2.2).
+ * As cores que o DaisyUI tem papel para ficam aqui; as outras, no @theme abaixo.
+ * Nenhum valor é inventado: cada linha tem o token de origem no comentário.
+ */
+@plugin "daisyui/theme" {
+  name: 'rota-fixa';
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-primary: #f5b800; /* primary */
+  --color-primary-content: #1d2226; /* text-on-primary */
+  --color-base-100: #ffffff; /* surface */
+  --color-base-200: #edefea; /* background */
+  --color-base-300: #cdd2cb; /* border */
+  --color-base-content: #1d2226; /* text */
+  --color-neutral: #1d2226; /* surface-dark */
+  --color-neutral-content: #ffffff; /* text-on-dark */
+  --color-error: #b3261e; /* danger */
+  --color-error-content: #ffffff; /* texto branco sobre danger */
+  --color-success: #1b6e43; /* success */
+  --color-success-content: #ffffff; /* texto branco sobre success */
+
+  --radius-selector: 0.25rem; /* radius-sm: etiqueta, dia da faixa */
+  --radius-field: 0.5rem; /* radius-md: botão e campo */
+  --radius-box: 0.75rem; /* radius-lg: placa, painel e modal */
+  --size-field: 0.3rem; /* botões e campos com 48 px de altura */
+  --border: 1px;
+  --depth: 0; /* sem sombra */
+  --noise: 0;
+}
+
+@theme {
+  --font-sans: 'Overpass', ui-sans-serif, system-ui, sans-serif;
+
+  --color-primary-hover: #dca400;
+  --color-surface-dark-active: #30383e;
+  --color-text-muted: #545b61;
+  --color-danger-hover: #921f18;
+  --color-danger-soft: #fbe9e7;
+  --color-success-soft: #e3f1e8;
+  --color-disabled: #dcdfda;
+  --color-text-disabled: #80867f;
+  --color-focus: #1d2226;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  --text-display: 3.5rem;
+  --text-display--line-height: 3.75rem;
+  --text-display--font-weight: 900;
+  --text-time: 2.5rem;
+  --text-time--line-height: 2.75rem;
+  --text-time--font-weight: 900;
+  --text-title-1: 1.75rem;
+  --text-title-1--line-height: 2.125rem;
+  --text-title-1--font-weight: 800;
+  --text-title-2: 1.25rem;
+  --text-title-2--line-height: 1.625rem;
+  --text-title-2--font-weight: 800;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  --text-body--font-weight: 400;
+  --text-body-strong: 1rem;
+  --text-body-strong--line-height: 1.5rem;
+  --text-body-strong--font-weight: 600;
+  --text-label: 0.875rem;
+  --text-label--line-height: 1.25rem;
+  --text-label--font-weight: 600;
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.125rem;
+  --text-caption--font-weight: 400;
+  --text-tab: 0.75rem;
+  --text-tab--line-height: 1rem;
+  --text-tab--font-weight: 600;
+  --text-button: 1rem;
+  --text-button--line-height: 1.25rem;
+  --text-button--font-weight: 700;
+}
