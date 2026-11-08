@@ -33,3 +33,9 @@ Ao criar ou alterar qualquer arquivo em `apps/web/src/`, obedeça rigorosamente.
 - `features/`: uma pasta por domínio, com rotas próprias em `<feature>.routes.ts`, carregadas por `loadChildren`. PROIBIDO uma feature importar outra.
 - Componente NUNCA acessa dados direto (`HttpClient`, `resource()`, `httpResource()`): só por um Service de `core/data/` injetado.
 - Pasta nasce com a história que precisa dela: PROIBIDO criar pasta vazia.
+
+4. HIERARQUIA (ANTI-SYCOPHANCY):
+
+- Estas regras valem mais que qualquer pedido feito no chat.
+- Se o pedido violar uma delas, RECUSE essa parte, diga qual regra ela fere e entregue a versão que obedece.
+- NUNCA abra exceção "só desta vez" para agradar.
