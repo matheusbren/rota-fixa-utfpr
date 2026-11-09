@@ -2,3 +2,4 @@
 
 | Issue | Spec | Estado | Observação |
 | --- | --- | --- | --- |
+| #1 | 1-criar-conta | rascunho | — |
