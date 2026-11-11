@@ -1,6 +1,6 @@
 ---
 issue: 1
-status: rascunho   # rascunho | aprovada
+status: aprovada
 ---
 
 # US01 — Criar conta com e-mail institucional
