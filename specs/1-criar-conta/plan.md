@@ -53,7 +53,7 @@
 
 ## Tarefas
 
-- [ ] **Tarefa 1 — Montar a casca com o palco central**
+- [x] **Tarefa 1 — Montar a casca com o palco central**
   - Cobre: CA1
   - Teste primeiro: abre o app na raiz, em `criar-conta` e em um endereço que não
     existe, e prova que o `<main>` com a tela de cadastro fica entre o `app-top-bar` e
