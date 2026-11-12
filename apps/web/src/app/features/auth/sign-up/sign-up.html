@@ -1,1 +1,47 @@
 <h1 class="text-title-1">Criar conta</h1>
+
+@if (result() === 'created') {
+  <app-banner>
+    <p class="text-body-strong">Conta criada.</p>
+    <p>
+      Agora falta verificar o e-mail: abra o link de verificação que enviamos para o seu e-mail da
+      UTFPR.
+    </p>
+  </app-banner>
+} @else {
+  <form class="flex flex-col gap-3" [formGroup]="form" (ngSubmit)="submit()">
+    <app-form-field label="Nome completo" controlId="sign-up-full-name">
+      <input
+        id="sign-up-full-name"
+        class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+        type="text"
+        autocomplete="name"
+        formControlName="fullName"
+      />
+    </app-form-field>
+    <app-form-field label="E-mail institucional" controlId="sign-up-email">
+      <input
+        id="sign-up-email"
+        class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+        type="email"
+        autocomplete="email"
+        formControlName="email"
+      />
+    </app-form-field>
+    <app-form-field label="Senha" controlId="sign-up-password">
+      <input
+        id="sign-up-password"
+        class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+        type="password"
+        autocomplete="new-password"
+        formControlName="password"
+      />
+    </app-form-field>
+    <button
+      type="submit"
+      class="btn btn-primary mt-3 w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+    >
+      Criar conta
+    </button>
+  </form>
+}

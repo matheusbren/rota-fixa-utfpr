@@ -70,7 +70,7 @@
   - Arquivos previstos: `core/layout/app-shell/`, `core/layout/side-nav/`,
     `core/layout/top-bar/`
 
-- [ ] **Tarefa 3 — Criar a conta pendente**
+- [x] **Tarefa 3 — Criar a conta pendente**
   - Cobre: CA3
   - Teste primeiro: preenche nome, e-mail e senha válidos, confirma e prova, com o
     `HttpTestingController`, que sai um `POST /users` com o e-mail normalizado,
@@ -79,6 +79,9 @@
   - Arquivos previstos: `core/models/user.ts`, `core/data/users.service.ts`,
     `core/auth/auth.service.ts`, `features/auth/sign-up/`, `shared/ui/form-field/`,
     `shared/ui/banner/`, `db.json`
+  - Entraram também, autorizados pela equipe antes da implementação: `src/environments/`
+    com a troca no `angular.json` (o §5.3 manda ler `environment.apiUrl`) e
+    `provideHttpClient()` no `app.config.ts` (§3). O plano não os tinha previsto.
 
 - [ ] **Tarefa 4 — Recusar e-mail fora do domínio**
   - Cobre: CA4

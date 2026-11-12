@@ -1,0 +1,14 @@
+# Decisões — Tarefa 3, rodada 1
+
+Os dois pareceres vieram APROVADO, sem apontamento bloqueante. As seis sugestões do
+revisor de código foram triadas: uma foi promovida a apontamento aceito, e as outras cinco
+ficaram de fora, com o motivo abaixo.
+
+| # | Apontamento (resumo) | Parecer | Decisão | Justificativa |
+| --- | --- | --- | --- | --- |
+| 1 | Na Tarefa 9, o erro do `POST` precisa virar resultado dentro do `signUp` (Observable interno do `exhaustMap`), senão o fluxo da tela morre e "confirmar de novo" não funciona | código (sugestão) | recusado nesta tarefa | É o CA9, que pertence à Tarefa 9. A orientação vai para quem implementa a Tarefa 9, sem antecipar código aqui (constituição §3, uma tarefa por vez) |
+| 2 | O `authInterceptor` do §2.1 não nasceu junto com o `provideHttpClient()` | código (sugestão) | recusado | O próprio §2.1 diz que "na E2 não acrescenta nada": criar agora seria uma indireção sem ganho, que o revisor de código também reprova. A ratificação vai no fechamento: o `architecture.md` passa a dizer que o `authInterceptor` nasce com o Supabase (E3) |
+| 3 | Depois de confirmar, o `@else` destrói o botão focado e o foco cai no `<body>`; a região `role="status"` nasce junto com o texto e pode não ser anunciada | código (sugestão) | recusado nesta tarefa | O aviso e o formulário ainda mudam nas Tarefas 6 a 9 (CA6, CA7 e CA9 mostram outros avisos, e no CA9 o formulário fica na tela). Decidir foco e região viva agora seria refazer depois. Fica com a candidata a Issue de foco da casca (decisão 2 da Tarefa 2) e com a conferência no navegador |
+| 4 | O teste diz provar o "e-mail normalizado", mas não prova o `trim()`: com `type="email"`, o próprio `<input>` tira os espaços antes de o valor chegar ao Angular, e apagar o `.trim()` deixa o teste verde | código (sugestão) | aceito (promovido a apontamento) | O texto da tarefa promete "o e-mail normalizado", e o teste só prova as minúsculas. A busca de e-mail repetido da Tarefa 6 depende de a conta ser gravada sem espaços, então essa parte da regra precisa de prova própria |
+| 5 | O validador da Tarefa 4 vai precisar da mesma normalização: exportá-la de `shared/validators/` e importar no `AuthService`, para a regra não existir em dois lugares | código (sugestão) | recusado nesta tarefa | O validador nasce na Tarefa 4, e mover a função agora seria antecipar o arquivo dela. A orientação vai para quem implementa a Tarefa 4 |
+| 6 | O `fullName` não tem validador, e nenhuma tarefa do plano o cria: uma conta com nome vazio pode ser gravada | código (sugestão) | recusado | Nenhum critério da spec aprovada exige o nome preenchido, e a spec está fechada. A constituição §3 manda abrir Issue nova em vez de inchar a spec no meio da história: fica registrado como candidata a Issue ("cadastro aceita nome vazio") |
