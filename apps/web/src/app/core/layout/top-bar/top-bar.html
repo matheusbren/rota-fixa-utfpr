@@ -1,3 +1,13 @@
-<header class="border-b-4 border-primary bg-neutral p-4 text-neutral-content">
+<header
+  class="flex items-center gap-2 border-b-4 border-primary bg-neutral p-4 text-neutral-content"
+>
+  <button
+    type="button"
+    class="btn btn-square btn-neutral focus-visible:outline-3 focus-visible:outline-primary lg:hidden"
+    aria-label="Abrir menu"
+    (click)="menuOpen.emit()"
+  >
+    <span class="material-symbols-rounded" aria-hidden="true">menu</span>
+  </button>
   <p class="text-title-2">Rota Fixa UTFPR</p>
 </header>

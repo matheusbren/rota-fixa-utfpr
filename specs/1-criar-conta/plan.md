@@ -62,7 +62,7 @@
     `core/layout/footer/`, `features/auth/sign-up/` (só o título da tela),
     `features/auth/auth.routes.ts`, `app.routes.ts`, `app.html`, `app.spec.ts`
 
-- [ ] **Tarefa 2 — Abrir e fechar a gaveta no celular**
+- [x] **Tarefa 2 — Abrir e fechar a gaveta no celular**
   - Cobre: CA2
   - Teste primeiro: prova que tocar no ☰ abre a gaveta com o link "Criar conta", que
     tocar no link fecha a gaveta e mostra o cadastro, e que tocar no overlay fecha sem
