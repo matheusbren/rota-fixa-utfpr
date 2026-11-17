@@ -19,6 +19,7 @@
         formControlName="fullName"
       />
     </app-form-field>
+    @let emailError = errorOf(form.controls.email);
     <app-form-field label="E-mail institucional" controlId="sign-up-email">
       <input
         id="sign-up-email"
@@ -26,7 +27,12 @@
         type="email"
         autocomplete="email"
         formControlName="email"
+        [attr.aria-invalid]="emailError ? true : null"
+        [attr.aria-describedby]="emailError ? 'sign-up-email-error' : null"
       />
+      @if (emailError) {
+        <p id="sign-up-email-error" class="text-caption text-error">{{ emailError }}</p>
+      }
     </app-form-field>
     <app-form-field label="Senha" controlId="sign-up-password">
       <input
@@ -39,7 +45,8 @@
     </app-form-field>
     <button
       type="submit"
-      class="btn btn-primary mt-3 w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      class="btn btn-primary mt-3 w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:bg-disabled disabled:text-text-disabled"
+      [disabled]="form.invalid"
     >
       Criar conta
     </button>

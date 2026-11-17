@@ -83,7 +83,7 @@
     com a troca no `angular.json` (o §5.3 manda ler `environment.apiUrl`) e
     `provideHttpClient()` no `app.config.ts` (§3). O plano não os tinha previsto.
 
-- [ ] **Tarefa 4 — Recusar e-mail fora do domínio**
+- [x] **Tarefa 4 — Recusar e-mail fora do domínio**
   - Cobre: CA4
   - Teste primeiro: prova que `ana@gmail.com` e `ana@utfpr.edu.br.exemplo.com` mostram
     "Use o seu e-mail da UTFPR", desabilitam o botão e não geram requisição, e que

@@ -1,5 +1,6 @@
 import { Service, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
+import { normalizeEmail } from '../../shared/validators/institutional-email';
 import { UsersService } from '../data/users.service';
 
 export interface SignUpData {
@@ -9,11 +10,6 @@ export interface SignUpData {
 }
 
 export type SignUpResult = 'created';
-
-// Maiúsculas e espaços nas pontas não distinguem um e-mail de outro.
-function normalizeEmail(email: string): string {
-  return email.trim().toLowerCase();
-}
 
 @Service()
 export class AuthService {

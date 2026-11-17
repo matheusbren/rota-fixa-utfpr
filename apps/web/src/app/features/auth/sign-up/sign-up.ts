@@ -1,10 +1,16 @@
 import { Component, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { exhaustMap, filter } from 'rxjs';
 import { AuthService, SignUpData } from '../../../core/auth/auth.service';
 import { Banner } from '../../../shared/ui/banner/banner';
 import { FormField } from '../../../shared/ui/form-field/form-field';
+import { institutionalEmail } from '../../../shared/validators/institutional-email';
+
+// O texto de cada erro de validação, pela chave que o validador devolve.
+const ERROR_MESSAGES: Record<string, string> = {
+  institutionalEmail: 'Use o seu e-mail da UTFPR',
+};
 
 @Component({
   selector: 'app-sign-up',
@@ -17,7 +23,7 @@ export class SignUp {
 
   protected readonly form = inject(FormBuilder).nonNullable.group({
     fullName: '',
-    email: '',
+    email: ['', institutionalEmail],
     password: '',
   });
 
@@ -34,5 +40,14 @@ export class SignUp {
 
   protected submit(): void {
     this.submission.set(this.form.getRawValue());
+  }
+
+  // O aviso do campo só aparece depois que a pessoa sai dele.
+  protected errorOf(control: AbstractControl): string | undefined {
+    if (!control.touched || !control.errors) {
+      return undefined;
+    }
+    const [error] = Object.keys(control.errors);
+    return ERROR_MESSAGES[error];
   }
 }
