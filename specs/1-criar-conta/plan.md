@@ -91,7 +91,7 @@
   - Arquivos previstos: `shared/validators/institutional-email.ts`,
     `features/auth/sign-up/`
 
-- [ ] **Tarefa 5 — Recusar senha fora dos requisitos**
+- [x] **Tarefa 5 — Recusar senha fora dos requisitos**
   - Cobre: CA5
   - Teste primeiro: prova que uma senha com menos de 8 caracteres e uma sem letra ou
     sem número mostram a mensagem do requisito que falta, desabilitam o botão e não

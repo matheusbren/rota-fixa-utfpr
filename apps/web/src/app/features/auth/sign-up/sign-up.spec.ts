@@ -121,4 +121,27 @@ describe('SignUp', () => {
     const request = httpTesting.expectOne(`${environment.apiUrl}/users`);
     expect(request.request.body).toMatchObject({ email: 'ana@utfpr.edu.br' });
   });
+
+  // CA5: curta, sem número e sem letra.
+  it.each([
+    ['car2026', 'A senha precisa ter 8 caracteres ou mais'],
+    ['caronautfpr', 'A senha precisa ter letra e número'],
+    ['20262026', 'A senha precisa ter letra e número'],
+  ])(
+    'recusa a senha %j ao sair do campo, avisa "%s", desabilita o botão e não grava nada',
+    async (password, message) => {
+      await fillIn('Nome completo', 'Ana Souza');
+      await fillIn('E-mail institucional', 'ana@utfpr.edu.br');
+      await fillIn('Senha', password);
+      expect(page.textContent).not.toContain(message);
+
+      await leave('Senha');
+
+      expect(description('Senha')).toBe(message);
+      expect(button('Criar conta')?.disabled).toBe(true);
+
+      await tap(button('Criar conta'));
+      httpTesting.expectNone(`${environment.apiUrl}/users`);
+    },
+  );
 });

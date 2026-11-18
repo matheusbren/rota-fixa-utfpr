@@ -6,10 +6,13 @@ import { AuthService, SignUpData } from '../../../core/auth/auth.service';
 import { Banner } from '../../../shared/ui/banner/banner';
 import { FormField } from '../../../shared/ui/form-field/form-field';
 import { institutionalEmail } from '../../../shared/validators/institutional-email';
+import { password } from '../../../shared/validators/password';
 
 // O texto de cada erro de validação, pela chave que o validador devolve.
 const ERROR_MESSAGES: Record<string, string> = {
   institutionalEmail: 'Use o seu e-mail da UTFPR',
+  passwordLength: 'A senha precisa ter 8 caracteres ou mais',
+  passwordLetterAndNumber: 'A senha precisa ter letra e número',
 };
 
 @Component({
@@ -24,7 +27,7 @@ export class SignUp {
   protected readonly form = inject(FormBuilder).nonNullable.group({
     fullName: '',
     email: ['', institutionalEmail],
-    password: '',
+    password: ['', password],
   });
 
   // Cada confirmação vira um envio; o resultado volta como signal (architecture.md §2.1).

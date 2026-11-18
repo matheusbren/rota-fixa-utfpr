@@ -34,6 +34,7 @@
         <p id="sign-up-email-error" class="text-caption text-error">{{ emailError }}</p>
       }
     </app-form-field>
+    @let passwordError = errorOf(form.controls.password);
     <app-form-field label="Senha" controlId="sign-up-password">
       <input
         id="sign-up-password"
@@ -41,7 +42,12 @@
         type="password"
         autocomplete="new-password"
         formControlName="password"
+        [attr.aria-invalid]="passwordError ? true : null"
+        [attr.aria-describedby]="passwordError ? 'sign-up-password-error' : null"
       />
+      @if (passwordError) {
+        <p id="sign-up-password-error" class="text-caption text-error">{{ passwordError }}</p>
+      }
     </app-form-field>
     <button
       type="submit"
