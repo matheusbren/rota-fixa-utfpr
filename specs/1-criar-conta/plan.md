@@ -45,7 +45,7 @@
   aqui: nasce com a primeira história que precise traduzir 401 ou rede no app inteiro.
 - **Dados.** O `db.json` ganha `"users": []`.
 - **A ratificar no `architecture.md` e no `design-tokens.md`**, numa branch de
-  manutenção depois desta história: (a) a `bottom-nav` e a barra de abas do celular
+  manutenção depois desta história (Issue #21): (a) a `bottom-nav` e a barra de abas do celular
   saem, porque a gaveta do ☰ faz a navegação do celular (§3, §4 e a tabela de
   breakpoints); (b) a "casca pública sem barra de navegação" deixa de existir:
   `/criar-conta` vive dentro da casca (§4); (c) `app-shell` e `app-footer` entram em
@@ -127,5 +127,21 @@
     possível criar a conta. Tente de novo.", os campos seguem preenchidos e confirmar de
     novo envia outra requisição. Falha antes porque o erro não é tratado.
   - Arquivos previstos: `core/auth/auth.service.ts`, `features/auth/sign-up/`
+
+- [ ] **Tarefa 10 — Declarar a dívida no código e alinhar o §2.1**
+  - Cobre: pendências 2 e 3 da auditoria final (nenhum critério de aceite novo).
+    (a) Cada premissa do "Assume que" da spec ganha o `// TODO #<issue>` no ponto do
+    código que ela afeta: `TODO #20` no `UsersService` (o campo `password` e a
+    gravação da senha em texto no `db.json`) e no `AuthService.signUp` (o cadastro
+    que vira Supabase Auth na E3); `TODO #2` no link "Entrar" da tela de cadastro.
+    (b) O `architecture.md` §2.1 passa a dizer quando cada interceptor nasce: o
+    `authInterceptor` com o Supabase (E3) e o `errorInterceptor` com a primeira
+    história que traduza 401 ou rede no app inteiro, como decidiram o item "Falha"
+    deste plano e o item 2 de `reviews/tarefa-03-decisoes-r1.md`. A versão sobe no §7.
+  - Teste primeiro: não há. A tarefa só acrescenta comentários e texto de
+    documentação, sem mudar comportamento; a prova é a suíte e o lint continuarem
+    verdes e o `grep` de `TODO #20` e `TODO #2` achar cada ponto.
+  - Arquivos previstos: `core/data/users.service.ts`, `core/auth/auth.service.ts`,
+    `features/auth/sign-up/sign-up.html`, `docs/architecture.md`
 
 ## Critérios sem tarefa
