@@ -114,7 +114,7 @@
     tratado.
   - Arquivos previstos: `core/auth/auth.service.ts`, `features/auth/sign-up/`
 
-- [ ] **Tarefa 8 — Mostrar a gravação em andamento**
+- [x] **Tarefa 8 — Mostrar a gravação em andamento**
   - Cobre: CA8
   - Teste primeiro: com o `POST` ainda sem resposta, o botão mostra "Criando conta…" e
     está desabilitado, e um segundo toque não gera segunda requisição. Falha antes

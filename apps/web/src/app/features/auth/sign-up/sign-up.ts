@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -40,6 +40,11 @@ export class SignUp {
       filter((data) => data !== undefined),
       exhaustMap((data) => this.auth.signUp(data)),
     ),
+  );
+
+  // A conta está sendo gravada do envio até o resultado chegar: o botão fica bloqueado (CA8).
+  protected readonly submitting = computed(
+    () => this.submission() !== undefined && this.result() === undefined,
   );
 
   protected submit(): void {

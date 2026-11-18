@@ -232,4 +232,23 @@ describe('SignUp', () => {
     expect(resendVerification).toHaveBeenCalledWith('ana@utfpr.edu.br');
     expect(page.querySelector('[role="status"]')?.textContent).toContain('E-mail reenviado');
   });
+
+  // CA8. A busca do e-mail já respondeu e o POST segue sem resposta: a conta está sendo gravada.
+  it('mostra "Criando conta…" e bloqueia o botão enquanto grava, sem gravar duas vezes', async () => {
+    await fillIn('Nome completo', 'Ana Souza');
+    await fillIn('E-mail institucional', 'ana@utfpr.edu.br');
+    await fillIn('Senha', 'carona2026');
+    // O botão é guardado antes do toque, porque o rótulo dele muda durante a gravação.
+    const submitButton = button('Criar conta');
+    await tap(submitButton);
+    answerEmailSearch([]);
+    await fixture.whenStable();
+    httpTesting.expectOne({ method: 'POST', url: `${environment.apiUrl}/users` });
+
+    expect(submitButton?.disabled, 'botão bloqueado').toBe(true);
+    expect(submitButton?.textContent?.trim()).toBe('Criando conta…');
+
+    await tap(submitButton);
+    httpTesting.expectNone(`${environment.apiUrl}/users`);
+  });
 });
