@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { exhaustMap, filter } from 'rxjs';
+import { exhaustMap, filter, map } from 'rxjs';
 import { AuthService, SignUpData } from '../../../core/auth/auth.service';
 import { Banner } from '../../../shared/ui/banner/banner';
 import { FormField } from '../../../shared/ui/form-field/form-field';
@@ -44,6 +44,27 @@ export class SignUp {
 
   protected submit(): void {
     this.submission.set(this.form.getRawValue());
+  }
+
+  // Cada toque em "Reenviar e-mail de verificação" soma um pedido: um contador, e não um
+  // booleano, para cada toque virar um novo reenvio. A tela não limita os reenvios; o limite
+  // só chega com o Supabase Auth (spec, "Fora de escopo").
+  private readonly resendRequests = signal(0);
+
+  protected readonly resent = toSignal(
+    toObservable(this.resendRequests).pipe(
+      filter((count) => count > 0),
+      // O reenvio vai para o e-mail do envio que deu `pending`: a tela já o tem.
+      map(() => this.submission()?.email),
+      filter((email) => email !== undefined),
+      exhaustMap((email) => this.auth.resendVerification(email)),
+      map(() => true),
+    ),
+    { initialValue: false },
+  );
+
+  protected resend(): void {
+    this.resendRequests.update((count) => count + 1);
   }
 
   // O aviso do campo só aparece depois que a pessoa sai dele.

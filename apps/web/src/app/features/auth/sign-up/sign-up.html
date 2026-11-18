@@ -20,6 +20,27 @@
       >Entrar</a
     >
   </div>
+} @else if (result() === 'pending') {
+  <div
+    role="status"
+    class="flex flex-col gap-3 rounded-md border border-base-300 bg-base-100 p-4 text-body"
+  >
+    <p class="text-body-strong">Falta verificar o e-mail</p>
+    <p>
+      A conta deste e-mail ainda não foi verificada. Abra o link de verificação que enviamos para o
+      seu e-mail da UTFPR ou peça um novo.
+    </p>
+    <button
+      type="button"
+      class="btn btn-primary w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      (click)="resend()"
+    >
+      Reenviar e-mail de verificação
+    </button>
+    @if (resent()) {
+      <p class="text-body-strong text-success">E-mail reenviado</p>
+    }
+  </div>
 } @else {
   <form class="flex flex-col gap-3" [formGroup]="form" (ngSubmit)="submit()">
     <app-form-field label="Nome completo" controlId="sign-up-full-name">

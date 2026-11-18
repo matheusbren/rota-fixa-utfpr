@@ -106,7 +106,7 @@
   - Arquivos previstos: `core/auth/auth.service.ts`, `core/data/users.service.ts`,
     `features/auth/sign-up/`
 
-- [ ] **Tarefa 7 — Avisar conta pendente e reenviar**
+- [x] **Tarefa 7 — Avisar conta pendente e reenviar**
   - Cobre: CA7
   - Teste primeiro: com uma conta pendente para o e-mail, confirmar o cadastro mostra
     o aviso de verificação pendente com o botão de reenviar e não gera `POST`; tocar

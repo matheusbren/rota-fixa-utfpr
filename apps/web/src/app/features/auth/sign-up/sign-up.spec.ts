@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../../core/auth/auth.service';
 import { SignUp } from './sign-up';
 
 describe('SignUp', () => {
@@ -194,9 +195,12 @@ describe('SignUp', () => {
     httpTesting.expectNone({ method: 'POST', url: `${environment.apiUrl}/users` });
   });
 
-  // O CA6 vale só para conta ativa. A pendente não pode receber um "já tem conta" que a
-  // empurre para a tela de entrar (spec, "Abandono no meio"): o aviso dela é o CA7.
-  it('não avisa que o e-mail já tem conta quando a conta achada está pendente', async () => {
+  // CA7. A conta pendente também não recebe o "já tem conta" do CA6, que a empurraria para
+  // a tela de entrar, onde ela não consegue entrar (spec, "Abandono no meio").
+  it('avisa que falta verificar o e-mail, não grava outra conta e reenvia o e-mail', async () => {
+    // Na E2 o reenvio não sai pela rede. O que a tela garante é entregar ao service o e-mail
+    // da conta pendente, para onde a E3 reenvia sem mexer na tela (architecture.md §2.1).
+    const resendVerification = vi.spyOn(TestBed.inject(AuthService), 'resendVerification');
     await fillIn('Nome completo', 'Ana Souza');
     await fillIn('E-mail institucional', 'ana@utfpr.edu.br');
     await fillIn('Senha', 'carona2026');
@@ -215,9 +219,17 @@ describe('SignUp', () => {
     ]);
     await fixture.whenStable();
 
+    httpTesting.expectNone({ method: 'POST', url: `${environment.apiUrl}/users` });
     expect(page.textContent).not.toContain('Este e-mail já tem conta');
     expect(link('Entrar')).toBeUndefined();
-    // Até a Tarefa 7 (CA7) tratar a conta pendente, o cadastro segue para a gravação.
-    httpTesting.expectOne({ method: 'POST', url: `${environment.apiUrl}/users` });
+    expect(page.querySelector('[role="status"]')?.textContent).toContain(
+      'Falta verificar o e-mail',
+    );
+    expect(page.textContent).not.toContain('E-mail reenviado');
+
+    await tap(button('Reenviar e-mail de verificação'));
+
+    expect(resendVerification).toHaveBeenCalledWith('ana@utfpr.edu.br');
+    expect(page.querySelector('[role="status"]')?.textContent).toContain('E-mail reenviado');
   });
 });
