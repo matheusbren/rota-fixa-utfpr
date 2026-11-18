@@ -1,8 +1,8 @@
 # 🛠️ Architecture / SSD
 
 **Projeto:** Rota Fixa UTFPR
-**Versão:** 1.1.0
-**Última atualização:** 03/11/2026
+**Versão:** 1.1.1
+**Última atualização:** 18/11/2026
 
 > 🤖 **O `prd.md` responde _o quê_ o produto faz. Este responde _onde as coisas
 > moram e como se chamam_.** Detalhe de tela — rota, componente, contrato —
@@ -676,7 +676,7 @@ erDiagram
 
 | Domínio | Rota | Guard | Dados (service) | US |
 | :------ | :--- | :---- | :-------------- | :-- |
-| | | | | |
+| `auth` | `/criar-conta` | — (o `guestGuard` chega com a US02) | `AuthService` → `UsersService` (`/users`) | US01 |
 
 ---
 
@@ -687,6 +687,7 @@ erDiagram
 | 01/10/2026 | 1.0.0 | Versão inicial (Atividade 06): stack Angular 22+, json-server → Supabase, camada de dados, estrutura core/shared/features, rotas, glossário técnico, diagrama ER e segredos |
 | 07/10/2026 | 1.0.1 | Revisão cruzada da Entrega 1: o diagrama ER deixa de ser copiado no README e passa a morar só na §5.2 |
 | 03/11/2026 | 1.1.0 | Atividade 07: tokens com nomes em inglês e tema do DaisyUI (§2.2); decisões do setup ratificadas (§2.3) |
+| 18/11/2026 | 1.1.1 | US01 (#1): primeira linha do mapa de domínios e rotas (§6) |
 
 ---
 
