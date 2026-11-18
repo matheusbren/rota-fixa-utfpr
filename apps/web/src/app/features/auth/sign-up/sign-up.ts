@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { exhaustMap, filter, map } from 'rxjs';
+import { exhaustMap, filter, map, startWith } from 'rxjs';
 import { AuthService, SignUpData } from '../../../core/auth/auth.service';
 import { Banner } from '../../../shared/ui/banner/banner';
 import { FormField } from '../../../shared/ui/form-field/form-field';
@@ -35,10 +35,12 @@ export class SignUp {
   // O `exhaustMap` não cancela um envio em andamento: cancelar não desfaz a conta já gravada.
   private readonly submission = signal<SignUpData | undefined>(undefined);
 
+  // Todo envio começa sem resultado, inclusive a nova tentativa depois de `failed` (CA9):
+  // assim o `submitting` também vale para ela.
   protected readonly result = toSignal(
     toObservable(this.submission).pipe(
       filter((data) => data !== undefined),
-      exhaustMap((data) => this.auth.signUp(data)),
+      exhaustMap((data) => this.auth.signUp(data).pipe(startWith(undefined))),
     ),
   );
 

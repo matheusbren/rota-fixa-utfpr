@@ -1,5 +1,5 @@
 import { Service, inject } from '@angular/core';
-import { Observable, map, of, switchMap } from 'rxjs';
+import { Observable, catchError, map, of, switchMap } from 'rxjs';
 import { normalizeEmail } from '../../shared/validators/institutional-email';
 import { UsersService } from '../data/users.service';
 
@@ -9,7 +9,7 @@ export interface SignUpData {
   password: string;
 }
 
-export type SignUpResult = 'created' | 'active' | 'pending';
+export type SignUpResult = 'created' | 'active' | 'pending' | 'failed';
 
 @Service()
 export class AuthService {
@@ -18,6 +18,8 @@ export class AuthService {
   // Antes de gravar, procura o e-mail: se ele já tem conta, ativa (CA6) ou pendente de
   // verificação (CA7), nenhuma outra é criada.
   // Toda conta nasce passageiro (`member`) e pendente até o e-mail ser verificado.
+  // Sem conexão ou com erro do servidor, na busca ou na gravação, o resultado é um só:
+  // `failed` (CA9). A tela não recebe o erro técnico.
   signUp({ fullName, email, password }: SignUpData): Observable<SignUpResult> {
     const normalizedEmail = normalizeEmail(email);
     return this.users.findByEmail(normalizedEmail).pipe(
@@ -32,6 +34,7 @@ export class AuthService {
           )
           .pipe(map((): SignUpResult => 'created'));
       }),
+      catchError(() => of<SignUpResult>('failed')),
     );
   }
 

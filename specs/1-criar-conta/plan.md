@@ -121,7 +121,7 @@
     porque o botão continua ativo.
   - Arquivos previstos: `features/auth/sign-up/`
 
-- [ ] **Tarefa 9 — Mostrar a falha da gravação**
+- [x] **Tarefa 9 — Mostrar a falha da gravação**
   - Cobre: CA9
   - Teste primeiro: com o `POST` falhando (sem rede e erro 500), aparece "Não foi
     possível criar a conta. Tente de novo.", os campos seguem preenchidos e confirmar de

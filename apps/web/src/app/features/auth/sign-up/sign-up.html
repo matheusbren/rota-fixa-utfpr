@@ -82,6 +82,14 @@
         <p id="sign-up-password-error" class="text-caption text-error">{{ passwordError }}</p>
       }
     </app-form-field>
+    @if (result() === 'failed') {
+      <p
+        role="alert"
+        class="rounded-md border border-error bg-danger-soft p-4 text-body text-error"
+      >
+        Não foi possível criar a conta. Tente de novo.
+      </p>
+    }
     <button
       type="submit"
       class="btn btn-primary mt-3 w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:bg-disabled disabled:text-text-disabled"

@@ -1,5 +1,9 @@
 import { HttpRequest, provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import {
+  HttpTestingController,
+  TestRequest,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { environment } from '../../../../environments/environment';
@@ -251,4 +255,45 @@ describe('SignUp', () => {
     await tap(submitButton);
     httpTesting.expectNone(`${environment.apiUrl}/users`);
   });
+
+  // CA9: a gravação falha sem conexão (o navegador nem recebe resposta) ou com erro do servidor.
+  it.each([
+    ['sem conexão', (request: TestRequest) => request.error(new ProgressEvent('error'))],
+    [
+      'com erro do servidor',
+      (request: TestRequest) =>
+        request.flush(null, { status: 500, statusText: 'Internal Server Error' }),
+    ],
+  ])(
+    'avisa que não criou a conta %s, mantém os campos e deixa confirmar de novo',
+    async (_, fail) => {
+      await fillIn('Nome completo', 'Ana Souza');
+      await fillIn('E-mail institucional', 'ana@utfpr.edu.br');
+      await fillIn('Senha', 'carona2026');
+      await tap(button('Criar conta'));
+      answerEmailSearch([]);
+      await fixture.whenStable();
+      fail(httpTesting.expectOne({ method: 'POST', url: `${environment.apiUrl}/users` }));
+      await fixture.whenStable();
+
+      expect(page.querySelector('[role="alert"]')?.textContent?.trim()).toBe(
+        'Não foi possível criar a conta. Tente de novo.',
+      );
+      expect(field('Nome completo').value).toBe('Ana Souza');
+      expect(field('E-mail institucional').value).toBe('ana@utfpr.edu.br');
+      expect(field('Senha').value).toBe('carona2026');
+
+      await tap(button('Criar conta'));
+      answerEmailSearch([]);
+      await fixture.whenStable();
+      const retry = httpTesting.expectOne({ method: 'POST', url: `${environment.apiUrl}/users` });
+      expect(retry.request.body).toMatchObject({
+        fullName: 'Ana Souza',
+        email: 'ana@utfpr.edu.br',
+        password: 'carona2026',
+      });
+      // A nova tentativa também é uma gravação em andamento (CA8).
+      expect(button('Criando conta…')?.disabled, 'botão bloqueado').toBe(true);
+    },
+  );
 });
