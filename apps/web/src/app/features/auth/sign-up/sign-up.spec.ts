@@ -1,6 +1,7 @@
-import { provideHttpClient } from '@angular/common/http';
+import { HttpRequest, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { SignUp } from './sign-up';
 
@@ -11,7 +12,7 @@ describe('SignUp', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
     httpTesting = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(SignUp);
@@ -35,6 +36,22 @@ describe('SignUp', () => {
     return Array.from(page.querySelectorAll('button')).find(
       (element) => element.textContent?.trim() === label,
     );
+  }
+
+  function link(label: string): HTMLAnchorElement | undefined {
+    return Array.from(page.querySelectorAll('a')).find(
+      (element) => element.textContent?.trim() === label,
+    );
+  }
+
+  // Antes de gravar, o cadastro procura o e-mail (CA6). O teste faz o papel do servidor e
+  // responde com as contas achadas; devolve a requisição para quem quiser conferi-la.
+  function answerEmailSearch(accounts: unknown[]): HttpRequest<unknown> {
+    const search = httpTesting.expectOne(
+      (request) => request.method === 'GET' && request.url === `${environment.apiUrl}/users`,
+    );
+    search.flush(accounts);
+    return search.request;
   }
 
   async function fillIn(label: string, value: string): Promise<void> {
@@ -67,6 +84,7 @@ describe('SignUp', () => {
     await fillIn('E-mail institucional', '  Ana.Souza@ALUNOS.UTFPR.edu.br ');
     await fillIn('Senha', 'carona2026');
     await tap(button('Criar conta'));
+    answerEmailSearch([]);
 
     const request = httpTesting.expectOne(`${environment.apiUrl}/users`);
     expect(request.request.method).toBe('POST');
@@ -118,6 +136,7 @@ describe('SignUp', () => {
     expect(button('Criar conta')?.disabled).toBe(false);
 
     await tap(button('Criar conta'));
+    answerEmailSearch([]);
     const request = httpTesting.expectOne(`${environment.apiUrl}/users`);
     expect(request.request.body).toMatchObject({ email: 'ana@utfpr.edu.br' });
   });
@@ -144,4 +163,61 @@ describe('SignUp', () => {
       httpTesting.expectNone(`${environment.apiUrl}/users`);
     },
   );
+
+  // CA6, no cenário do plano: a conta ativa está em `ANA@utfpr.edu.br` e a pessoa digita
+  // `ana@utfpr.edu.br`. Quem prova que a busca sai normalizada (o json-server compara com
+  // igualdade exata) é o auth.service.spec.ts.
+  it('avisa que o e-mail já tem conta, com o link "Entrar", e não grava outra', async () => {
+    await fillIn('Nome completo', 'Ana Souza');
+    await fillIn('E-mail institucional', 'ana@utfpr.edu.br');
+    await fillIn('Senha', 'carona2026');
+    await tap(button('Criar conta'));
+
+    const search = answerEmailSearch([
+      {
+        id: 'a1b2',
+        fullName: 'Ana Souza',
+        email: 'ANA@utfpr.edu.br',
+        password: 'carona2026',
+        role: 'member',
+        emailVerified: true,
+        createdAt: '2026-11-10T12:00:00.000Z',
+      },
+    ]);
+    await fixture.whenStable();
+
+    expect(search.urlWithParams).toBe(`${environment.apiUrl}/users?email=ana@utfpr.edu.br`);
+    expect(page.querySelector('[role="status"] p')?.textContent?.trim()).toBe(
+      'Este e-mail já tem conta',
+    );
+    expect(link('Entrar')?.getAttribute('href')).toBe('/entrar');
+    httpTesting.expectNone({ method: 'POST', url: `${environment.apiUrl}/users` });
+  });
+
+  // O CA6 vale só para conta ativa. A pendente não pode receber um "já tem conta" que a
+  // empurre para a tela de entrar (spec, "Abandono no meio"): o aviso dela é o CA7.
+  it('não avisa que o e-mail já tem conta quando a conta achada está pendente', async () => {
+    await fillIn('Nome completo', 'Ana Souza');
+    await fillIn('E-mail institucional', 'ana@utfpr.edu.br');
+    await fillIn('Senha', 'carona2026');
+    await tap(button('Criar conta'));
+
+    answerEmailSearch([
+      {
+        id: 'a1b2',
+        fullName: 'Ana Souza',
+        email: 'ana@utfpr.edu.br',
+        password: 'carona2026',
+        role: 'member',
+        emailVerified: false,
+        createdAt: '2026-11-10T12:00:00.000Z',
+      },
+    ]);
+    await fixture.whenStable();
+
+    expect(page.textContent).not.toContain('Este e-mail já tem conta');
+    expect(link('Entrar')).toBeUndefined();
+    // Até a Tarefa 7 (CA7) tratar a conta pendente, o cadastro segue para a gravação.
+    httpTesting.expectOne({ method: 'POST', url: `${environment.apiUrl}/users` });
+  });
 });

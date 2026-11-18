@@ -98,7 +98,7 @@
     geram requisição. Falha antes porque o validador não existe.
   - Arquivos previstos: `shared/validators/password.ts`, `features/auth/sign-up/`
 
-- [ ] **Tarefa 6 — Avisar que o e-mail já tem conta**
+- [x] **Tarefa 6 — Avisar que o e-mail já tem conta**
   - Cobre: CA6
   - Teste primeiro: com uma conta ativa em `ANA@utfpr.edu.br`, cadastrar
     `ana@utfpr.edu.br` mostra "Este e-mail já tem conta" com o link "Entrar" e não gera

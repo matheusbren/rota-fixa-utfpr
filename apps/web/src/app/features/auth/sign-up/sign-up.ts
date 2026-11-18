@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { exhaustMap, filter } from 'rxjs';
 import { AuthService, SignUpData } from '../../../core/auth/auth.service';
 import { Banner } from '../../../shared/ui/banner/banner';
@@ -17,7 +18,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 @Component({
   selector: 'app-sign-up',
-  imports: [ReactiveFormsModule, FormField, Banner],
+  imports: [ReactiveFormsModule, RouterLink, FormField, Banner],
   templateUrl: './sign-up.html',
   host: { class: 'mx-auto flex w-full max-w-md flex-col gap-6' },
 })

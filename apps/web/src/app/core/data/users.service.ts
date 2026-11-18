@@ -19,6 +19,13 @@ export class UsersService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/users`;
 
+  // O json-server compara o e-mail com igualdade exata: quem chama já o manda normalizado.
+  findByEmail(email: string): Observable<User | undefined> {
+    return this.http
+      .get<UserRecord[]>(this.url, { params: { email } })
+      .pipe(map((records) => records.map(toUser).at(0)));
+  }
+
   create(user: Omit<User, 'id' | 'createdAt'>, password: string): Observable<User> {
     const record: Omit<UserRecord, 'id'> = {
       ...user,
