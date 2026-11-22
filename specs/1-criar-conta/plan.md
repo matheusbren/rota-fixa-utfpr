@@ -145,7 +145,7 @@
   - Arquivos previstos: `core/data/users.service.ts`, `core/auth/auth.service.ts`,
     `features/auth/sign-up/sign-up.html`, `docs/architecture.md`
 
-- [ ] **Tarefa 11 — Ratificar a casca no `architecture.md` e no `design-tokens.md`**
+- [x] **Tarefa 11 — Ratificar a casca no `architecture.md` e no `design-tokens.md`**
   - Cobre: pendência 1 da segunda auditoria final (nenhum critério de aceite novo). É
     o conteúdo dos quatro passos da Issue #21, que passa a ser fechada por este PR.
     (a) `architecture.md` §4, "Hierarquia de layout": uma casca só, o `AppShell`

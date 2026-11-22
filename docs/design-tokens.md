@@ -1,8 +1,8 @@
 # 🎨 Tokens de Design
 
 **Projeto:** Rota Fixa UTFPR
-**Versão:** 1.1.0
-**Última atualização:** 03/11/2026
+**Versão:** 1.1.1
+**Última atualização:** 22/11/2026
 
 > 🤖 **Este documento existe para a IA parar de inventar um botão diferente a cada
 > tela.** Não é um design system — é o mínimo que dá à prototipagem assistida algo a
@@ -120,7 +120,7 @@ tabulares (`tabular-nums`). Ícones: Material Symbols Rounded.
 | `body-strong` | Overpass · 16/24 · 600 (SemiBold) | `text-body-strong` | informação principal de uma linha (lugar, nome) |
 | `label` | Overpass · 14/20 · 600 (SemiBold) | `text-label` | rótulo de campo, faixa de dias, etiqueta |
 | `caption` | Overpass · 13/18 · 400 (Regular) | `text-caption` | apoio, ajuda de campo |
-| `tab` | Overpass · 12/16 · 600 (SemiBold) | `text-tab` | rótulo da barra de abas no celular |
+| `tab` | Overpass · 12/16 · 600 (SemiBold) | `text-tab` | sem uso em tela hoje; o token continua no tema |
 | `button` | Overpass · 16/20 · 700 (Bold) | `text-button` | texto de botão |
 
 Nomes anteriores (versão 1.0.0): `horario` → `time`, `titulo-1` → `title-1`,
@@ -148,10 +148,10 @@ versão mobile antes da versão desktop. Os valores são os padrões do Tailwind
 
 | Token | Largura mínima | Vale para |
 | --- | --- | --- |
-| (base) | 0 | celular, desenhado em 360 px sem rolagem lateral: uma coluna, barra de abas embaixo |
+| (base) | 0 | celular, desenhado em 360 px sem rolagem lateral: uma coluna, menu lateral na gaveta que o ☰ da barra do app abre |
 | `sm` | 640 px | celular deitado: filtros da busca lado a lado |
 | `md` | 768 px | tablet: resultados da busca em 2 colunas |
-| `lg` | 1024 px | desktop: menu lateral no lugar da barra de abas; detalhe da rota e formulários em 2 colunas |
+| `lg` | 1024 px | desktop: menu lateral fixo na esquerda, sem a gaveta nem o ☰; detalhe da rota e formulários em 2 colunas |
 | `xl` | 1280 px | desktop largo: agenda como quadro semanal de 3 colunas |
 
 ## Identidade PWA

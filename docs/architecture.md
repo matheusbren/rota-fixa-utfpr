@@ -1,7 +1,7 @@
 # 🛠️ Architecture / SSD
 
 **Projeto:** Rota Fixa UTFPR
-**Versão:** 1.1.2
+**Versão:** 1.1.3
 **Última atualização:** 22/11/2026
 
 > 🤖 **O `prd.md` responde _o quê_ o produto faz. Este responde _onde as coisas
@@ -57,7 +57,7 @@
   seletor de componente com prefixo `app-`, igual às caixas do Mapa de
   Componentes no Figma.
 - **Framework CSS:** Tailwind CSS 4 + DaisyUI 5, com o tema próprio `rota-fixa` (ID5). Tokens completos em [design-tokens.md](design-tokens.md); o resumo para o Tailwind está na §2.2.
-- **Dados (em duas fases):** **json-server** no MVP (E2) → **Supabase** na E3, com autenticação (JWT) e CRUD reais (IDs 21–22). A troca atinge só os Services (§2.1).
+- **Dados (em duas fases):** **json-server** no MVP (E2) → **Supabase** na E3, com autenticação (JWT) e CRUD reais (IDs 21–22). A troca atinge os Services e o `app.config.ts`, que na E3 passa a registrar o `authInterceptor`; tela nenhuma muda (§2.1).
   - **E2 — json-server (linha 1, ainda beta):** `db.json` na **raiz** do
     repositório, servido por `npm run api` em `http://localhost:3000`. Uma
     coleção por entidade do §5.1, com os nomes e campos de lá. Na linha 1 o
@@ -320,7 +320,7 @@ apps/web/src/
     │   ├── data/        # Services de dados + mapeadores (§2.1)
     │   ├── auth/        # AuthService, authGuard, guestGuard, adminGuard
     │   ├── http/        # authInterceptor, errorInterceptor
-    │   └── layout/      # casca do app: top-bar, bottom-nav, side-nav, offline-page
+    │   └── layout/      # casca do app: app-shell, top-bar, side-nav, footer, offline-page
     ├── shared/          # caixa de ferramentas — não conhece domínio
     │   ├── ui/          # componentes burros (só input()/output())
     │   ├── pipes/       # weekdays, fare, first-name
@@ -352,7 +352,7 @@ Os seletores são os do mapa.
 
 | Onde mora | Componentes (`app-…`) | Por quê |
 | :-------- | :-------------------- | :------ |
-| `core/layout/` | `top-bar`, `bottom-nav`, `side-nav`, `offline-page` | Moldura do app: uma instância, presente em quase toda tela |
+| `core/layout/` | `app-shell` (o seletor já é `app-shell`), `top-bar`, `side-nav`, `footer`, `offline-page` | Moldura do app: uma instância, presente em quase toda tela |
 | `shared/ui/` | `route-plate`, `weekday-strip`, `seat-meter`, `status-tag`, `trip-list`, `form-field`, `banner`, `offline-banner` | Aparecem em dois ou mais domínios (ex.: `route-plate` na busca, no detalhe e em minhas rotas) |
 | `features/auth/` | `sign-in`, `sign-up`, `brand-hero` | Só existem antes de entrar |
 | `features/agenda/` | `agenda`, `week-board`, `trip-card`, `release-seat-dialog` | Só na agenda (o `week-board` é a agenda no desktop largo) |
@@ -381,11 +381,15 @@ withComponentInputBinding())` — o parâmetro da URL chega na página como
 `input()` com o mesmo nome (`routeId = input.required<string>()`), sem
 `ActivatedRoute` (IDs 16–17).
 
-**Hierarquia de layout** (ID18): duas cascas, com as telas como rotas filhas.
+**Hierarquia de layout** (ID18): uma casca só, o `AppShell`
+(`core/layout/app-shell/`), com as telas como rotas filhas, inclusive
+`/criar-conta`.
 
-- **Casca pública** — sem barra de navegação: `/entrar` e `/criar-conta`.
-- **Casca do app** (`core/layout/`) — `top-bar` e `bottom-nav` no celular,
-  `side-nav` a partir de `lg`. Todas as outras telas são filhas dela.
+- **Moldura** — o `top-bar` em cima, o palco central (o `<main>` com o
+  `<router-outlet />` das rotas filhas) e o `footer` embaixo.
+- **Navegação** (opção B: links na lateral, barra superior só com contexto) —
+  abaixo de `lg`, o ☰ do `top-bar` abre a gaveta com o `side-nav`; a partir de
+  `lg`, o mesmo `side-nav` fica fixo na lateral esquerda e o ☰ some.
 
 **Mapa inicial** — as telas do protótipo viram rotas. Toda rota de feature é
 carregada só quando a pessoa entra nela (`loadChildren` / `loadComponent`).
@@ -693,6 +697,7 @@ erDiagram
 | 03/11/2026 | 1.1.0 | Atividade 07: tokens com nomes em inglês e tema do DaisyUI (§2.2); decisões do setup ratificadas (§2.3) |
 | 18/11/2026 | 1.1.1 | US01 (#1): primeira linha do mapa de domínios e rotas (§6) |
 | 22/11/2026 | 1.1.2 | US01 (#1): a §2.1 passa a dizer quando cada interceptor nasce — o `authInterceptor` com o Supabase (E3) e o `errorInterceptor` com a primeira história que traduza 401 ou falta de rede no app inteiro |
+| 22/11/2026 | 1.1.3 | US01 (#1), com o conteúdo da #21: a casca passa a ser uma só, o `AppShell` — a casca pública e a `bottom-nav` saem, e a navegação abaixo de `lg` é a gaveta do ☰ (§4); `app-shell` e `footer` entram em `core/layout/` (§3); a troca da E3 também registra o `authInterceptor` no `app.config.ts` (§2) |
 
 ---
 
