@@ -44,8 +44,9 @@
   falha, e a tela mostra o texto do CA9. O `errorInterceptor` global do §2.1 não entra
   aqui: nasce com a primeira história que precise traduzir 401 ou rede no app inteiro.
 - **Dados.** O `db.json` ganha `"users": []`.
-- **A ratificar no `architecture.md` e no `design-tokens.md`**, numa branch de
-  manutenção depois desta história (Issue #21): (a) a `bottom-nav` e a barra de abas do celular
+- **A ratificar no `architecture.md` e no `design-tokens.md`**, pela Tarefa 11 desta
+  história (a segunda auditoria final não aceitou adiar para a branch de manutenção
+  da Issue #21, que este PR passa a fechar): (a) a `bottom-nav` e a barra de abas do celular
   saem, porque a gaveta do ☰ faz a navegação do celular (§3, §4 e a tabela de
   breakpoints); (b) a "casca pública sem barra de navegação" deixa de existir:
   `/criar-conta` vive dentro da casca (§4); (c) `app-shell` e `app-footer` entram em
@@ -143,5 +144,32 @@
     verdes e o `grep` de `TODO #20` e `TODO #2` achar cada ponto.
   - Arquivos previstos: `core/data/users.service.ts`, `core/auth/auth.service.ts`,
     `features/auth/sign-up/sign-up.html`, `docs/architecture.md`
+
+- [ ] **Tarefa 11 — Ratificar a casca no `architecture.md` e no `design-tokens.md`**
+  - Cobre: pendência 1 da segunda auditoria final (nenhum critério de aceite novo). É
+    o conteúdo dos quatro passos da Issue #21, que passa a ser fechada por este PR.
+    (a) `architecture.md` §4, "Hierarquia de layout": uma casca só, o `AppShell`
+    (`core/layout/app-shell/`), com as telas como rotas filhas, inclusive
+    `/criar-conta`; a "casca pública" sai. Abaixo de `lg` a navegação é a gaveta do ☰
+    do `top-bar`; a partir de `lg` o mesmo `side-nav` fica fixo na lateral (opção B);
+    a `bottom-nav` sai.
+    (b) `architecture.md` §3: `app-shell` e `footer` entram em `core/layout/` e a
+    `bottom-nav` sai, na árvore de pastas e na tabela "Onde mora".
+    (c) `architecture.md` §2: a frase "A troca atinge só os Services" passa a dizer
+    que a E3 também registra o `authInterceptor` no `app.config.ts`, sem mudar tela
+    nenhuma (sugestão 1 de `reviews/tarefa-10-codigo-r1.md`).
+    (d) `design-tokens.md`: a tabela de breakpoints troca a "barra de abas" pela
+    gaveta do ☰ abaixo de `lg` e pelo menu lateral fixo a partir de `lg`; o papel do
+    token `tab` deixa de citar a barra de abas (o token continua no tema: tirá-lo do
+    `styles.css` é código, fora desta tarefa).
+    (e) `specs/README.md`: a observação da linha do #1 passa a contar as tarefas
+    feitas de verdade.
+    A versão e a data sobem em cada documento, com linha no histórico onde ele existe.
+  - Teste primeiro: não há. A tarefa só muda documentação; a prova é a suíte e o lint
+    continuarem verdes e o `grep` de `bottom-nav`, "casca pública" e "barra de abas"
+    não achar mais nada em `docs/architecture.md` nem em `docs/design-tokens.md`,
+    fora das linhas de histórico.
+  - Arquivos previstos: `docs/architecture.md`, `docs/design-tokens.md`,
+    `specs/README.md`
 
 ## Critérios sem tarefa
