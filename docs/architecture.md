@@ -1,8 +1,8 @@
 # 🛠️ Architecture / SSD
 
 **Projeto:** Rota Fixa UTFPR
-**Versão:** 1.1.1
-**Última atualização:** 18/11/2026
+**Versão:** 1.1.2
+**Última atualização:** 22/11/2026
 
 > 🤖 **O `prd.md` responde _o quê_ o produto faz. Este responde _onde as coisas
 > moram e como se chamam_.** Detalhe de tela — rota, componente, contrato —
@@ -118,15 +118,19 @@
     `accessToken` como signals, e é a única classe do app que importa o SDK.
     Os guards e as telas não mudam da E2 para a E3.
 - **Interceptors funcionais** (`HttpInterceptorFn`, registrados com
-  `provideHttpClient(withInterceptors([...]))` — ID23):
-  - `authInterceptor`: na E3, coloca `apikey` (a chave publishable) e
-    `Authorization: Bearer <accessToken>` em toda requisição à API do
-    Supabase. Na E2 não acrescenta nada — existe desde o início para a troca
-    não mexer em `app.config.ts`.
-  - `errorInterceptor`: o único lugar que traduz erro HTTP em mensagem de
-    gente (sem código técnico na tela — PRD §7). 401 encerra a sessão e
-    leva para `/entrar`; falta de rede vira "Sem conexão"; o resto vira uma
-    mensagem genérica em português. A tela recebe a mensagem pronta.
+  `provideHttpClient(withInterceptors([...]))` — ID23). Nenhum dos dois existe
+  desde o início: cada um nasce quando passa a ter o que fazer.
+  - `authInterceptor`: nasce com o Supabase, na E3, e coloca `apikey` (a
+    chave publishable) e `Authorization: Bearer <accessToken>` em toda
+    requisição à API do Supabase. Na E2 não existe: não teria nada a
+    acrescentar, e criá-lo vazio seria uma indireção sem ganho.
+  - `errorInterceptor`: nasce com a primeira história que precise traduzir
+    401 ou falta de rede no app inteiro. A partir daí é o único lugar que
+    traduz erro HTTP em mensagem de gente (sem código técnico na tela — PRD
+    §7). 401 encerra a sessão e leva para `/entrar`; falta de rede vira "Sem
+    conexão"; o resto vira uma mensagem genérica em português. A tela recebe
+    a mensagem pronta. Até ele nascer, o Service converte a falha no
+    resultado que a tela espera, como o `AuthService` faz no cadastro (US01).
 - **Assíncrono ↔ reativo:** Service devolve `Observable` (é o que o
   `HttpClient` entrega); a página converte para signal com `toSignal()` na
   leitura e usa `toObservable()` quando um signal precisa disparar uma busca
@@ -688,6 +692,7 @@ erDiagram
 | 07/10/2026 | 1.0.1 | Revisão cruzada da Entrega 1: o diagrama ER deixa de ser copiado no README e passa a morar só na §5.2 |
 | 03/11/2026 | 1.1.0 | Atividade 07: tokens com nomes em inglês e tema do DaisyUI (§2.2); decisões do setup ratificadas (§2.3) |
 | 18/11/2026 | 1.1.1 | US01 (#1): primeira linha do mapa de domínios e rotas (§6) |
+| 22/11/2026 | 1.1.2 | US01 (#1): a §2.1 passa a dizer quando cada interceptor nasce — o `authInterceptor` com o Supabase (E3) e o `errorInterceptor` com a primeira história que traduza 401 ou falta de rede no app inteiro |
 
 ---
 

@@ -128,7 +128,7 @@
     novo envia outra requisição. Falha antes porque o erro não é tratado.
   - Arquivos previstos: `core/auth/auth.service.ts`, `features/auth/sign-up/`
 
-- [ ] **Tarefa 10 — Declarar a dívida no código e alinhar o §2.1**
+- [x] **Tarefa 10 — Declarar a dívida no código e alinhar o §2.1**
   - Cobre: pendências 2 e 3 da auditoria final (nenhum critério de aceite novo).
     (a) Cada premissa do "Assume que" da spec ganha o `// TODO #<issue>` no ponto do
     código que ela afeta: `TODO #20` no `UsersService` (o campo `password` e a

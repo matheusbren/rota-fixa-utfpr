@@ -20,6 +20,10 @@ export class AuthService {
   // Toda conta nasce passageiro (`member`) e pendente até o e-mail ser verificado.
   // Sem conexão ou com erro do servidor, na busca ou na gravação, o resultado é um só:
   // `failed` (CA9). A tela não recebe o erro técnico.
+  // TODO #20: na E2 o cadastro é simulado na coleção `users` do db.json e nenhum e-mail é
+  // enviado: a conta só deixa de ser pendente quando alguém edita o `emailVerified` no db.json
+  // (spec, "Assume que"). Na E3 o cadastro vira Supabase Auth, com a verificação de e-mail de
+  // verdade (architecture.md §2.1).
   signUp({ fullName, email, password }: SignUpData): Observable<SignUpResult> {
     const normalizedEmail = normalizeEmail(email);
     return this.users.findByEmail(normalizedEmail).pipe(

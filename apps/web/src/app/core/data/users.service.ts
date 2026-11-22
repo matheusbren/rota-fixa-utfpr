@@ -5,6 +5,8 @@ import { environment } from '../../../environments/environment';
 import { User } from '../models/user';
 
 // O formato da coleção `users` no db.json (E2): o modelo mais a senha em texto.
+// TODO #20: o campo `password` só existe na simulação da E2 (spec, "Assume que"). Na E3 a senha
+// fica com o Supabase Auth, e a tabela `users` não tem essa coluna (architecture.md §5.2).
 interface UserRecord extends User {
   password: string;
 }
@@ -26,6 +28,9 @@ export class UsersService {
       .pipe(map((records) => records.map(toUser).at(0)));
   }
 
+  // TODO #20: a senha é gravada em texto no db.json, o que só vale para os dados fictícios de
+  // desenvolvimento (architecture.md §2.1). Na E3 o cadastro é do Supabase Auth, e a senha deixa
+  // de passar por este Service.
   create(user: Omit<User, 'id' | 'createdAt'>, password: string): Observable<User> {
     const record: Omit<UserRecord, 'id'> = {
       ...user,
