@@ -1,8 +1,8 @@
 # 📄 Product Requirements Document (PRD)
 
 **Projeto:** Rota Fixa UTFPR
-**Versão:** 1.2.0
-**Última atualização:** 07/10/2026
+**Versão:** 1.3.0
+**Última atualização:** 18/11/2026
 
 > 🤖 **Este documento é a fonte da verdade sobre o QUE o produto faz.** Regra de
 > negócio que não estiver aqui não existe — nem para a equipe, nem para a IA.
@@ -82,7 +82,7 @@ falta, e falta repetida limita novas assinaturas.
 > sessão, `M` vira algumas tarefas, `L` pede divisão. O status percorre
 > `Draft` → `Ready` → `Live`.
 
-### US01 — Criar conta com e-mail institucional · `Must Have` · `M` · Status: `Ready`
+### US01 — Criar conta com e-mail institucional · `Must Have` · `M` · Status: `Live`
 
 **Como** estudante ou servidor da UTFPR, **eu quero** criar uma conta com o meu
 e-mail institucional **para que** eu só divida carro com gente de dentro da
@@ -96,11 +96,13 @@ universidade.
 - [ ] **Dado** que informo um e-mail de domínio não institucional, **quando**
       tento confirmar, **então** vejo "Use o seu e-mail da UTFPR" e nada é
       gravado.
-- [ ] **Dado** que já existe conta com aquele e-mail, **quando** tento cadastrar
-      de novo, **então** vejo a mensagem de e-mail já cadastrado com o caminho
-      para entrar, e nenhuma conta duplicada é criada.
-- [ ] **Dado** que a conta está pendente de verificação, **quando** tento entrar,
-      **então** vejo o aviso de verificação pendente e a opção de reenviar.
+- [ ] **Dado** que já existe conta ativa com aquele e-mail, **quando** tento
+      cadastrar de novo, **então** vejo a mensagem de e-mail já cadastrado com o
+      caminho para entrar, e nenhuma conta duplicada é criada.
+- [ ] **Dado** que já existe conta com aquele e-mail e ela está pendente de
+      verificação, **quando** tento cadastrar de novo, **então** vejo o aviso de
+      verificação pendente e a opção de reenviar, e nenhuma conta duplicada é
+      criada.
 
 **Regras relacionadas:** RN01
 
@@ -118,6 +120,8 @@ que** as minhas caronas e os meus dados fiquem acessíveis só para mim.
 - [ ] **Dado** que informo senha incorreta, **quando** tento entrar, **então**
       vejo "E-mail ou senha inválidos", sem dizer qual dos dois errei, e
       continuo na tela de entrada.
+- [ ] **Dado** que a conta está pendente de verificação, **quando** tento entrar,
+      **então** vejo o aviso de verificação pendente e a opção de reenviar.
 - [ ] **Dado** que estou autenticado, **quando** saio, **então** a sessão é
       encerrada e tentar abrir a agenda me leva de volta para a tela de entrada.
 - [ ] **Dado** que não estou autenticado, **quando** abro pelo endereço direto
@@ -607,6 +611,7 @@ basta.
 | 20/09/2026 | 1.0.0  | Versão inicial: visão, glossário, atores, US01–US19, RN01–RN18, fora de escopo e requisitos não funcionais. |
 | 30/09/2026 | 1.1.0  | Pontos de desistência do protótipo (Atividade 05): novos critérios de aceite em US07 e US09.                |
 | 07/10/2026 | 1.2.0  | Revisão cruzada da Entrega 1: visitante não vê "foto" (o produto não guarda foto) e frase do administrador corrigida. |
+| 18/11/2026 | 1.3.0  | US01 entregue (`Live`, spec #1): o aviso de conta pendente ao entrar passa para a US02, e a US01 trata a conta pendente no novo cadastro, separada da conta ativa. |
 
 ---
 

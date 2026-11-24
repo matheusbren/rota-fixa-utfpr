@@ -1,0 +1,16 @@
+<nav aria-label="Menu principal">
+  <ul class="flex flex-col gap-1">
+    @for (link of links(); track link.path) {
+      <li>
+        <a
+          class="flex min-h-12 items-center rounded-md px-4 text-body-strong hover:bg-surface-dark-active focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          [routerLink]="link.path"
+          routerLinkActive="bg-surface-dark-active"
+          ariaCurrentWhenActive="page"
+          (click)="linkSelect.emit()"
+          >{{ link.label }}</a
+        >
+      </li>
+    }
+  </ul>
+</nav>

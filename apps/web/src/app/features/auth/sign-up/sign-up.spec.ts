@@ -1,0 +1,299 @@
+import { HttpRequest, provideHttpClient } from '@angular/common/http';
+import {
+  HttpTestingController,
+  TestRequest,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../../core/auth/auth.service';
+import { SignUp } from './sign-up';
+
+describe('SignUp', () => {
+  let fixture: ComponentFixture<SignUp>;
+  let httpTesting: HttpTestingController;
+  let page: HTMLElement;
+
+  beforeEach(async () => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+    });
+    httpTesting = TestBed.inject(HttpTestingController);
+    fixture = TestBed.createComponent(SignUp);
+    page = fixture.nativeElement as HTMLElement;
+    await fixture.whenStable();
+  });
+
+  // Nenhuma requisição pode sobrar sem ter sido conferida pelo teste.
+  afterEach(() => httpTesting.verify());
+
+  // O campo é achado pelo rótulo, como a pessoa o enxerga na tela.
+  function field(label: string): HTMLInputElement {
+    const control = Array.from(page.querySelectorAll('label')).find(
+      (element) => element.textContent?.trim() === label,
+    )?.control;
+    expect(control, `campo "${label}"`).toBeInstanceOf(HTMLInputElement);
+    return control as HTMLInputElement;
+  }
+
+  function button(label: string): HTMLButtonElement | undefined {
+    return Array.from(page.querySelectorAll('button')).find(
+      (element) => element.textContent?.trim() === label,
+    );
+  }
+
+  function link(label: string): HTMLAnchorElement | undefined {
+    return Array.from(page.querySelectorAll('a')).find(
+      (element) => element.textContent?.trim() === label,
+    );
+  }
+
+  // Antes de gravar, o cadastro procura o e-mail (CA6). O teste faz o papel do servidor e
+  // responde com as contas achadas; devolve a requisição para quem quiser conferi-la.
+  function answerEmailSearch(accounts: unknown[]): HttpRequest<unknown> {
+    const search = httpTesting.expectOne(
+      (request) => request.method === 'GET' && request.url === `${environment.apiUrl}/users`,
+    );
+    search.flush(accounts);
+    return search.request;
+  }
+
+  async function fillIn(label: string, value: string): Promise<void> {
+    const input = field(label);
+    input.value = value;
+    input.dispatchEvent(new Event('input'));
+    await fixture.whenStable();
+  }
+
+  async function tap(element: HTMLElement | undefined): Promise<void> {
+    expect(element).toBeDefined();
+    element?.click();
+    await fixture.whenStable();
+  }
+
+  async function leave(label: string): Promise<void> {
+    field(label).dispatchEvent(new Event('blur'));
+    await fixture.whenStable();
+  }
+
+  // O texto que o campo anuncia como descrição (aria-describedby): é o aviso ligado a ele.
+  function description(label: string): string {
+    const ids = field(label).getAttribute('aria-describedby')?.split(' ') ?? [];
+    return ids.map((id) => page.querySelector(`[id="${id}"]`)?.textContent?.trim() ?? '').join(' ');
+  }
+
+  // CA3
+  it('grava a conta como pendente e avisa que falta verificar o e-mail', async () => {
+    await fillIn('Nome completo', 'Ana Souza');
+    await fillIn('E-mail institucional', '  Ana.Souza@ALUNOS.UTFPR.edu.br ');
+    await fillIn('Senha', 'carona2026');
+    await tap(button('Criar conta'));
+    answerEmailSearch([]);
+
+    const request = httpTesting.expectOne(`${environment.apiUrl}/users`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({
+      fullName: 'Ana Souza',
+      email: 'ana.souza@alunos.utfpr.edu.br',
+      password: 'carona2026',
+      role: 'member',
+      emailVerified: false,
+      createdAt: expect.any(String),
+    });
+
+    request.flush({ id: 'a1b2', ...request.request.body });
+    await fixture.whenStable();
+
+    expect(page.querySelector('[role="status"]')?.textContent).toContain(
+      'falta verificar o e-mail',
+    );
+  });
+
+  // CA4
+  it.each(['ana@gmail.com', 'ana@utfpr.edu.br.exemplo.com'])(
+    'recusa %s ao sair do campo, desabilita o botão e não grava nada',
+    async (email) => {
+      await fillIn('Nome completo', 'Ana Souza');
+      await fillIn('E-mail institucional', email);
+      await fillIn('Senha', 'carona2026');
+      expect(page.textContent).not.toContain('Use o seu e-mail da UTFPR');
+
+      await leave('E-mail institucional');
+
+      expect(description('E-mail institucional')).toBe('Use o seu e-mail da UTFPR');
+      expect(button('Criar conta')?.disabled).toBe(true);
+
+      await tap(button('Criar conta'));
+      httpTesting.expectNone(`${environment.apiUrl}/users`);
+    },
+  );
+
+  // CA4: maiúsculas não contam. O espaço do fim o próprio <input type="email"> já tira;
+  // quem prova que o validador o ignora é o institutional-email.spec.ts.
+  it('aceita Ana@UTFPR.edu.br com espaço no fim', async () => {
+    await fillIn('Nome completo', 'Ana Souza');
+    await fillIn('E-mail institucional', 'Ana@UTFPR.edu.br ');
+    await fillIn('Senha', 'carona2026');
+    await leave('E-mail institucional');
+
+    expect(page.textContent).not.toContain('Use o seu e-mail da UTFPR');
+    expect(button('Criar conta')?.disabled).toBe(false);
+
+    await tap(button('Criar conta'));
+    answerEmailSearch([]);
+    const request = httpTesting.expectOne(`${environment.apiUrl}/users`);
+    expect(request.request.body).toMatchObject({ email: 'ana@utfpr.edu.br' });
+  });
+
+  // CA5: curta, sem número e sem letra.
+  it.each([
+    ['car2026', 'A senha precisa ter 8 caracteres ou mais'],
+    ['caronautfpr', 'A senha precisa ter letra e número'],
+    ['20262026', 'A senha precisa ter letra e número'],
+  ])(
+    'recusa a senha %j ao sair do campo, avisa "%s", desabilita o botão e não grava nada',
+    async (password, message) => {
+      await fillIn('Nome completo', 'Ana Souza');
+      await fillIn('E-mail institucional', 'ana@utfpr.edu.br');
+      await fillIn('Senha', password);
+      expect(page.textContent).not.toContain(message);
+
+      await leave('Senha');
+
+      expect(description('Senha')).toBe(message);
+      expect(button('Criar conta')?.disabled).toBe(true);
+
+      await tap(button('Criar conta'));
+      httpTesting.expectNone(`${environment.apiUrl}/users`);
+    },
+  );
+
+  // CA6, no cenário do plano: a conta ativa está em `ANA@utfpr.edu.br` e a pessoa digita
+  // `ana@utfpr.edu.br`. Quem prova que a busca sai normalizada (o json-server compara com
+  // igualdade exata) é o auth.service.spec.ts.
+  it('avisa que o e-mail já tem conta, com o link "Entrar", e não grava outra', async () => {
+    await fillIn('Nome completo', 'Ana Souza');
+    await fillIn('E-mail institucional', 'ana@utfpr.edu.br');
+    await fillIn('Senha', 'carona2026');
+    await tap(button('Criar conta'));
+
+    const search = answerEmailSearch([
+      {
+        id: 'a1b2',
+        fullName: 'Ana Souza',
+        email: 'ANA@utfpr.edu.br',
+        password: 'carona2026',
+        role: 'member',
+        emailVerified: true,
+        createdAt: '2026-11-10T12:00:00.000Z',
+      },
+    ]);
+    await fixture.whenStable();
+
+    expect(search.urlWithParams).toBe(`${environment.apiUrl}/users?email=ana@utfpr.edu.br`);
+    expect(page.querySelector('[role="status"] p')?.textContent?.trim()).toBe(
+      'Este e-mail já tem conta',
+    );
+    expect(link('Entrar')?.getAttribute('href')).toBe('/entrar');
+    httpTesting.expectNone({ method: 'POST', url: `${environment.apiUrl}/users` });
+  });
+
+  // CA7. A conta pendente também não recebe o "já tem conta" do CA6, que a empurraria para
+  // a tela de entrar, onde ela não consegue entrar (spec, "Abandono no meio").
+  it('avisa que falta verificar o e-mail, não grava outra conta e reenvia o e-mail', async () => {
+    // Na E2 o reenvio não sai pela rede. O que a tela garante é entregar ao service o e-mail
+    // da conta pendente, para onde a E3 reenvia sem mexer na tela (architecture.md §2.1).
+    const resendVerification = vi.spyOn(TestBed.inject(AuthService), 'resendVerification');
+    await fillIn('Nome completo', 'Ana Souza');
+    await fillIn('E-mail institucional', 'ana@utfpr.edu.br');
+    await fillIn('Senha', 'carona2026');
+    await tap(button('Criar conta'));
+
+    answerEmailSearch([
+      {
+        id: 'a1b2',
+        fullName: 'Ana Souza',
+        email: 'ana@utfpr.edu.br',
+        password: 'carona2026',
+        role: 'member',
+        emailVerified: false,
+        createdAt: '2026-11-10T12:00:00.000Z',
+      },
+    ]);
+    await fixture.whenStable();
+
+    httpTesting.expectNone({ method: 'POST', url: `${environment.apiUrl}/users` });
+    expect(page.textContent).not.toContain('Este e-mail já tem conta');
+    expect(link('Entrar')).toBeUndefined();
+    expect(page.querySelector('[role="status"]')?.textContent).toContain(
+      'Falta verificar o e-mail',
+    );
+    expect(page.textContent).not.toContain('E-mail reenviado');
+
+    await tap(button('Reenviar e-mail de verificação'));
+
+    expect(resendVerification).toHaveBeenCalledWith('ana@utfpr.edu.br');
+    expect(page.querySelector('[role="status"]')?.textContent).toContain('E-mail reenviado');
+  });
+
+  // CA8. A busca do e-mail já respondeu e o POST segue sem resposta: a conta está sendo gravada.
+  it('mostra "Criando conta…" e bloqueia o botão enquanto grava, sem gravar duas vezes', async () => {
+    await fillIn('Nome completo', 'Ana Souza');
+    await fillIn('E-mail institucional', 'ana@utfpr.edu.br');
+    await fillIn('Senha', 'carona2026');
+    // O botão é guardado antes do toque, porque o rótulo dele muda durante a gravação.
+    const submitButton = button('Criar conta');
+    await tap(submitButton);
+    answerEmailSearch([]);
+    await fixture.whenStable();
+    httpTesting.expectOne({ method: 'POST', url: `${environment.apiUrl}/users` });
+
+    expect(submitButton?.disabled, 'botão bloqueado').toBe(true);
+    expect(submitButton?.textContent?.trim()).toBe('Criando conta…');
+
+    await tap(submitButton);
+    httpTesting.expectNone(`${environment.apiUrl}/users`);
+  });
+
+  // CA9: a gravação falha sem conexão (o navegador nem recebe resposta) ou com erro do servidor.
+  it.each([
+    ['sem conexão', (request: TestRequest) => request.error(new ProgressEvent('error'))],
+    [
+      'com erro do servidor',
+      (request: TestRequest) =>
+        request.flush(null, { status: 500, statusText: 'Internal Server Error' }),
+    ],
+  ])(
+    'avisa que não criou a conta %s, mantém os campos e deixa confirmar de novo',
+    async (_, fail) => {
+      await fillIn('Nome completo', 'Ana Souza');
+      await fillIn('E-mail institucional', 'ana@utfpr.edu.br');
+      await fillIn('Senha', 'carona2026');
+      await tap(button('Criar conta'));
+      answerEmailSearch([]);
+      await fixture.whenStable();
+      fail(httpTesting.expectOne({ method: 'POST', url: `${environment.apiUrl}/users` }));
+      await fixture.whenStable();
+
+      expect(page.querySelector('[role="alert"]')?.textContent?.trim()).toBe(
+        'Não foi possível criar a conta. Tente de novo.',
+      );
+      expect(field('Nome completo').value).toBe('Ana Souza');
+      expect(field('E-mail institucional').value).toBe('ana@utfpr.edu.br');
+      expect(field('Senha').value).toBe('carona2026');
+
+      await tap(button('Criar conta'));
+      answerEmailSearch([]);
+      await fixture.whenStable();
+      const retry = httpTesting.expectOne({ method: 'POST', url: `${environment.apiUrl}/users` });
+      expect(retry.request.body).toMatchObject({
+        fullName: 'Ana Souza',
+        email: 'ana@utfpr.edu.br',
+        password: 'carona2026',
+      });
+      // A nova tentativa também é uma gravação em andamento (CA8).
+      expect(button('Criando conta…')?.disabled, 'botão bloqueado').toBe(true);
+    },
+  );
+});

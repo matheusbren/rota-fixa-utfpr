@@ -1,0 +1,110 @@
+<h1 class="text-title-1">Criar conta</h1>
+
+@if (result() === 'created') {
+  <app-banner>
+    <p class="text-body-strong">Conta criada.</p>
+    <p>
+      Agora falta verificar o e-mail: abra o link de verificação que enviamos para o seu e-mail da
+      UTFPR.
+    </p>
+  </app-banner>
+} @else if (result() === 'active') {
+  <div
+    role="status"
+    class="flex flex-col gap-3 rounded-md border border-base-300 bg-base-100 p-4 text-body"
+  >
+    <p class="text-body-strong">Este e-mail já tem conta</p>
+    <!--
+      TODO #2: a tela de entrar nasce com a US02. Até lá, `/entrar` cai na rota coringa e volta
+      ao cadastro (spec, "Assume que").
+    -->
+    <a
+      class="btn btn-primary w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      routerLink="/entrar"
+      >Entrar</a
+    >
+  </div>
+} @else if (result() === 'pending') {
+  <div
+    role="status"
+    class="flex flex-col gap-3 rounded-md border border-base-300 bg-base-100 p-4 text-body"
+  >
+    <p class="text-body-strong">Falta verificar o e-mail</p>
+    <p>
+      A conta deste e-mail ainda não foi verificada. Abra o link de verificação que enviamos para o
+      seu e-mail da UTFPR ou peça um novo.
+    </p>
+    <button
+      type="button"
+      class="btn btn-primary w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      (click)="resend()"
+    >
+      Reenviar e-mail de verificação
+    </button>
+    @if (resent()) {
+      <p class="text-body-strong text-success">E-mail reenviado</p>
+    }
+  </div>
+} @else {
+  <form class="flex flex-col gap-3" [formGroup]="form" (ngSubmit)="submit()">
+    <app-form-field label="Nome completo" controlId="sign-up-full-name">
+      <input
+        id="sign-up-full-name"
+        class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+        type="text"
+        autocomplete="name"
+        formControlName="fullName"
+      />
+    </app-form-field>
+    @let emailError = errorOf(form.controls.email);
+    <app-form-field label="E-mail institucional" controlId="sign-up-email">
+      <input
+        id="sign-up-email"
+        class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+        type="email"
+        autocomplete="email"
+        formControlName="email"
+        [attr.aria-invalid]="emailError ? true : null"
+        [attr.aria-describedby]="emailError ? 'sign-up-email-error' : null"
+      />
+      @if (emailError) {
+        <p id="sign-up-email-error" class="text-caption text-error">{{ emailError }}</p>
+      }
+    </app-form-field>
+    @let passwordError = errorOf(form.controls.password);
+    <app-form-field label="Senha" controlId="sign-up-password">
+      <input
+        id="sign-up-password"
+        class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+        type="password"
+        autocomplete="new-password"
+        formControlName="password"
+        [attr.aria-invalid]="passwordError ? true : null"
+        [attr.aria-describedby]="passwordError ? 'sign-up-password-error' : null"
+      />
+      @if (passwordError) {
+        <p id="sign-up-password-error" class="text-caption text-error">{{ passwordError }}</p>
+      }
+    </app-form-field>
+    @if (result() === 'failed') {
+      <p
+        role="alert"
+        class="rounded-md border border-error bg-danger-soft p-4 text-body text-error"
+      >
+        Não foi possível criar a conta. Tente de novo.
+      </p>
+    }
+    <button
+      type="submit"
+      class="btn btn-primary mt-3 w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:bg-disabled disabled:text-text-disabled"
+      [disabled]="form.invalid || submitting()"
+    >
+      @if (submitting()) {
+        <span class="loading loading-spinner" aria-hidden="true"></span>
+        Criando conta…
+      } @else {
+        Criar conta
+      }
+    </button>
+  </form>
+}
