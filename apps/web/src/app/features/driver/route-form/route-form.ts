@@ -148,8 +148,9 @@ export class RouteForm {
   // §2.1). O `exhaustMap` não cancela um envio em andamento: cancelar não desfaz a rota já gravada.
   private readonly submission = signal<NewFixedRoute | undefined>(undefined);
 
-  // Todo envio começa sem resultado: assim o `submitting` vale desde o toque.
-  private readonly publication = toSignal(
+  // Todo envio começa sem resultado, inclusive a nova tentativa depois de `failed` (CA11): assim o
+  // `submitting` vale desde o toque, e o aviso da falha anterior some.
+  protected readonly publication = toSignal(
     toObservable(this.submission).pipe(
       filter((route) => route !== undefined),
       exhaustMap((route) => this.fixedRoutes.publish(route).pipe(startWith(undefined))),
@@ -158,7 +159,7 @@ export class RouteForm {
 
   // Do toque até a tela da rota abrir, o botão mostra "Publicando…" e fica bloqueado (CA10). A rota
   // publicada continua bloqueando: a navegação até a tela dela ainda está em andamento, e um toque
-  // nesse meio-tempo gravaria uma segunda rota.
+  // nesse meio-tempo gravaria uma segunda rota. A falha libera o botão para a nova tentativa (CA11).
   protected readonly submitting = computed(() => {
     const publication = this.publication();
     return (

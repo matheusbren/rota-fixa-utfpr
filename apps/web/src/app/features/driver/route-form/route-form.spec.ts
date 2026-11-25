@@ -580,6 +580,22 @@ describe('RouteForm', () => {
     return field('Bairro', HTMLInputElement).value;
   }
 
+  // Todos os campos preenchidos, cada um com um valor diferente do que a tela abre: o sentido da
+  // volta, o CEP (que preenche o Bairro pelo ViaCEP), o ponto de encontro com espaços nas pontas e
+  // mais de um dia.
+  async function fillInEveryField(): Promise<void> {
+    await chooseCampus('Guarapuava');
+    await tap(choice('Sentido', 'Volto do campus'));
+    await fillIn(POSTAL_CODE, '85010-000');
+    await answerPostalCode('85010000', (request) => request.flush(viaCepAddress('Centro')));
+    await fillIn('Ponto de encontro', '  Frente da Padaria Central ');
+    for (const label of ['Segunda', 'Quarta', 'Sexta']) {
+      await tap(choice('Dias da semana', label));
+    }
+    await fillIn('Horário de saída', '07:30');
+    await fillIn('Vagas', '3');
+  }
+
   // CA8: a busca sai quando o CEP fica completo, sem esperar a pessoa sair do campo.
   it.each(['85010-000', '85010000'])(
     'preenche o Bairro com o bairro do CEP %j assim que os 8 números são digitados',
@@ -752,16 +768,7 @@ describe('RouteForm', () => {
   // mais. O teste faz o papel do json-server, que inventa o id da rota.
   it('publica a rota ativa, com a pessoa de exemplo como motorista, e abre a tela dela com "Rota publicada"', async () => {
     await openFromMenu();
-    await chooseCampus('Guarapuava');
-    await tap(choice('Sentido', 'Volto do campus'));
-    await fillIn(POSTAL_CODE, '85010-000');
-    await answerPostalCode('85010000', (request) => request.flush(viaCepAddress('Centro')));
-    await fillIn('Ponto de encontro', '  Frente da Padaria Central ');
-    for (const label of ['Segunda', 'Quarta', 'Sexta']) {
-      await tap(choice('Dias da semana', label));
-    }
-    await fillIn('Horário de saída', '07:30');
-    await fillIn('Vagas', '3');
+    await fillInEveryField();
 
     await tap(submitButton());
 
@@ -828,4 +835,56 @@ describe('RouteForm', () => {
     await answerRouteScreen(published);
     expect(TestBed.inject(Router).url).toBe('/rotas/rota-nova?publicada=1');
   });
+
+  // CA11: a gravação falha sem conexão (o navegador nem recebe resposta) ou com erro do servidor. A
+  // tela fica onde está, com tudo o que a pessoa digitou, e o novo toque é uma nova gravação, que
+  // pode dar certo.
+  it.each([
+    ['sem conexão', (request: TestRequest) => request.error(new ProgressEvent('error'))],
+    [
+      'com erro do servidor',
+      (request: TestRequest) =>
+        request.flush(null, { status: 500, statusText: 'Internal Server Error' }),
+    ],
+  ])(
+    'avisa que não publicou a rota %s, mantém os campos e grava de novo no novo toque',
+    async (_, fail) => {
+      await openFromMenu();
+      await fillInEveryField();
+      const filledIn = formState();
+      // O botão é guardado antes do toque, porque o rótulo dele muda durante a gravação.
+      const button = submitButton();
+      await tap(button);
+      const request = httpTesting.expectOne({ method: 'POST', url: FIXED_ROUTES_URL });
+      const sent = request.request.body;
+
+      fail(request);
+      await harness.fixture.whenStable();
+
+      expect(page.querySelector('main [role="alert"]')?.textContent?.trim()).toBe(
+        'Não foi possível publicar a rota. Tente de novo.',
+      );
+      expect(TestBed.inject(Router).url).toBe('/minhas-rotas/nova');
+      expect(formState()).toEqual(filledIn);
+      expect(button?.textContent?.trim()).toBe('Publicar rota');
+      expect(button?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+
+      await tap(button);
+      const retry = httpTesting.expectOne({ method: 'POST', url: FIXED_ROUTES_URL });
+
+      // A nova tentativa leva os mesmos dados, e é uma gravação em andamento como a primeira
+      // (CA10): o aviso da falha anterior some.
+      expect(retry.request.body).toEqual({ ...sent, createdAt: expect.any(String) });
+      expect(page.querySelector('main [role="alert"]')).toBeNull();
+      expect(button?.textContent?.trim()).toBe('Publicando…');
+      expect(button?.disabled, 'botão bloqueado').toBe(true);
+
+      const published = { id: 'rota-nova', ...retry.request.body };
+      retry.flush(published);
+      await harness.fixture.whenStable();
+      await answerRouteScreen(published);
+
+      expect(TestBed.inject(Router).url).toBe('/rotas/rota-nova?publicada=1');
+    },
+  );
 });

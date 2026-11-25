@@ -166,6 +166,12 @@
     }
   </app-form-field>
 
+  <!-- Os campos continuam como a pessoa os deixou, para ela tocar de novo (CA11). -->
+  @if (publication()?.status === 'failed') {
+    <p role="alert" class="rounded-md border border-error bg-danger-soft p-4 text-body text-error">
+      Não foi possível publicar a rota. Tente de novo.
+    </p>
+  }
   <button
     type="submit"
     class="btn btn-primary mt-3 w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:bg-disabled disabled:text-text-disabled"

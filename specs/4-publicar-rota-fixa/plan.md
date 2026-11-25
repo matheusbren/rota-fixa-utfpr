@@ -119,7 +119,7 @@
     `core/data/fixed-routes.service.{ts,spec.ts}`, `route-form.{ts,html,spec.ts}`,
     `route-detail.{ts,html,spec.ts}`
 
-- [ ] **Tarefa 7 — Avisar a falha do envio sem perder o que foi digitado**
+- [x] **Tarefa 7 — Avisar a falha do envio sem perder o que foi digitado**
   - Cobre: CA11
   - Teste primeiro: o servidor responde erro (e falha de rede): aparece "Não foi
     possível publicar a rota. Tente de novo.", os campos têm os mesmos valores, o

@@ -37,9 +37,10 @@ export interface PublishedFixedRoute {
 }
 
 // O que a publicação devolve, como o `signUp` da US01: um resultado só, que a tela lê, e nunca o
-// erro técnico (architecture.md §2.1). Os outros desfechos da spec, a falha da gravação (CA11) e o
-// conflito com outra rota (CA12), entram como novos membros desta união.
-export type FixedRoutePublication = PublishedFixedRoute;
+// erro técnico (architecture.md §2.1). A rota publicada, ou `failed` quando a gravação falha, sem
+// conexão ou com erro do servidor (CA11). O conflito com outra rota (CA12) entra como novo membro
+// desta união.
+export type FixedRoutePublication = PublishedFixedRoute | { status: 'failed' };
 
 // Mapeador (architecture.md §2.1): a resposta do servidor vira o modelo. Na E2 o db.json já usa
 // os nomes do modelo; na E3 é aqui que o formato do Supabase é traduzido.
@@ -113,6 +114,8 @@ export class FixedRoutesService {
   // da publicação em ISO 8601 (architecture.md §5.1). O id é o servidor que inventa.
   // Os espaços das pontas do bairro e do ponto de encontro não contam (CA3 e CA4), e não são
   // gravados. Só os campos da rota são gravados: o CEP, que só ajuda a achar o bairro, não (CA8).
+  // Sem conexão ou com erro do servidor, o resultado é `failed` (CA11). Até o `errorInterceptor`
+  // nascer, é aqui que a falha vira o resultado que a tela espera (architecture.md §2.1).
   publish({
     driverId,
     campusId,
@@ -142,6 +145,7 @@ export class FixedRoutesService {
         status: 'published',
         route: toFixedRoute(created),
       })),
+      catchError(() => of<FixedRoutePublication>({ status: 'failed' })),
     );
   }
 }
