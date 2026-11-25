@@ -34,6 +34,29 @@ const GUARAPUAVA_ID = CAMPUSES.find(({ name }) => name === 'Guarapuava')?.id;
 // A coleção das rotas no json-server.
 const FIXED_ROUTES_URL = `${environment.apiUrl}/fixed_routes`;
 
+// As rotas ativas da pessoa de exemplo, que o envio confere antes de gravar (CA12).
+const ACTIVE_ROUTES_URL = `${FIXED_ROUTES_URL}?driverId=sample-user&status=active`;
+
+// Uma rota ativa da pessoa de exemplo, já gravada: do Centro, segunda, quarta e sexta às 07:30.
+const ACTIVE_ROUTE = {
+  id: 'rota-do-centro',
+  driverId: 'sample-user',
+  campusId: GUARAPUAVA_ID,
+  direction: 'to_campus',
+  neighborhood: 'Centro',
+  meetingPoint: 'Frente da Padaria Central',
+  weekdays: [1, 3, 5],
+  departureTime: '07:30',
+  seats: 3,
+  suggestedFareCents: null,
+  status: 'active',
+  closedAt: null,
+  createdAt: '2026-11-20T10:00:00.000Z',
+};
+
+// O aviso da rota nova que coincide com a rota do Centro, com os dados dela (CA12).
+const CONFLICT_MESSAGE = 'Esta rota coincide com a sua rota de Centro (seg, qua e sex às 07:30)';
+
 // O que a tela mostra nos oito campos; nos grupos (Sentido e Dias da semana), as opções marcadas.
 interface FormState {
   campus: string;
@@ -275,6 +298,13 @@ describe('RouteForm', () => {
   // A rota válida inteira, pronta para publicar.
   function fillInValidRoute(): Promise<void> {
     return fillInValidRouteExcept();
+  }
+
+  // Antes de gravar, o envio confere as rotas ativas da pessoa de exemplo (CA12), e o teste faz o
+  // papel do json-server nessa busca.
+  async function answerActiveRoutes(routes: (typeof ACTIVE_ROUTE)[]): Promise<void> {
+    httpTesting.expectOne({ method: 'GET', url: ACTIVE_ROUTES_URL }).flush(routes);
+    await harness.fixture.whenStable();
   }
 
   // Depois do envio, a tela da rota busca a rota pelo id e o nome do campus dela, e o teste faz o
@@ -765,12 +795,14 @@ describe('RouteForm', () => {
 
   // CA9: o POST leva o que a pessoa informou e a pessoa de exemplo como motorista (spec, "Assume
   // que"), e não leva o CEP, que só ajuda a achar o bairro (CA8): o `toEqual` recusa qualquer campo a
-  // mais. O teste faz o papel do json-server, que inventa o id da rota.
+  // mais. O teste faz o papel do json-server: a pessoa não tem rota ativa que conflite (CA12), e o
+  // servidor inventa o id da rota gravada.
   it('publica a rota ativa, com a pessoa de exemplo como motorista, e abre a tela dela com "Rota publicada"', async () => {
     await openFromMenu();
     await fillInEveryField();
 
     await tap(submitButton());
+    await answerActiveRoutes([]);
 
     const request = httpTesting.expectOne({ method: 'POST', url: FIXED_ROUTES_URL });
     expect(request.request.body).toEqual({
@@ -813,6 +845,7 @@ describe('RouteForm', () => {
     // O botão é guardado antes do toque, porque o rótulo dele muda durante a gravação.
     const button = submitButton();
     await tap(button);
+    await answerActiveRoutes([]);
     const request = httpTesting.expectOne({ method: 'POST', url: FIXED_ROUTES_URL });
 
     expect(button?.disabled, 'botão bloqueado').toBe(true);
@@ -855,6 +888,7 @@ describe('RouteForm', () => {
       // O botão é guardado antes do toque, porque o rótulo dele muda durante a gravação.
       const button = submitButton();
       await tap(button);
+      await answerActiveRoutes([]);
       const request = httpTesting.expectOne({ method: 'POST', url: FIXED_ROUTES_URL });
       const sent = request.request.body;
 
@@ -870,6 +904,7 @@ describe('RouteForm', () => {
       expect(button?.disabled, 'botão "Publicar rota" ligado').toBe(false);
 
       await tap(button);
+      await answerActiveRoutes([]);
       const retry = httpTesting.expectOne({ method: 'POST', url: FIXED_ROUTES_URL });
 
       // A nova tentativa leva os mesmos dados, e é uma gravação em andamento como a primeira
@@ -887,4 +922,69 @@ describe('RouteForm', () => {
       expect(TestBed.inject(Router).url).toBe('/rotas/rota-nova?publicada=1');
     },
   );
+
+  // Uma rota nova que a rota do Centro impede: da Vila Carli, quarta às 08:00, 30 minutos depois da
+  // saída dela. O bairro, os dias e o horário são diferentes dos dela, então os dados do aviso só
+  // podem vir da rota que conflita.
+  async function fillInRouteThatConflicts(): Promise<void> {
+    await chooseCampus('Guarapuava');
+    await fillIn('Bairro', 'Vila Carli');
+    await fillIn('Ponto de encontro', 'Praça da Catedral');
+    await tap(choice('Dias da semana', 'Quarta'));
+    await fillIn('Horário de saída', '08:00');
+    await fillIn('Vagas', '2');
+  }
+
+  // CA12: a conferência vem antes da gravação. A tela fica onde está, com tudo o que a pessoa
+  // digitou, para ela decidir qual rota manter.
+  it('recusa a rota que coincide com outra rota ativa minha, mostra os dados dela, mantém os campos e não grava nada', async () => {
+    await openFromMenu();
+    await fillInRouteThatConflicts();
+    const filledIn = formState();
+    // O botão é guardado antes do toque, porque o rótulo dele muda durante a conferência.
+    const button = submitButton();
+
+    await tap(button);
+    await answerActiveRoutes([ACTIVE_ROUTE]);
+
+    expect(page.querySelector('main [role="alert"]')?.textContent?.trim()).toBe(CONFLICT_MESSAGE);
+    httpTesting.expectNone(isWrite);
+    expect(TestBed.inject(Router).url).toBe('/minhas-rotas/nova');
+    expect(formState()).toEqual(filledIn);
+    expect(button?.textContent?.trim()).toBe('Publicar rota');
+    expect(button?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+  });
+
+  // CA12: o aviso é do toque que conflitou. A pessoa passa o horário para 90 minutos depois da
+  // saída da rota do Centro e toca de novo: o aviso some, e a rota, que já não coincide, é gravada.
+  it('tira o aviso do conflito no novo toque e publica a rota que deixou de coincidir', async () => {
+    await openFromMenu();
+    await fillInRouteThatConflicts();
+    const button = submitButton();
+    await tap(button);
+    await answerActiveRoutes([ACTIVE_ROUTE]);
+    expect(page.querySelector('main [role="alert"]')?.textContent?.trim()).toBe(CONFLICT_MESSAGE);
+
+    await fillIn('Horário de saída', '09:00');
+    await tap(button);
+
+    expect(page.querySelector('main [role="alert"]')).toBeNull();
+    expect(button?.textContent?.trim()).toBe('Publicando…');
+    expect(button?.disabled, 'botão bloqueado').toBe(true);
+
+    await answerActiveRoutes([ACTIVE_ROUTE]);
+    const request = httpTesting.expectOne({ method: 'POST', url: FIXED_ROUTES_URL });
+    expect(request.request.body).toMatchObject({
+      neighborhood: 'Vila Carli',
+      weekdays: [3],
+      departureTime: '09:00',
+    });
+
+    const published = { id: 'rota-nova', ...request.request.body };
+    request.flush(published);
+    await harness.fixture.whenStable();
+    await answerRouteScreen(published);
+
+    expect(TestBed.inject(Router).url).toBe('/rotas/rota-nova?publicada=1');
+  });
 });

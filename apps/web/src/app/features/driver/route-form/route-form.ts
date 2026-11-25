@@ -8,6 +8,7 @@ import { CampusesService } from '../../../core/data/campuses.service';
 import { FixedRoutesService, NewFixedRoute } from '../../../core/data/fixed-routes.service';
 import { PostalCodeLookup, PostalCodeService } from '../../../core/data/postal-code.service';
 import { FixedRouteDirection } from '../../../core/models/fixed-route';
+import { WeekdaysPipe } from '../../../shared/pipes/weekdays.pipe';
 import { FormField } from '../../../shared/ui/form-field/form-field';
 import { WeekdayPicker } from '../../../shared/ui/weekday-picker/weekday-picker';
 import { isPostalCode, postalCode } from '../../../shared/validators/postal-code';
@@ -71,7 +72,7 @@ const POSTAL_CODE_NOTICES: Record<'not-found' | 'failed', string> = {
 
 @Component({
   selector: 'app-route-form',
-  imports: [ReactiveFormsModule, FormField, WeekdayPicker],
+  imports: [ReactiveFormsModule, FormField, WeekdayPicker, WeekdaysPipe],
   templateUrl: './route-form.html',
   host: { class: 'mx-auto flex w-full max-w-md flex-col gap-6' },
 })
@@ -148,8 +149,8 @@ export class RouteForm {
   // §2.1). O `exhaustMap` não cancela um envio em andamento: cancelar não desfaz a rota já gravada.
   private readonly submission = signal<NewFixedRoute | undefined>(undefined);
 
-  // Todo envio começa sem resultado, inclusive a nova tentativa depois de `failed` (CA11): assim o
-  // `submitting` vale desde o toque, e o aviso da falha anterior some.
+  // Todo envio começa sem resultado, inclusive a nova tentativa depois de `failed` (CA11) ou de
+  // `conflict` (CA12): assim o `submitting` vale desde o toque, e o aviso anterior some.
   protected readonly publication = toSignal(
     toObservable(this.submission).pipe(
       filter((route) => route !== undefined),
@@ -159,7 +160,8 @@ export class RouteForm {
 
   // Do toque até a tela da rota abrir, o botão mostra "Publicando…" e fica bloqueado (CA10). A rota
   // publicada continua bloqueando: a navegação até a tela dela ainda está em andamento, e um toque
-  // nesse meio-tempo gravaria uma segunda rota. A falha libera o botão para a nova tentativa (CA11).
+  // nesse meio-tempo gravaria uma segunda rota. A falha e o conflito liberam o botão para a nova
+  // tentativa (CA11 e CA12).
   protected readonly submitting = computed(() => {
     const publication = this.publication();
     return (

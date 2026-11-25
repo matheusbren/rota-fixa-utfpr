@@ -166,10 +166,19 @@
     }
   </app-form-field>
 
-  <!-- Os campos continuam como a pessoa os deixou, para ela tocar de novo (CA11). -->
-  @if (publication()?.status === 'failed') {
+  <!-- Os campos continuam como a pessoa os deixou, para ela tocar de novo (CA11) ou decidir qual
+  rota manter: o aviso do conflito traz os dados da rota que coincide com a nova (CA12). -->
+  @let result = publication();
+  @if (result?.status === 'failed') {
     <p role="alert" class="rounded-md border border-error bg-danger-soft p-4 text-body text-error">
       Não foi possível publicar a rota. Tente de novo.
+    </p>
+  } @else if (result?.status === 'conflict') {
+    @let conflict = result.route;
+    @let conflictWeekdays = conflict.weekdays | weekdays;
+    <p role="alert" class="rounded-md border border-error bg-danger-soft p-4 text-body text-error">
+      Esta rota coincide com a sua rota de {{ conflict.neighborhood }} ({{ conflictWeekdays }} às
+      {{ conflict.departureTime }})
     </p>
   }
   <button

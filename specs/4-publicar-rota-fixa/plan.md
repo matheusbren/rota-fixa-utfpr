@@ -128,7 +128,7 @@
   - Arquivos previstos: `core/data/fixed-routes.service.ts`,
     `route-form.{ts,html,spec.ts}`
 
-- [ ] **Tarefa 8 — Recusar a rota que coincide com outra minha**
+- [x] **Tarefa 8 — Recusar a rota que coincide com outra minha**
   - Cobre: CA12
   - Teste primeiro: `findConflict` recusa o mesmo dia com 59 minutos de diferença e
     aceita com 60, e aceita dias diferentes no mesmo horário; na tela, com uma rota
