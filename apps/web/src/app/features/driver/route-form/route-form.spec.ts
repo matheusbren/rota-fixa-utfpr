@@ -48,6 +48,18 @@ const BLANK_FORM: FormState = {
   seats: '',
 };
 
+// A dica do Ponto de encontro, que a tela mostra desde que abre (CA4).
+const MEETING_POINT_HINT =
+  'Um lugar público, como a frente de uma padaria. Nunca o endereço da sua casa.';
+
+// Os campos de texto de uma rota válida, cada um com um valor que todas as regras aceitam.
+const VALID_TEXT_FIELDS: [label: string, value: string][] = [
+  ['Bairro', 'Centro'],
+  ['Ponto de encontro', 'Frente da Padaria Central'],
+  ['Horário de saída', '07:30'],
+  ['Vagas', '3'],
+];
+
 // Gravar é qualquer requisição que não seja leitura.
 function isWrite(request: HttpRequest<unknown>): boolean {
   return request.method !== 'GET';
@@ -175,9 +187,36 @@ describe('RouteForm', () => {
     await harness.fixture.whenStable();
   }
 
+  // Sair do campo vale para qualquer um, inclusive a lista do Campus.
   async function leave(label: string): Promise<void> {
-    field(label, HTMLInputElement).dispatchEvent(new Event('blur'));
+    field(label, HTMLElement).dispatchEvent(new Event('blur'));
     await harness.fixture.whenStable();
+  }
+
+  // Os textos que o campo anuncia como descrição (aria-describedby), na ordem: a dica, se houver,
+  // e o aviso de erro.
+  function descriptions(label: string): string[] {
+    const ids = field(label, HTMLElement).getAttribute('aria-describedby')?.split(' ') ?? [];
+    return ids.map((id) => page.querySelector(`[id="${id}"]`)?.textContent?.trim() ?? '');
+  }
+
+  function isMarkedInvalid(label: string): boolean {
+    return field(label, HTMLElement).getAttribute('aria-invalid') === 'true';
+  }
+
+  // Deixa a rota válida, menos o campo que o teste confere: assim o botão desligado prova a regra
+  // dele. Ninguém sai de campo nenhum, então nenhum fica tocado e nenhum aviso aparece.
+  async function fillInValidRouteExcept(skipped: string): Promise<void> {
+    if (skipped !== 'Campus') {
+      await chooseCampus('Guarapuava');
+    }
+    for (const [label, value] of VALID_TEXT_FIELDS) {
+      if (label !== skipped) {
+        await fillIn(label, value);
+      }
+    }
+    // Uma rota válida tem pelo menos um dia (CA5).
+    await tap(choice('Dias da semana', 'Segunda'));
   }
 
   // Fechar a aba apaga o app da memória; só o que estivesse guardado no navegador
@@ -235,4 +274,119 @@ describe('RouteForm', () => {
       httpTesting.expectNone(isWrite);
     },
   );
+
+  // CA2
+  it('avisa ao sair do Campus sem escolher nenhum, mantém o botão desligado e tira o aviso quando um campus é escolhido', async () => {
+    await openFromMenu();
+    await fillInValidRouteExcept('Campus');
+    expectNoMessages();
+
+    await leave('Campus');
+
+    expect(descriptions('Campus')).toEqual(['Uma das pontas precisa ser um campus da UTFPR']);
+    expect(isMarkedInvalid('Campus')).toBe(true);
+    expect(submitButton()?.disabled, 'botão "Publicar rota" desligado').toBe(true);
+
+    await chooseCampus('Guarapuava');
+
+    expect(descriptions('Campus')).toEqual([]);
+    expectNoMessages();
+    expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+  });
+
+  // CA3: vazio, só com espaços, com 2 caracteres e com 2 cercados de espaços.
+  it.each([
+    ['', 'Informe o bairro da outra ponta'],
+    ['   ', 'Informe o bairro da outra ponta'],
+    ['Ce', 'O bairro precisa ter pelo menos 3 letras'],
+    ['  Ce  ', 'O bairro precisa ter pelo menos 3 letras'],
+  ])(
+    'recusa o Bairro %j ao sair do campo, avisa "%s" e mantém o botão desligado',
+    async (value, message) => {
+      await openFromMenu();
+      await fillInValidRouteExcept('Bairro');
+      await fillIn('Bairro', value);
+      expectNoMessages();
+
+      await leave('Bairro');
+
+      expect(descriptions('Bairro')).toEqual([message]);
+      expect(isMarkedInvalid('Bairro')).toBe(true);
+      expect(submitButton()?.disabled, 'botão "Publicar rota" desligado').toBe(true);
+    },
+  );
+
+  // CA3
+  it('tira o aviso do Bairro quando ele chega a 3 caracteres e liga o botão', async () => {
+    await openFromMenu();
+    await fillInValidRouteExcept('Bairro');
+    await fillIn('Bairro', 'Ce');
+    await leave('Bairro');
+    expect(descriptions('Bairro')).toEqual(['O bairro precisa ter pelo menos 3 letras']);
+
+    await fillIn('Bairro', 'Cen');
+    await leave('Bairro');
+
+    expect(descriptions('Bairro')).toEqual([]);
+    expectNoMessages();
+    expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+  });
+
+  // CA4: a dica não é erro, então não marca o campo nem vira alerta.
+  it('mostra a dica do Ponto de encontro desde que a tela abre, sem marcar o campo como errado', async () => {
+    await openFromMenu();
+
+    expect(descriptions('Ponto de encontro')).toEqual([MEETING_POINT_HINT]);
+    expectNoMessages();
+  });
+
+  // CA4: vazio, só com espaços e com 4 caracteres.
+  it.each([
+    ['', 'Descreva o ponto de encontro'],
+    ['   ', 'Descreva o ponto de encontro'],
+    ['Praç', 'Descreva o ponto de encontro com pelo menos 5 caracteres'],
+  ])(
+    'recusa o Ponto de encontro %j ao sair do campo, avisa "%s", mantém a dica e o botão desligado',
+    async (value, message) => {
+      await openFromMenu();
+      await fillInValidRouteExcept('Ponto de encontro');
+      await fillIn('Ponto de encontro', value);
+      expectNoMessages();
+
+      await leave('Ponto de encontro');
+
+      expect(descriptions('Ponto de encontro')).toEqual([MEETING_POINT_HINT, message]);
+      expect(isMarkedInvalid('Ponto de encontro')).toBe(true);
+      expect(submitButton()?.disabled, 'botão "Publicar rota" desligado').toBe(true);
+    },
+  );
+
+  // CA4
+  it('tira o aviso do Ponto de encontro quando ele chega a 5 caracteres e liga o botão', async () => {
+    await openFromMenu();
+    await fillInValidRouteExcept('Ponto de encontro');
+    await fillIn('Ponto de encontro', 'Praç');
+    await leave('Ponto de encontro');
+    expect(descriptions('Ponto de encontro')).toEqual([
+      MEETING_POINT_HINT,
+      'Descreva o ponto de encontro com pelo menos 5 caracteres',
+    ]);
+
+    await fillIn('Ponto de encontro', 'Praça');
+    await leave('Ponto de encontro');
+
+    expect(descriptions('Ponto de encontro')).toEqual([MEETING_POINT_HINT]);
+    expectNoMessages();
+    expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+  });
+
+  // CA3 e CA4: o navegador não deixa digitar além do limite do campo.
+  it.each([
+    ['Bairro', 60],
+    ['Ponto de encontro', 120],
+  ])('não deixa digitar no %s mais de %i caracteres', async (label, maxLength) => {
+    await openFromMenu();
+
+    expect(field(label, HTMLInputElement).maxLength).toBe(maxLength);
+  });
 });

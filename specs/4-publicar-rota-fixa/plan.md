@@ -68,7 +68,7 @@
     `core/models/campus.ts`, `core/data/campuses.service.ts`,
     `core/layout/app-shell/app-shell.ts` (link do menu), `db.json`
 
-- [ ] **Tarefa 2 — Recusar campus, bairro e ponto de encontro inválidos**
+- [x] **Tarefa 2 — Recusar campus, bairro e ponto de encontro inválidos**
   - Cobre: CA2, CA3, CA4
   - Teste primeiro: para cada regra, um teste que aceita e um que recusa (campus
     vazio; bairro vazio, só espaços, com 2 e com 3 caracteres; ponto de encontro

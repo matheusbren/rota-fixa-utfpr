@@ -1,17 +1,23 @@
 <h1 class="text-title-1">Publicar uma rota fixa</h1>
 
 <form class="flex flex-col gap-3" [formGroup]="form">
+  @let campusError = errorOf('campusId');
   <app-form-field label="Campus" controlId="route-form-campus">
     <select
       id="route-form-campus"
       class="select w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
       formControlName="campusId"
+      [attr.aria-invalid]="campusError ? true : null"
+      [attr.aria-describedby]="campusError ? 'route-form-campus-error' : null"
     >
       <option value="">Escolha o campus</option>
       @for (campus of campuses(); track campus.id) {
         <option [value]="campus.id">{{ campus.name }}</option>
       }
     </select>
+    @if (campusError) {
+      <p id="route-form-campus-error" class="text-caption text-error">{{ campusError }}</p>
+    }
   </app-form-field>
 
   <fieldset class="flex flex-col gap-1">
@@ -49,22 +55,48 @@
     />
   </app-form-field>
 
+  @let neighborhoodError = errorOf('neighborhood');
   <app-form-field label="Bairro" controlId="route-form-neighborhood">
     <input
       id="route-form-neighborhood"
       class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
       type="text"
+      maxlength="60"
       formControlName="neighborhood"
+      [attr.aria-invalid]="neighborhoodError ? true : null"
+      [attr.aria-describedby]="neighborhoodError ? 'route-form-neighborhood-error' : null"
     />
+    @if (neighborhoodError) {
+      <p id="route-form-neighborhood-error" class="text-caption text-error">
+        {{ neighborhoodError }}
+      </p>
+    }
   </app-form-field>
 
+  <!-- A dica não é erro: aparece desde o início e continua ali junto com o aviso (CA4). -->
+  @let meetingPointError = errorOf('meetingPoint');
   <app-form-field label="Ponto de encontro" controlId="route-form-meeting-point">
     <input
       id="route-form-meeting-point"
       class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
       type="text"
+      maxlength="120"
       formControlName="meetingPoint"
+      [attr.aria-invalid]="meetingPointError ? true : null"
+      [attr.aria-describedby]="
+        meetingPointError
+          ? 'route-form-meeting-point-hint route-form-meeting-point-error'
+          : 'route-form-meeting-point-hint'
+      "
     />
+    <p id="route-form-meeting-point-hint" class="text-caption text-text-muted">
+      Um lugar público, como a frente de uma padaria. Nunca o endereço da sua casa.
+    </p>
+    @if (meetingPointError) {
+      <p id="route-form-meeting-point-error" class="text-caption text-error">
+        {{ meetingPointError }}
+      </p>
+    }
   </app-form-field>
 
   <fieldset class="flex flex-col gap-1" formGroupName="weekdays">
