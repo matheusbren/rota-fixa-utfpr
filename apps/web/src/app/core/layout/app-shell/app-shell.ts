@@ -12,7 +12,10 @@ import { TopBar } from '../top-bar/top-bar';
 })
 export class AppShell {
   // Cada história acrescenta o link da própria tela quando ela existir.
-  protected readonly navLinks: NavLink[] = [{ label: 'Criar conta', path: '/criar-conta' }];
+  protected readonly navLinks: NavLink[] = [
+    { label: 'Criar conta', path: '/criar-conta' },
+    { label: 'Publicar uma rota fixa', path: '/minhas-rotas/nova' },
+  ];
 
   protected readonly drawerOpen = signal(false);
 

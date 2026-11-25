@@ -1,0 +1,110 @@
+<h1 class="text-title-1">Publicar uma rota fixa</h1>
+
+<form class="flex flex-col gap-3" [formGroup]="form">
+  <app-form-field label="Campus" controlId="route-form-campus">
+    <select
+      id="route-form-campus"
+      class="select w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+      formControlName="campusId"
+    >
+      <option value="">Escolha o campus</option>
+      @for (campus of campuses(); track campus.id) {
+        <option [value]="campus.id">{{ campus.name }}</option>
+      }
+    </select>
+  </app-form-field>
+
+  <fieldset class="flex flex-col gap-1">
+    <legend class="mb-1 text-label">Sentido</legend>
+    <label class="flex min-h-12 items-center gap-3 text-body">
+      <input
+        type="radio"
+        class="radio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        name="direction"
+        value="to_campus"
+        formControlName="direction"
+      />
+      Vou para o campus
+    </label>
+    <label class="flex min-h-12 items-center gap-3 text-body">
+      <input
+        type="radio"
+        class="radio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        name="direction"
+        value="from_campus"
+        formControlName="direction"
+      />
+      Volto do campus
+    </label>
+  </fieldset>
+
+  <app-form-field label="CEP do bairro (opcional)" controlId="route-form-postal-code">
+    <input
+      id="route-form-postal-code"
+      class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+      type="text"
+      inputmode="numeric"
+      autocomplete="postal-code"
+      formControlName="postalCode"
+    />
+  </app-form-field>
+
+  <app-form-field label="Bairro" controlId="route-form-neighborhood">
+    <input
+      id="route-form-neighborhood"
+      class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+      type="text"
+      formControlName="neighborhood"
+    />
+  </app-form-field>
+
+  <app-form-field label="Ponto de encontro" controlId="route-form-meeting-point">
+    <input
+      id="route-form-meeting-point"
+      class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+      type="text"
+      formControlName="meetingPoint"
+    />
+  </app-form-field>
+
+  <fieldset class="flex flex-col gap-1" formGroupName="weekdays">
+    <legend class="mb-1 text-label">Dias da semana</legend>
+    @for (weekday of weekdays; track weekday.isoDay) {
+      <label class="flex min-h-12 items-center gap-3 text-body">
+        <input
+          type="checkbox"
+          class="checkbox focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          [formControlName]="weekday.isoDay"
+        />
+        {{ weekday.label }}
+      </label>
+    }
+  </fieldset>
+
+  <app-form-field label="Horário de saída" controlId="route-form-departure-time">
+    <input
+      id="route-form-departure-time"
+      class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+      type="time"
+      formControlName="departureTime"
+    />
+  </app-form-field>
+
+  <app-form-field label="Vagas" controlId="route-form-seats">
+    <input
+      id="route-form-seats"
+      class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+      type="number"
+      inputmode="numeric"
+      formControlName="seats"
+    />
+  </app-form-field>
+
+  <button
+    type="submit"
+    class="btn btn-primary mt-3 w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:bg-disabled disabled:text-text-disabled"
+    [disabled]="form.invalid"
+  >
+    Publicar rota
+  </button>
+</form>

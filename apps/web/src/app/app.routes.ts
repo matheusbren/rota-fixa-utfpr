@@ -7,7 +7,13 @@ export const routes: Routes = [
   {
     path: '',
     component: AppShell,
+    // `minhas-rotas` vem antes do caminho vazio: para saber se uma URL cabe no caminho vazio, o
+    // roteador baixa as rotas de auth, e quem abre `/minhas-rotas` não precisa delas.
     children: [
+      {
+        path: 'minhas-rotas',
+        loadChildren: () => import('./features/driver/driver.routes').then((m) => m.driverRoutes),
+      },
       {
         path: '',
         loadChildren: () => import('./features/auth/auth.routes').then((m) => m.authRoutes),

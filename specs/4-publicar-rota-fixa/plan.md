@@ -57,7 +57,7 @@
 
 ## Tarefas
 
-- [ ] **Tarefa 1 — Abrir a tela de publicar com o botão desligado**
+- [x] **Tarefa 1 — Abrir a tela de publicar com o botão desligado**
   - Cobre: CA1, CA17
   - Teste primeiro: `route-form.spec.ts` acha os oito campos pelo rótulo, os 13
     câmpus vindos do GET `/campuses`, "Vou para o campus" marcado, nenhuma
