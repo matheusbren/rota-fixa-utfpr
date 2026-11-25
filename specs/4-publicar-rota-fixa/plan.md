@@ -95,7 +95,7 @@
   - Arquivos previstos: `core/data/postal-code.service.{ts,spec.ts}`,
     `shared/validators/postal-code.{ts,spec.ts}`, `route-form.{ts,html,spec.ts}`
 
-- [ ] **Tarefa 5 — Mostrar a rota pelo id da URL**
+- [x] **Tarefa 5 — Mostrar a rota pelo id da URL**
   - Cobre: CA13, CA14
   - Teste primeiro: `route-detail.spec.ts` entrega o `routeId` como input e faz o
     papel do servidor: rota que existe mostra campus, sentido, ponto de encontro,

@@ -1,0 +1,51 @@
+@let lookup = routeLookup();
+@if (lookup?.status === 'found') {
+  @let route = lookup.route;
+  @let campusName = lookup.campus.name;
+  <!-- O sentido vai da origem ao destino: do bairro ao campus na ida, ao contrário na volta (CA13). -->
+  @let origin = route.direction === 'to_campus' ? route.neighborhood : campusName;
+  @let destination = route.direction === 'to_campus' ? campusName : route.neighborhood;
+  <h1 class="text-title-1">{{ origin }} → {{ destination }}</h1>
+
+  <dl class="flex flex-col gap-4 rounded-lg border border-base-300 bg-base-100 p-4">
+    <div class="flex flex-col gap-1">
+      <dt class="text-label text-text-muted">Campus</dt>
+      <dd class="text-body-strong">{{ campusName }}</dd>
+    </div>
+    <div class="flex flex-col gap-1">
+      <dt class="text-label text-text-muted">Ponto de encontro</dt>
+      <dd class="text-body-strong">{{ route.meetingPoint }}</dd>
+    </div>
+    <div class="flex flex-col gap-1">
+      <dt class="text-label text-text-muted">Dias da semana</dt>
+      <dd class="text-body-strong">{{ route.weekdays | weekdays }}</dd>
+    </div>
+    <div class="flex flex-col gap-1">
+      <dt class="text-label text-text-muted">Horário de saída</dt>
+      <dd class="text-time">{{ route.departureTime }}</dd>
+    </div>
+    <div class="flex flex-col gap-1">
+      <dt class="text-label text-text-muted">Vagas</dt>
+      <dd class="text-body-strong">{{ route.seats | i18nPlural: seatsLabels }}</dd>
+    </div>
+  </dl>
+} @else if (lookup?.status === 'not-found') {
+  <h1 class="text-title-1">Não achamos esta rota</h1>
+  <!-- A tela "Minhas rotas" nasce na Tarefa 10 desta história; até lá, o endereço cai na rota coringa. -->
+  <a
+    class="btn btn-primary w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+    routerLink="/minhas-rotas"
+    >Minhas rotas</a
+  >
+} @else if (lookup?.status === 'failed') {
+  <p role="alert" class="rounded-md border border-error bg-danger-soft p-4 text-body text-error">
+    Não foi possível carregar a rota. Tente de novo.
+  </p>
+  <button
+    type="button"
+    class="btn btn-primary w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+    (click)="retry()"
+  >
+    Tentar de novo
+  </button>
+}
