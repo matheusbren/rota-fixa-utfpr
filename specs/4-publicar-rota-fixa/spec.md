@@ -1,6 +1,6 @@
 ---
 issue: 4
-status: rascunho
+status: aprovada
 ---
 
 # US04 — Publicar uma rota fixa
