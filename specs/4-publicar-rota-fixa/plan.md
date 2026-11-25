@@ -85,7 +85,7 @@
   - Arquivos previstos: `shared/ui/weekday-picker/`,
     `shared/validators/weekdays-count.{ts,spec.ts}`, `route-form.{ts,html,spec.ts}`
 
-- [ ] **Tarefa 4 — Preencher o bairro pelo CEP**
+- [x] **Tarefa 4 — Preencher o bairro pelo CEP**
   - Cobre: CA8
   - Teste primeiro: o teste faz o papel do ViaCEP — CEP que existe preenche o
     Bairro; formato errado mostra "O CEP tem 8 números" e desliga o botão; `erro`

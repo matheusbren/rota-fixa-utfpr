@@ -1,5 +1,9 @@
 import { HttpRequest, provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import {
+  HttpTestingController,
+  TestRequest,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -65,6 +69,23 @@ const VALID_TEXT_FIELDS: [label: string, value: string][] = [
   ['Horário de saída', '07:30'],
   ['Vagas', '3'],
 ];
+
+// O rótulo do campo CEP, que a pessoa enxerga na tela (CA1).
+const POSTAL_CODE = 'CEP do bairro (opcional)';
+
+// Os dois avisos da busca do CEP. Não são erro de validação: não marcam o campo (CA8).
+const POSTAL_CODE_NOT_FOUND = 'Não achamos este CEP. Digite o bairro.';
+const POSTAL_CODE_LOOKUP_FAILED = 'Não deu para buscar o CEP agora. Digite o bairro.';
+
+// O endereço do ViaCEP para um CEP, só com os 8 números, como a API pede.
+function viaCepUrl(digits: string): string {
+  return `https://viacep.com.br/ws/${digits}/json/`;
+}
+
+// A resposta do ViaCEP para um CEP que existe. Da resposta, a tela só usa o bairro.
+function viaCepAddress(bairro: string): Record<string, string> {
+  return { logradouro: 'Rua XV de Novembro', bairro, localidade: 'Guarapuava', uf: 'PR' };
+}
 
 // Gravar é qualquer requisição que não seja leitura.
 function isWrite(request: HttpRequest<unknown>): boolean {
@@ -512,5 +533,185 @@ describe('RouteForm', () => {
     await openFromMenu();
 
     expect(field(label, HTMLInputElement).maxLength).toBe(maxLength);
+  });
+
+  // O teste faz o papel do ViaCEP: responde à busca do CEP com os 8 números.
+  async function answerPostalCode(
+    digits: string,
+    respond: (request: TestRequest) => void,
+  ): Promise<void> {
+    respond(httpTesting.expectOne({ method: 'GET', url: viaCepUrl(digits) }));
+    await harness.fixture.whenStable();
+  }
+
+  function neighborhoodValue(): string {
+    return field('Bairro', HTMLInputElement).value;
+  }
+
+  // CA8: a busca sai quando o CEP fica completo, sem esperar a pessoa sair do campo.
+  it.each(['85010-000', '85010000'])(
+    'preenche o Bairro com o bairro do CEP %j assim que os 8 números são digitados',
+    async (value) => {
+      await openFromMenu();
+      await fillInValidRouteExcept('Bairro');
+
+      await fillIn(POSTAL_CODE, value);
+      await answerPostalCode('85010000', (request) => request.flush(viaCepAddress('Santa Cruz')));
+
+      expect(neighborhoodValue()).toBe('Santa Cruz');
+      expect(descriptions(POSTAL_CODE)).toEqual([]);
+      expectNoMessages();
+      expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+    },
+  );
+
+  // CA8: o CEP só ajuda; quem decide o bairro é a pessoa.
+  it('deixa editar o Bairro preenchido pelo CEP', async () => {
+    await openFromMenu();
+    await fillIn(POSTAL_CODE, '85010-000');
+    await answerPostalCode('85010000', (request) => request.flush(viaCepAddress('Santa Cruz')));
+
+    const neighborhood = field('Bairro', HTMLInputElement);
+    expect(neighborhood.readOnly).toBe(false);
+    expect(neighborhood.disabled).toBe(false);
+
+    await fillIn('Bairro', 'Vila Carli');
+    await leave('Bairro');
+
+    expect(neighborhoodValue()).toBe('Vila Carli');
+    expectNoMessages();
+  });
+
+  // CA3 e CA8: o Bairro não guarda mais de 60 caracteres, nem quando eles vêm do ViaCEP.
+  it('corta em 60 caracteres o bairro do CEP que passa do limite do campo', async () => {
+    const longNeighborhood = 'Conjunto Habitacional Jardim das Américas '.repeat(2);
+    await openFromMenu();
+    await fillInValidRouteExcept('Bairro');
+
+    await fillIn(POSTAL_CODE, '85010-000');
+    await answerPostalCode('85010000', (request) => request.flush(viaCepAddress(longNeighborhood)));
+
+    expect(neighborhoodValue()).toBe(longNeighborhood.slice(0, 60));
+    expectNoMessages();
+    expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+  });
+
+  // CA3 e CA8: o aviso do Bairro segue a regra de todos os campos, e só aparece depois que a
+  // pessoa sai do Bairro, mesmo quando foi o CEP que o preencheu.
+  it('só avisa do bairro curto vindo do CEP depois que a pessoa sai do Bairro', async () => {
+    await openFromMenu();
+    await fillInValidRouteExcept('Bairro');
+
+    await fillIn(POSTAL_CODE, '01001-000');
+    await answerPostalCode('01001000', (request) => request.flush(viaCepAddress('Sé')));
+
+    expect(neighborhoodValue()).toBe('Sé');
+    expectNoMessages();
+    expect(submitButton()?.disabled, 'botão "Publicar rota" desligado').toBe(true);
+
+    await leave('Bairro');
+
+    expect(descriptions('Bairro')).toEqual(['O bairro precisa ter pelo menos 3 letras']);
+  });
+
+  // CA8: números de menos, de mais e letra não são CEP, e nada é buscado.
+  it.each(['8501000', '850100001', '85010-0a0'])(
+    'recusa o CEP %j ao sair do campo, avisa "O CEP tem 8 números", não busca e mantém o botão desligado',
+    async (value) => {
+      await openFromMenu();
+      await fillInValidRouteExcept(POSTAL_CODE);
+      await fillIn(POSTAL_CODE, value);
+      expectNoMessages();
+
+      await leave(POSTAL_CODE);
+
+      expect(descriptions(POSTAL_CODE)).toEqual(['O CEP tem 8 números']);
+      expect(isMarkedInvalid(POSTAL_CODE)).toBe(true);
+      expect(submitButton()?.disabled, 'botão "Publicar rota" desligado').toBe(true);
+      httpTesting.expectNone((request) => request.url.startsWith('https://viacep.com.br/'));
+    },
+  );
+
+  // CA8: o CEP é opcional, então apagá-lo também tira o aviso.
+  it('tira o aviso de formato e liga o botão quando o CEP é apagado', async () => {
+    await openFromMenu();
+    await fillInValidRouteExcept(POSTAL_CODE);
+    await fillIn(POSTAL_CODE, '8501');
+    await leave(POSTAL_CODE);
+    expect(descriptions(POSTAL_CODE)).toEqual(['O CEP tem 8 números']);
+
+    await fillIn(POSTAL_CODE, '');
+    await leave(POSTAL_CODE);
+
+    expect(descriptions(POSTAL_CODE)).toEqual([]);
+    expectNoMessages();
+    expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+  });
+
+  // CA8
+  it('tira o aviso de formato, busca o CEP e liga o botão quando o CEP é corrigido', async () => {
+    await openFromMenu();
+    await fillInValidRouteExcept(POSTAL_CODE);
+    await fillIn(POSTAL_CODE, '8501');
+    await leave(POSTAL_CODE);
+    expect(descriptions(POSTAL_CODE)).toEqual(['O CEP tem 8 números']);
+
+    await fillIn(POSTAL_CODE, '85010-000');
+    await answerPostalCode('85010000', (request) => request.flush(viaCepAddress('Centro')));
+    await leave(POSTAL_CODE);
+
+    expect(descriptions(POSTAL_CODE)).toEqual([]);
+    expectNoMessages();
+    expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+  });
+
+  // CA8: os avisos da busca não são erro do campo. O Bairro fica como estava e o botão continua
+  // ligado, porque o CEP é só uma ajuda.
+  it.each([
+    [
+      'o CEP não existe',
+      POSTAL_CODE_NOT_FOUND,
+      (request: TestRequest) => request.flush({ erro: 'true' }),
+    ],
+    [
+      'a busca fica sem conexão',
+      POSTAL_CODE_LOOKUP_FAILED,
+      (request: TestRequest) => request.error(new ProgressEvent('error')),
+    ],
+    [
+      'o ViaCEP está fora do ar',
+      POSTAL_CODE_LOOKUP_FAILED,
+      (request: TestRequest) =>
+        request.flush('', { status: 503, statusText: 'Service Unavailable' }),
+    ],
+  ])(
+    'quando %s, avisa "%s" sem marcar o CEP, deixa o Bairro como estava e não bloqueia o botão',
+    async (_, message, respond) => {
+      await openFromMenu();
+      await fillInValidRouteExcept(POSTAL_CODE);
+
+      await fillIn(POSTAL_CODE, '85010-000');
+      await answerPostalCode('85010000', respond);
+      await leave(POSTAL_CODE);
+
+      expect(descriptions(POSTAL_CODE)).toEqual([message]);
+      expect(isMarkedInvalid(POSTAL_CODE)).toBe(false);
+      expectNoMessages();
+      expect(neighborhoodValue()).toBe('Centro');
+      expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+    },
+  );
+
+  // CA8: só a resposta do último CEP digitado preenche o Bairro.
+  it('cancela a busca do CEP anterior quando outro CEP é digitado', async () => {
+    await openFromMenu();
+    await fillIn(POSTAL_CODE, '85010-000');
+    const previous = httpTesting.expectOne(viaCepUrl('85010000'));
+
+    await fillIn(POSTAL_CODE, '85015-430');
+    await answerPostalCode('85015430', (request) => request.flush(viaCepAddress('Santa Cruz')));
+
+    expect(previous.cancelled).toBe(true);
+    expect(neighborhoodValue()).toBe('Santa Cruz');
   });
 });

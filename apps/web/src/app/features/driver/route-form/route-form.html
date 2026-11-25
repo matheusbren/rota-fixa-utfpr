@@ -44,6 +44,9 @@
     </label>
   </fieldset>
 
+  <!-- O formato errado é erro do campo; o aviso da busca não é: não marca o campo (CA8). -->
+  @let postalCodeError = errorOf('postalCode');
+  @let postalCodeNotice = postalCodeLookupNotice();
   <app-form-field label="CEP do bairro (opcional)" controlId="route-form-postal-code">
     <input
       id="route-form-postal-code"
@@ -52,7 +55,24 @@
       inputmode="numeric"
       autocomplete="postal-code"
       formControlName="postalCode"
+      [attr.aria-invalid]="postalCodeError ? true : null"
+      [attr.aria-describedby]="
+        postalCodeError
+          ? 'route-form-postal-code-error'
+          : postalCodeNotice
+            ? 'route-form-postal-code-notice'
+            : null
+      "
     />
+    @if (postalCodeError) {
+      <p id="route-form-postal-code-error" class="text-caption text-error">
+        {{ postalCodeError }}
+      </p>
+    } @else if (postalCodeNotice) {
+      <p id="route-form-postal-code-notice" class="text-caption text-text-muted">
+        {{ postalCodeNotice }}
+      </p>
+    }
   </app-form-field>
 
   @let neighborhoodError = errorOf('neighborhood');
@@ -61,7 +81,7 @@
       id="route-form-neighborhood"
       class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
       type="text"
-      maxlength="60"
+      [maxlength]="neighborhoodMaxLength"
       formControlName="neighborhood"
       [attr.aria-invalid]="neighborhoodError ? true : null"
       [attr.aria-describedby]="neighborhoodError ? 'route-form-neighborhood-error' : null"
