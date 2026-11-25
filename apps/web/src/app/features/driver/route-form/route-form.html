@@ -99,29 +99,38 @@
     }
   </app-form-field>
 
-  <fieldset class="flex flex-col gap-1" formGroupName="weekdays">
+  <!-- O aviso dos dias vale para o grupo inteiro, então é o grupo que fica marcado (CA5). -->
+  @let weekdaysError = errorOf('weekdays');
+  <fieldset
+    class="flex flex-col gap-1"
+    [attr.aria-invalid]="weekdaysError ? true : null"
+    [attr.aria-describedby]="weekdaysError ? 'route-form-weekdays-error' : null"
+  >
     <legend class="mb-1 text-label">Dias da semana</legend>
-    @for (weekday of weekdays; track weekday.isoDay) {
-      <label class="flex min-h-12 items-center gap-3 text-body">
-        <input
-          type="checkbox"
-          class="checkbox focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
-          [formControlName]="weekday.isoDay"
-        />
-        {{ weekday.label }}
-      </label>
+    <app-weekday-picker formControlName="weekdays" />
+    @if (weekdaysError) {
+      <p id="route-form-weekdays-error" class="text-caption text-error">{{ weekdaysError }}</p>
     }
   </fieldset>
 
+  @let departureTimeError = errorOf('departureTime');
   <app-form-field label="Horário de saída" controlId="route-form-departure-time">
     <input
       id="route-form-departure-time"
       class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
       type="time"
       formControlName="departureTime"
+      [attr.aria-invalid]="departureTimeError ? true : null"
+      [attr.aria-describedby]="departureTimeError ? 'route-form-departure-time-error' : null"
     />
+    @if (departureTimeError) {
+      <p id="route-form-departure-time-error" class="text-caption text-error">
+        {{ departureTimeError }}
+      </p>
+    }
   </app-form-field>
 
+  @let seatsError = errorOf('seats');
   <app-form-field label="Vagas" controlId="route-form-seats">
     <input
       id="route-form-seats"
@@ -129,7 +138,12 @@
       type="number"
       inputmode="numeric"
       formControlName="seats"
+      [attr.aria-invalid]="seatsError ? true : null"
+      [attr.aria-describedby]="seatsError ? 'route-form-seats-error' : null"
     />
+    @if (seatsError) {
+      <p id="route-form-seats-error" class="text-caption text-error">{{ seatsError }}</p>
+    }
   </app-form-field>
 
   <button

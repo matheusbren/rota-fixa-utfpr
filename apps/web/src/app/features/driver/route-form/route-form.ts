@@ -3,10 +3,16 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CampusesService } from '../../../core/data/campuses.service';
 import { FormField } from '../../../shared/ui/form-field/form-field';
+import { WeekdayPicker } from '../../../shared/ui/weekday-picker/weekday-picker';
 import { trimmedMinLength, trimmedRequired } from '../../../shared/validators/trimmed';
+import { weekdaysCount } from '../../../shared/validators/weekdays-count';
 
 // Os campos que já têm regra própria, pelo nome do controle no formulário.
-type ValidatedField = 'campusId' | 'neighborhood' | 'meetingPoint';
+type ValidatedField =
+  'campusId' | 'neighborhood' | 'meetingPoint' | 'weekdays' | 'departureTime' | 'seats';
+
+// Abaixo de 1, acima de 4 ou número quebrado: a mesma frase para as três regras (CA7).
+const SEATS_RANGE_MESSAGE = 'Uma rota tem de 1 a 4 vagas';
 
 // O texto de cada erro, por campo e pela chave que o validador devolve: o mesmo erro tem frases
 // diferentes em campos diferentes (o "vazio" do Bairro não é o do Ponto de encontro).
@@ -22,29 +28,29 @@ const ERROR_MESSAGES: Record<ValidatedField, Record<string, string>> = {
     trimmedRequired: 'Descreva o ponto de encontro',
     trimmedMinLength: 'Descreva o ponto de encontro com pelo menos 5 caracteres',
   },
+  weekdays: {
+    tooFewWeekdays: 'Escolha pelo menos um dia da semana',
+    tooManyWeekdays: 'Uma rota tem no máximo 5 dias',
+  },
+  departureTime: {
+    required: 'Informe o horário de saída',
+  },
+  seats: {
+    required: 'Informe quantas vagas o carro oferece',
+    min: SEATS_RANGE_MESSAGE,
+    max: SEATS_RANGE_MESSAGE,
+    pattern: SEATS_RANGE_MESSAGE,
+  },
 };
-
-// Segunda a sábado, pelo número do dia no padrão ISO (1 = segunda), como o `weekdays` da rota
-// (architecture.md §5.1).
-const WEEKDAYS = [
-  { isoDay: 1, label: 'Segunda' },
-  { isoDay: 2, label: 'Terça' },
-  { isoDay: 3, label: 'Quarta' },
-  { isoDay: 4, label: 'Quinta' },
-  { isoDay: 5, label: 'Sexta' },
-  { isoDay: 6, label: 'Sábado' },
-];
 
 @Component({
   selector: 'app-route-form',
-  imports: [ReactiveFormsModule, FormField],
+  imports: [ReactiveFormsModule, FormField, WeekdayPicker],
   templateUrl: './route-form.html',
   host: { class: 'mx-auto flex w-full max-w-md flex-col gap-6' },
 })
 export class RouteForm {
   protected readonly campuses = toSignal(inject(CampusesService).list(), { initialValue: [] });
-
-  protected readonly weekdays = WEEKDAYS;
 
   private readonly formBuilder = inject(FormBuilder).nonNullable;
 
@@ -58,17 +64,14 @@ export class RouteForm {
     // Os espaços das pontas não contam (CA3 e CA4).
     neighborhood: ['', [trimmedRequired, trimmedMinLength(3)]],
     meetingPoint: ['', [trimmedRequired, trimmedMinLength(5)]],
-    // Uma caixa por dia, pelo número ISO, todas desmarcadas.
-    weekdays: this.formBuilder.group({
-      1: false,
-      2: false,
-      3: false,
-      4: false,
-      5: false,
-      6: false,
-    }),
+    // Os dias marcados, pelo número ISO; nenhum ao abrir (CA5).
+    weekdays: this.formBuilder.control<number[]>([], weekdaysCount(1, 5)),
     departureTime: ['', Validators.required],
-    seats: [null as number | null, Validators.required],
+    // De 1 a 4, e só número inteiro: o padrão recusa o 2,5 (CA7).
+    seats: [
+      null as number | null,
+      [Validators.required, Validators.min(1), Validators.max(4), Validators.pattern(/^\d+$/)],
+    ],
   });
 
   // O aviso do campo só aparece depois que a pessoa sai dele, e um erro por vez.

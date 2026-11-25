@@ -52,6 +52,12 @@ const BLANK_FORM: FormState = {
 const MEETING_POINT_HINT =
   'Um lugar público, como a frente de uma padaria. Nunca o endereço da sua casa.';
 
+// Os dias que a tela oferece, de segunda a sábado (CA1).
+const WEEKDAY_LABELS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+
+// A mesma frase para Vagas abaixo de 1, acima de 4 ou com número quebrado (CA7).
+const SEATS_RANGE_MESSAGE = 'Uma rota tem de 1 a 4 vagas';
+
 // Os campos de texto de uma rota válida, cada um com um valor que todas as regras aceitam.
 const VALID_TEXT_FIELDS: [label: string, value: string][] = [
   ['Bairro', 'Centro'],
@@ -116,12 +122,16 @@ describe('RouteForm', () => {
 
   // Sentido e Dias da semana são grupos de opções: o grupo é achado pela legenda, e cada opção
   // pelo próprio rótulo.
-  function choices(legend: string): HTMLLabelElement[] {
-    const group = Array.from(page.querySelectorAll('main fieldset')).find(
-      (element) => element.querySelector('legend')?.textContent?.trim() === legend,
+  function group(legend: string): HTMLFieldSetElement {
+    const element = Array.from(page.querySelectorAll<HTMLFieldSetElement>('main fieldset')).find(
+      (fieldset) => fieldset.querySelector('legend')?.textContent?.trim() === legend,
     );
-    expect(group, `grupo "${legend}"`).toBeDefined();
-    return Array.from(group?.querySelectorAll('label') ?? []);
+    expect(element, `grupo "${legend}"`).toBeDefined();
+    return element as HTMLFieldSetElement;
+  }
+
+  function choices(legend: string): HTMLLabelElement[] {
+    return Array.from(group(legend).querySelectorAll('label'));
   }
 
   function choiceLabels(legend: string): string[] {
@@ -193,15 +203,27 @@ describe('RouteForm', () => {
     await harness.fixture.whenStable();
   }
 
-  // Os textos que o campo anuncia como descrição (aria-describedby), na ordem: a dica, se houver,
-  // e o aviso de erro.
-  function descriptions(label: string): string[] {
-    const ids = field(label, HTMLElement).getAttribute('aria-describedby')?.split(' ') ?? [];
+  // Os textos que o campo (ou o grupo) anuncia como descrição (aria-describedby), na ordem: a dica,
+  // se houver, e o aviso de erro.
+  function descriptionsOf(element: HTMLElement): string[] {
+    const ids = element.getAttribute('aria-describedby')?.split(' ') ?? [];
     return ids.map((id) => page.querySelector(`[id="${id}"]`)?.textContent?.trim() ?? '');
+  }
+
+  function descriptions(label: string): string[] {
+    return descriptionsOf(field(label, HTMLElement));
+  }
+
+  function groupDescriptions(legend: string): string[] {
+    return descriptionsOf(group(legend));
   }
 
   function isMarkedInvalid(label: string): boolean {
     return field(label, HTMLElement).getAttribute('aria-invalid') === 'true';
+  }
+
+  function isGroupMarkedInvalid(legend: string): boolean {
+    return group(legend).getAttribute('aria-invalid') === 'true';
   }
 
   // Deixa a rota válida, menos o campo que o teste confere: assim o botão desligado prova a regra
@@ -216,7 +238,9 @@ describe('RouteForm', () => {
       }
     }
     // Uma rota válida tem pelo menos um dia (CA5).
-    await tap(choice('Dias da semana', 'Segunda'));
+    if (skipped !== 'Dias da semana') {
+      await tap(choice('Dias da semana', 'Segunda'));
+    }
   }
 
   // Fechar a aba apaga o app da memória; só o que estivesse guardado no navegador
@@ -238,14 +262,7 @@ describe('RouteForm', () => {
     expect(formState()).toEqual(BLANK_FORM);
     expect(campusOptions()).toEqual(CAMPUS_NAMES);
     expect(choiceLabels('Sentido')).toEqual(['Vou para o campus', 'Volto do campus']);
-    expect(choiceLabels('Dias da semana')).toEqual([
-      'Segunda',
-      'Terça',
-      'Quarta',
-      'Quinta',
-      'Sexta',
-      'Sábado',
-    ]);
+    expect(choiceLabels('Dias da semana')).toEqual(WEEKDAY_LABELS);
     expectNoMessages();
     expect(submitButton()?.disabled, 'botão "Publicar rota" desligado').toBe(true);
   });
@@ -376,6 +393,113 @@ describe('RouteForm', () => {
     await leave('Ponto de encontro');
 
     expect(descriptions('Ponto de encontro')).toEqual([MEETING_POINT_HINT]);
+    expectNoMessages();
+    expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+  });
+
+  // CA5: o aviso dos dias aparece no primeiro toque numa caixa, não ao sair do grupo.
+  it('aceita um dia, avisa quando o único dia é desmarcado, mantém o botão desligado e tira o aviso quando um dia é marcado', async () => {
+    await openFromMenu();
+    await fillInValidRouteExcept('Dias da semana');
+    expectNoMessages();
+
+    await tap(choice('Dias da semana', 'Segunda'));
+
+    expectNoMessages();
+    expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+
+    await tap(choice('Dias da semana', 'Segunda'));
+
+    expect(groupDescriptions('Dias da semana')).toEqual(['Escolha pelo menos um dia da semana']);
+    expect(isGroupMarkedInvalid('Dias da semana')).toBe(true);
+    expect(submitButton()?.disabled, 'botão "Publicar rota" desligado').toBe(true);
+
+    await tap(choice('Dias da semana', 'Quarta'));
+
+    expect(groupDescriptions('Dias da semana')).toEqual([]);
+    expectNoMessages();
+    expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+  });
+
+  // CA5
+  it('aceita cinco dias, avisa ao marcar o sexto, mantém o botão desligado e tira o aviso quando volta a cinco', async () => {
+    await openFromMenu();
+    await fillInValidRouteExcept('Dias da semana');
+    for (const label of WEEKDAY_LABELS.slice(0, 5)) {
+      await tap(choice('Dias da semana', label));
+    }
+
+    expectNoMessages();
+    expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+
+    await tap(choice('Dias da semana', 'Sábado'));
+
+    expect(groupDescriptions('Dias da semana')).toEqual(['Uma rota tem no máximo 5 dias']);
+    expect(isGroupMarkedInvalid('Dias da semana')).toBe(true);
+    expect(submitButton()?.disabled, 'botão "Publicar rota" desligado').toBe(true);
+
+    await tap(choice('Dias da semana', 'Segunda'));
+
+    expect(groupDescriptions('Dias da semana')).toEqual([]);
+    expectNoMessages();
+    expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+  });
+
+  // CA6
+  it('avisa ao sair do Horário de saída vazio, mantém o botão desligado e tira o aviso quando o horário é informado', async () => {
+    await openFromMenu();
+    await fillInValidRouteExcept('Horário de saída');
+    expectNoMessages();
+
+    await leave('Horário de saída');
+
+    expect(descriptions('Horário de saída')).toEqual(['Informe o horário de saída']);
+    expect(isMarkedInvalid('Horário de saída')).toBe(true);
+    expect(submitButton()?.disabled, 'botão "Publicar rota" desligado').toBe(true);
+
+    await fillIn('Horário de saída', '07:30');
+    await leave('Horário de saída');
+
+    expect(descriptions('Horário de saída')).toEqual([]);
+    expectNoMessages();
+    expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
+  });
+
+  // CA7: vazio, abaixo de 1, acima de 4 e número quebrado. O campo numérico do navegador entrega o
+  // 2,5 digitado como "2.5", com ponto, seja qual for a língua do aparelho.
+  it.each([
+    ['', 'Informe quantas vagas o carro oferece'],
+    ['0', SEATS_RANGE_MESSAGE],
+    ['5', SEATS_RANGE_MESSAGE],
+    ['2.5', SEATS_RANGE_MESSAGE],
+  ])(
+    'recusa Vagas %j ao sair do campo, avisa "%s" e mantém o botão desligado',
+    async (value, message) => {
+      await openFromMenu();
+      await fillInValidRouteExcept('Vagas');
+      await fillIn('Vagas', value);
+      expectNoMessages();
+
+      await leave('Vagas');
+
+      expect(descriptions('Vagas')).toEqual([message]);
+      expect(isMarkedInvalid('Vagas')).toBe(true);
+      expect(submitButton()?.disabled, 'botão "Publicar rota" desligado').toBe(true);
+    },
+  );
+
+  // CA7: 1 e 4 são as pontas da faixa.
+  it.each(['1', '4'])('tira o aviso de Vagas com %j e liga o botão', async (value) => {
+    await openFromMenu();
+    await fillInValidRouteExcept('Vagas');
+    await fillIn('Vagas', '5');
+    await leave('Vagas');
+    expect(descriptions('Vagas')).toEqual([SEATS_RANGE_MESSAGE]);
+
+    await fillIn('Vagas', value);
+    await leave('Vagas');
+
+    expect(descriptions('Vagas')).toEqual([]);
     expectNoMessages();
     expect(submitButton()?.disabled, 'botão "Publicar rota" ligado').toBe(false);
   });

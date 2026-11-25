@@ -77,7 +77,7 @@
   - Arquivos previstos: `shared/validators/trimmed.{ts,spec.ts}`,
     `route-form.{ts,html,spec.ts}`
 
-- [ ] **Tarefa 3 — Recusar dias, horário e vagas fora das regras**
+- [x] **Tarefa 3 — Recusar dias, horário e vagas fora das regras**
   - Cobre: CA5, CA6, CA7
   - Teste primeiro: nenhum dia e seis dias recusam, um e cinco aceitam; horário
     vazio recusa; vagas vazio, 0, 5 e 2,5 recusam, 1 e 4 aceitam. Falha porque o
