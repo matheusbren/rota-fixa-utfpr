@@ -1,9 +1,13 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { catchError, of, switchMap } from 'rxjs';
+import { Router } from '@angular/router';
+import { catchError, exhaustMap, filter, of, startWith, switchMap } from 'rxjs';
+import { AuthService } from '../../../core/auth/auth.service';
 import { CampusesService } from '../../../core/data/campuses.service';
+import { FixedRoutesService, NewFixedRoute } from '../../../core/data/fixed-routes.service';
 import { PostalCodeLookup, PostalCodeService } from '../../../core/data/postal-code.service';
+import { FixedRouteDirection } from '../../../core/models/fixed-route';
 import { FormField } from '../../../shared/ui/form-field/form-field';
 import { WeekdayPicker } from '../../../shared/ui/weekday-picker/weekday-picker';
 import { isPostalCode, postalCode } from '../../../shared/validators/postal-code';
@@ -76,6 +80,12 @@ export class RouteForm {
 
   private readonly postalCodes = inject(PostalCodeService);
 
+  private readonly auth = inject(AuthService);
+
+  private readonly fixedRoutes = inject(FixedRoutesService);
+
+  private readonly router = inject(Router);
+
   private readonly formBuilder = inject(FormBuilder).nonNullable;
 
   // O formulário nasce a cada vez que a tela abre e some quando ela fecha: o que foi digitado não
@@ -83,7 +93,7 @@ export class RouteForm {
   // Os campos obrigatórios começam vazios, então o botão nasce desligado (CA1).
   protected readonly form = this.formBuilder.group({
     campusId: ['', Validators.required],
-    direction: 'to_campus',
+    direction: this.formBuilder.control<FixedRouteDirection>('to_campus'),
     // Opcional, mas, se preenchido, com o formato de CEP (CA8).
     postalCode: ['', postalCode],
     // Os espaços das pontas não contam (CA3 e CA4).
@@ -134,6 +144,29 @@ export class RouteForm {
     return lookup && lookup.status !== 'found' ? POSTAL_CODE_NOTICES[lookup.status] : undefined;
   });
 
+  // Cada toque em "Publicar rota" vira um envio; o resultado volta como signal (architecture.md
+  // §2.1). O `exhaustMap` não cancela um envio em andamento: cancelar não desfaz a rota já gravada.
+  private readonly submission = signal<NewFixedRoute | undefined>(undefined);
+
+  // Todo envio começa sem resultado: assim o `submitting` vale desde o toque.
+  private readonly publication = toSignal(
+    toObservable(this.submission).pipe(
+      filter((route) => route !== undefined),
+      exhaustMap((route) => this.fixedRoutes.publish(route).pipe(startWith(undefined))),
+    ),
+  );
+
+  // Do toque até a tela da rota abrir, o botão mostra "Publicando…" e fica bloqueado (CA10). A rota
+  // publicada continua bloqueando: a navegação até a tela dela ainda está em andamento, e um toque
+  // nesse meio-tempo gravaria uma segunda rota.
+  protected readonly submitting = computed(() => {
+    const publication = this.publication();
+    return (
+      this.submission() !== undefined &&
+      (publication === undefined || publication.status === 'published')
+    );
+  });
+
   constructor() {
     // O bairro achado pelo CEP vai para o campo Bairro, que continua editável (CA8, ID13). Cortado
     // no limite do campo, para não ligar o erro sem mensagem do `maxlength`. O campo fica alterado,
@@ -145,6 +178,36 @@ export class RouteForm {
         neighborhood.setValue(lookup.neighborhood.slice(0, this.neighborhoodMaxLength));
         neighborhood.markAsDirty();
       }
+    });
+
+    // Gravada a rota, a tela dela abre com o aviso "Rota publicada" (CA9). O `publicada` da URL é o
+    // que diferencia quem chega pelo envio de quem abre o endereço da rota direto.
+    effect(() => {
+      const publication = this.publication();
+      if (publication?.status === 'published') {
+        this.router.navigate(['/rotas', publication.route.id], { queryParams: { publicada: 1 } });
+      }
+    });
+  }
+
+  // O que vai para o envio são os campos da rota, com a pessoa da sessão como motorista. O CEP fica
+  // de fora: ele só ajuda a achar o bairro e não é gravado (CA8).
+  protected submit(): void {
+    const { campusId, direction, neighborhood, meetingPoint, weekdays, departureTime, seats } =
+      this.form.getRawValue();
+    // O botão só liga com o formulário válido, e a regra das vagas já recusou o campo vazio (CA7).
+    if (seats === null) {
+      return;
+    }
+    this.submission.set({
+      driverId: this.auth.currentUserId(),
+      campusId,
+      direction,
+      neighborhood,
+      meetingPoint,
+      weekdays,
+      departureTime,
+      seats,
     });
   }
 

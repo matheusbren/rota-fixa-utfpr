@@ -108,7 +108,7 @@
     `core/models/fixed-route.ts`, `core/data/fixed-routes.service.ts`,
     `shared/pipes/weekdays.pipe.{ts,spec.ts}`
 
-- [ ] **Tarefa 6 — Publicar a rota e ir para a tela dela, sem gravar duas vezes**
+- [x] **Tarefa 6 — Publicar a rota e ir para a tela dela, sem gravar duas vezes**
   - Cobre: CA9, CA10
   - Teste primeiro: com o formulário válido, o POST para `/fixed_routes` leva os
     campos, `status: active` e o `driverId` da pessoa de exemplo; o botão mostra

@@ -1,20 +1,26 @@
 import { I18nPluralPipe } from '@angular/common';
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, booleanAttribute, computed, inject, input, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { startWith, switchMap } from 'rxjs';
 import { FixedRoutesService } from '../../../core/data/fixed-routes.service';
 import { WeekdaysPipe } from '../../../shared/pipes/weekdays.pipe';
+import { Banner } from '../../../shared/ui/banner/banner';
 
 @Component({
   selector: 'app-route-detail',
-  imports: [I18nPluralPipe, RouterLink, WeekdaysPipe],
+  imports: [I18nPluralPipe, RouterLink, WeekdaysPipe, Banner],
   templateUrl: './route-detail.html',
   host: { class: 'mx-auto flex w-full max-w-md flex-col gap-6' },
 })
 export class RouteDetail {
   // O `:routeId` da URL, entregue pelo roteador (`withComponentInputBinding()`, architecture.md §4).
   readonly routeId = input.required<string>();
+
+  // O `?publicada` da URL, que só o envio da rota põe (CA9); sem ele, nenhum aviso. Também chega
+  // pelo roteador, que liga o input pelo nome do parâmetro, e o lint não deixa dar outro nome ao
+  // input (`alias`): por isso o nome é o da URL que a pessoa vê, em português (architecture.md §2).
+  readonly publicada = input(false, { transform: booleanAttribute });
 
   private readonly fixedRoutes = inject(FixedRoutesService);
 

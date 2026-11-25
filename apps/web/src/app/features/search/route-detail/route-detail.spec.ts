@@ -111,6 +111,11 @@ describe('RouteDetail', () => {
     return page.querySelector('main [role="alert"]')?.textContent?.trim();
   }
 
+  // O aviso de sucesso (o `Banner` de shared/ui/), que o leitor de tela anuncia sem tirar o foco.
+  function statusText(): string | undefined {
+    return page.querySelector('main [role="status"]')?.textContent?.trim();
+  }
+
   // O elemento achado pelo texto, como a pessoa o enxerga na tela.
   function byText<T extends HTMLElement>(selector: string, text: string): T | undefined {
     return Array.from(page.querySelectorAll<T>(`main ${selector}`)).find(
@@ -149,6 +154,27 @@ describe('RouteDetail', () => {
       'Horário de saída': '18:10',
       Vagas: '1 vaga',
     });
+  });
+
+  // CA9: quem chega pelo envio vê o aviso junto com os dados que informou. O envio marca a URL
+  // com `publicada`, que chega à tela como input (`withComponentInputBinding()`).
+  it('mostra "Rota publicada" e os dados da rota a quem chega pelo envio', async () => {
+    await open(`/rotas/${ROUTE_ID}?publicada=1`);
+    await answerWithRoute();
+
+    expect(statusText()).toBe('Rota publicada');
+    expect(heading()).toBe('Centro → Guarapuava');
+    expect(details()).toEqual(ROUTE_DETAILS);
+  });
+
+  // CA9: o aviso fala do envio que acabou de dar certo; quem abre o endereço da rota direto não
+  // publicou nada agora.
+  it('não mostra "Rota publicada" a quem abre o endereço da rota direto', async () => {
+    await open(`/rotas/${ROUTE_ID}`);
+    await answerWithRoute();
+
+    expect(statusText()).toBeUndefined();
+    expect(details()).toEqual(ROUTE_DETAILS);
   });
 
   // CA14

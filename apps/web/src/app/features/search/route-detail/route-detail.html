@@ -1,3 +1,8 @@
+<!-- O aviso fala do envio, que já deu certo: não depende da busca da rota (CA9). -->
+@if (publicada()) {
+  <app-banner>Rota publicada</app-banner>
+}
+
 @let lookup = routeLookup();
 @if (lookup?.status === 'found') {
   @let route = lookup.route;

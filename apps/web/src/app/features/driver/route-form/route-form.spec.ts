@@ -1,14 +1,14 @@
-import { HttpRequest, provideHttpClient } from '@angular/common/http';
+import { HttpRequest } from '@angular/common/http';
 import {
   HttpTestingController,
   TestRequest,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Router, provideRouter } from '@angular/router';
+import { Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { environment } from '../../../../environments/environment';
-import { routes } from '../../../app.routes';
+import { appConfig } from '../../../app.config';
 
 // Os 13 câmpus da UTFPR, como o servidor os devolve.
 const CAMPUS_NAMES = [
@@ -27,6 +27,12 @@ const CAMPUS_NAMES = [
   'Toledo',
 ];
 const CAMPUSES = CAMPUS_NAMES.map((name, index) => ({ id: `${index + 1}`, name, city: name }));
+
+// O id do câmpus de Guarapuava, como o servidor o devolve.
+const GUARAPUAVA_ID = CAMPUSES.find(({ name }) => name === 'Guarapuava')?.id;
+
+// A coleção das rotas no json-server.
+const FIXED_ROUTES_URL = `${environment.apiUrl}/fixed_routes`;
 
 // O que a tela mostra nos oito campos; nos grupos (Sentido e Dias da semana), as opções marcadas.
 interface FormState {
@@ -97,10 +103,12 @@ describe('RouteForm', () => {
   let httpTesting: HttpTestingController;
   let page: HTMLElement;
 
-  // O app inteiro, com a casca e o menu: a tela é aberta pelo menu, como a pessoa faz (CA1).
+  // O app inteiro, com a casca e o menu: a tela é aberta pelo menu, como a pessoa faz (CA1). A
+  // configuração é a do app (app.config.ts), que entrega o id da URL à tela da rota aberta depois
+  // do envio (CA9). O teste faz o papel do servidor.
   async function openApp(): Promise<void> {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter(routes)],
+      providers: [...appConfig.providers, provideHttpClientTesting()],
     });
     httpTesting = TestBed.inject(HttpTestingController);
     harness = await RouterTestingHarness.create('/criar-conta');
@@ -249,7 +257,7 @@ describe('RouteForm', () => {
 
   // Deixa a rota válida, menos o campo que o teste confere: assim o botão desligado prova a regra
   // dele. Ninguém sai de campo nenhum, então nenhum fica tocado e nenhum aviso aparece.
-  async function fillInValidRouteExcept(skipped: string): Promise<void> {
+  async function fillInValidRouteExcept(skipped?: string): Promise<void> {
     if (skipped !== 'Campus') {
       await chooseCampus('Guarapuava');
     }
@@ -262,6 +270,30 @@ describe('RouteForm', () => {
     if (skipped !== 'Dias da semana') {
       await tap(choice('Dias da semana', 'Segunda'));
     }
+  }
+
+  // A rota válida inteira, pronta para publicar.
+  function fillInValidRoute(): Promise<void> {
+    return fillInValidRouteExcept();
+  }
+
+  // Depois do envio, a tela da rota busca a rota pelo id e o nome do campus dela, e o teste faz o
+  // papel do servidor nas duas buscas.
+  async function answerRouteScreen(route: { id: string }): Promise<void> {
+    httpTesting.expectOne({ method: 'GET', url: `${FIXED_ROUTES_URL}/${route.id}` }).flush(route);
+    await harness.fixture.whenStable();
+    httpTesting.expectOne({ method: 'GET', url: `${environment.apiUrl}/campuses` }).flush(CAMPUSES);
+    await harness.fixture.whenStable();
+  }
+
+  // Os dados da rota na tela dela, pelo rótulo de cada um, como a pessoa os lê.
+  function routeDetails(): Record<string, string> {
+    return Object.fromEntries(
+      Array.from(page.querySelectorAll('main dl dt')).map((term) => [
+        term.textContent?.trim() ?? '',
+        term.nextElementSibling?.textContent?.trim() ?? '',
+      ]),
+    );
   }
 
   // Fechar a aba apaga o app da memória; só o que estivesse guardado no navegador
@@ -713,5 +745,87 @@ describe('RouteForm', () => {
 
     expect(previous.cancelled).toBe(true);
     expect(neighborhoodValue()).toBe('Santa Cruz');
+  });
+
+  // CA9: o POST leva o que a pessoa informou e a pessoa de exemplo como motorista (spec, "Assume
+  // que"), e não leva o CEP, que só ajuda a achar o bairro (CA8): o `toEqual` recusa qualquer campo a
+  // mais. O teste faz o papel do json-server, que inventa o id da rota.
+  it('publica a rota ativa, com a pessoa de exemplo como motorista, e abre a tela dela com "Rota publicada"', async () => {
+    await openFromMenu();
+    await chooseCampus('Guarapuava');
+    await tap(choice('Sentido', 'Volto do campus'));
+    await fillIn(POSTAL_CODE, '85010-000');
+    await answerPostalCode('85010000', (request) => request.flush(viaCepAddress('Centro')));
+    await fillIn('Ponto de encontro', '  Frente da Padaria Central ');
+    for (const label of ['Segunda', 'Quarta', 'Sexta']) {
+      await tap(choice('Dias da semana', label));
+    }
+    await fillIn('Horário de saída', '07:30');
+    await fillIn('Vagas', '3');
+
+    await tap(submitButton());
+
+    const request = httpTesting.expectOne({ method: 'POST', url: FIXED_ROUTES_URL });
+    expect(request.request.body).toEqual({
+      driverId: 'sample-user',
+      campusId: GUARAPUAVA_ID,
+      direction: 'from_campus',
+      neighborhood: 'Centro',
+      meetingPoint: 'Frente da Padaria Central',
+      weekdays: [1, 3, 5],
+      departureTime: '07:30',
+      seats: 3,
+      suggestedFareCents: null,
+      status: 'active',
+      closedAt: null,
+      createdAt: expect.any(String),
+    });
+
+    const published = { id: 'rota-nova', ...request.request.body };
+    request.flush(published);
+    await harness.fixture.whenStable();
+    await answerRouteScreen(published);
+
+    expect(TestBed.inject(Router).url).toBe('/rotas/rota-nova?publicada=1');
+    expect(page.querySelector('main [role="status"]')?.textContent?.trim()).toBe('Rota publicada');
+    expect(page.querySelector('main h1')?.textContent?.trim()).toBe('Guarapuava → Centro');
+    expect(routeDetails()).toEqual({
+      Campus: 'Guarapuava',
+      'Ponto de encontro': 'Frente da Padaria Central',
+      'Dias da semana': 'seg, qua e sex',
+      'Horário de saída': '07:30',
+      Vagas: '3 vagas',
+    });
+  });
+
+  // CA10: do toque até a tela da rota abrir, um segundo toque não grava outra rota. Primeiro o
+  // servidor ainda não respondeu; depois já respondeu, mas a tela da rota ainda não abriu.
+  it('mostra "Publicando…" e bloqueia o botão enquanto grava, sem gravar duas vezes', async () => {
+    await openFromMenu();
+    await fillInValidRoute();
+    // O botão é guardado antes do toque, porque o rótulo dele muda durante a gravação.
+    const button = submitButton();
+    await tap(button);
+    const request = httpTesting.expectOne({ method: 'POST', url: FIXED_ROUTES_URL });
+
+    expect(button?.disabled, 'botão bloqueado').toBe(true);
+    expect(button?.textContent?.trim()).toBe('Publicando…');
+
+    await tap(button);
+    httpTesting.expectNone(isWrite);
+
+    // A resposta chega, e a tela é desenhada antes de a navegação para a rota terminar.
+    const published = { id: 'rota-nova', ...request.request.body };
+    request.flush(published);
+    harness.fixture.detectChanges();
+
+    expect(page.querySelector('main h1')?.textContent?.trim()).toBe('Publicar uma rota fixa');
+    expect(button?.disabled, 'botão bloqueado').toBe(true);
+    expect(button?.textContent?.trim()).toBe('Publicando…');
+
+    await tap(button);
+    httpTesting.expectNone(isWrite);
+    await answerRouteScreen(published);
+    expect(TestBed.inject(Router).url).toBe('/rotas/rota-nova?publicada=1');
   });
 });

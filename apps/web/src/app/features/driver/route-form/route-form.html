@@ -1,6 +1,6 @@
 <h1 class="text-title-1">Publicar uma rota fixa</h1>
 
-<form class="flex flex-col gap-3" [formGroup]="form">
+<form class="flex flex-col gap-3" [formGroup]="form" (ngSubmit)="submit()">
   @let campusError = errorOf('campusId');
   <app-form-field label="Campus" controlId="route-form-campus">
     <select
@@ -169,8 +169,13 @@
   <button
     type="submit"
     class="btn btn-primary mt-3 w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:bg-disabled disabled:text-text-disabled"
-    [disabled]="form.invalid"
+    [disabled]="form.invalid || submitting()"
   >
-    Publicar rota
+    @if (submitting()) {
+      <span class="loading loading-spinner" aria-hidden="true"></span>
+      Publicando…
+    } @else {
+      Publicar rota
+    }
   </button>
 </form>
