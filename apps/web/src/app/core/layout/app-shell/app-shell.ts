@@ -14,6 +14,7 @@ export class AppShell {
   // Cada história acrescenta o link da própria tela quando ela existir.
   protected readonly navLinks: NavLink[] = [
     { label: 'Criar conta', path: '/criar-conta' },
+    { label: 'Minhas rotas', path: '/minhas-rotas' },
     { label: 'Publicar uma rota fixa', path: '/minhas-rotas/nova' },
   ];
 

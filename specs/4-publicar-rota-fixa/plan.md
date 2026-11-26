@@ -149,7 +149,7 @@
   - Arquivos previstos: `features/search/route-detail/upcoming-trips.{ts,spec.ts}`,
     `shared/ui/segmented-control/`, `route-detail.{ts,html,spec.ts}`
 
-- [ ] **Tarefa 10 — Listar as minhas rotas ativas**
+- [x] **Tarefa 10 — Listar as minhas rotas ativas**
   - Cobre: CA16
   - Teste primeiro: `my-routes.spec.ts` faz o papel do servidor — duas rotas viram
     dois cartões, e tocar num leva a `/rotas/<id>`; lista vazia mostra "Você ainda

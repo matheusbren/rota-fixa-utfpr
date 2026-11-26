@@ -1,0 +1,15 @@
+@let fixedRoute = route();
+@let campusName = campus().name;
+<!-- O sentido vai da origem ao destino: do bairro ao campus na ida, ao contrário na volta (CA13). -->
+@let origin = fixedRoute.direction === 'to_campus' ? fixedRoute.neighborhood : campusName;
+@let destination = fixedRoute.direction === 'to_campus' ? campusName : fixedRoute.neighborhood;
+<button
+  type="button"
+  class="flex w-full cursor-pointer flex-wrap items-baseline gap-x-3 gap-y-1 rounded-lg border border-base-300 bg-base-100 p-4 text-left hover:bg-base-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+  (click)="routeSelect.emit(fixedRoute.id)"
+>
+  <span class="w-full text-title-2">{{ origin }} → {{ destination }}</span>
+  <span class="text-body-strong">{{ fixedRoute.weekdays | weekdays }}</span>
+  <span class="text-body-strong tabular-nums">{{ fixedRoute.departureTime }}</span>
+  <span class="text-body text-text-muted">{{ fixedRoute.seats | i18nPlural: seatsLabels }}</span>
+</button>

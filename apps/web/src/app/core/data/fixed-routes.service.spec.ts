@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { HttpRequest, provideHttpClient } from '@angular/common/http';
 import {
   HttpTestingController,
   TestRequest,
@@ -6,8 +6,14 @@ import {
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { environment } from '../../../environments/environment';
+import { Campus } from '../models/campus';
 import { FixedRoute } from '../models/fixed-route';
-import { FixedRoutePublication, FixedRoutesService, NewFixedRoute } from './fixed-routes.service';
+import {
+  ActiveFixedRoutesLookup,
+  FixedRoutePublication,
+  FixedRoutesService,
+  NewFixedRoute,
+} from './fixed-routes.service';
 
 // O relógio parado no instante da publicação, para conferir o `createdAt` (architecture.md §5.1).
 const NOW = '2026-11-25T10:00:00.000Z';
@@ -17,6 +23,22 @@ const FIXED_ROUTES_URL = `${environment.apiUrl}/fixed_routes`;
 
 // As rotas ativas do motorista que quem chama entrega, filtradas pelo json-server.
 const ACTIVE_ROUTES_URL = `${FIXED_ROUTES_URL}?driverId=motorista-42&status=active`;
+
+// A coleção dos câmpus no json-server, e dois deles como o servidor os devolve.
+const CAMPUSES_URL = `${environment.apiUrl}/campuses`;
+const GUARAPUAVA: Campus = { id: 'guarapuava', name: 'Guarapuava', city: 'Guarapuava' };
+const CURITIBA: Campus = { id: 'curitiba', name: 'Curitiba', city: 'Curitiba' };
+
+// A busca das rotas ativas do motorista, conferida pelo nome de cada parâmetro, e não pela URL
+// inteira, que muda com a ordem deles.
+function isActiveRoutesSearch(request: HttpRequest<unknown>): boolean {
+  return (
+    request.method === 'GET' &&
+    request.url === FIXED_ROUTES_URL &&
+    request.params.get('driverId') === 'motorista-42' &&
+    request.params.get('status') === 'active'
+  );
+}
 
 // A rota como quem chama a entrega: o que a pessoa informou, com os espaços das pontas que ela
 // digitou no bairro e no ponto de encontro, mais o motorista.
@@ -201,4 +223,83 @@ describe('FixedRoutesService', () => {
       expect(publication.result()).toEqual({ status: 'failed' });
     },
   );
+
+  // Busca as rotas ativas do motorista para "Minhas rotas" e guarda o que a busca devolve.
+  function lookupActiveRoutes(): {
+    result: () => ActiveFixedRoutesLookup | undefined;
+    failure: () => unknown;
+  } {
+    let lookup: ActiveFixedRoutesLookup | undefined;
+    let failure: unknown;
+    fixedRoutes.lookupActiveByDriver('motorista-42').subscribe({
+      next: (result) => (lookup = result),
+      error: (reason: unknown) => (failure = reason),
+    });
+    return { result: () => lookup, failure: () => failure };
+  }
+
+  // CA16: o cartão mostra o sentido com o nome do campus, e a rota só guarda o id dele. Os cartões
+  // ficam na ordem em que o servidor devolve as rotas.
+  it('devolve as rotas ativas do motorista entregue, cada uma com o campus dela, na ordem do servidor', () => {
+    const toGuarapuava = activeRoute('rota-guarapuava', [1, 3, 5], '07:30');
+    const toCuritiba = { ...activeRoute('rota-curitiba', [2, 4], '18:00'), campusId: 'curitiba' };
+    const lookup = lookupActiveRoutes();
+
+    httpTesting.expectOne(isActiveRoutesSearch).flush([toCuritiba, toGuarapuava]);
+    httpTesting.expectOne({ method: 'GET', url: CAMPUSES_URL }).flush([GUARAPUAVA, CURITIBA]);
+
+    expect(lookup.result()).toEqual({
+      status: 'found',
+      routes: [
+        { route: toCuritiba, campus: CURITIBA },
+        { route: toGuarapuava, campus: GUARAPUAVA },
+      ],
+    });
+  });
+
+  // CA16: a busca falha sem conexão ou com erro do servidor. Ela devolve `failed`, e nunca o erro
+  // técnico (architecture.md §2.1): o Observable não termina em erro, então a tela que o lê não
+  // guarda erro nenhum e pode buscar de novo.
+  it.each(FAILURES)(
+    'devolve a busca das minhas rotas que falhou, sem o erro técnico, quando a busca das rotas ativas fica %s',
+    (_, fail) => {
+      const lookup = lookupActiveRoutes();
+
+      fail(httpTesting.expectOne(isActiveRoutesSearch));
+
+      httpTesting.expectNone({ method: 'GET', url: CAMPUSES_URL });
+      expect(lookup.failure()).toBeUndefined();
+      expect(lookup.result()).toEqual({ status: 'failed' });
+    },
+  );
+
+  // CA16: sem os câmpus, o cartão não tem como mostrar o sentido: a busca também falha.
+  it.each(FAILURES)(
+    'devolve a busca das minhas rotas que falhou, sem o erro técnico, quando a busca dos câmpus fica %s',
+    (_, fail) => {
+      const lookup = lookupActiveRoutes();
+
+      httpTesting.expectOne(isActiveRoutesSearch).flush([activeRoute('rota-1', [1], '07:30')]);
+      fail(httpTesting.expectOne({ method: 'GET', url: CAMPUSES_URL }));
+
+      expect(lookup.failure()).toBeUndefined();
+      expect(lookup.result()).toEqual({ status: 'failed' });
+    },
+  );
+
+  // O campus que não está na lista é dado quebrado, que a chave estrangeira da E3 impede
+  // (architecture.md §5.2): como no `findById`, para a tela a busca falhou.
+  it('devolve a busca das minhas rotas que falhou quando o campus de uma rota não existe', () => {
+    const lookup = lookupActiveRoutes();
+
+    httpTesting
+      .expectOne(isActiveRoutesSearch)
+      .flush([
+        activeRoute('rota-1', [1], '07:30'),
+        { ...activeRoute('rota-2', [2], '07:30'), campusId: 'campus-apagado' },
+      ]);
+    httpTesting.expectOne({ method: 'GET', url: CAMPUSES_URL }).flush([GUARAPUAVA, CURITIBA]);
+
+    expect(lookup.result()).toEqual({ status: 'failed' });
+  });
 });

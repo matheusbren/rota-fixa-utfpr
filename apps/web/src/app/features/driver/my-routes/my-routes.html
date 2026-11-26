@@ -1,0 +1,37 @@
+<h1 class="text-title-1">Minhas rotas</h1>
+
+@let lookup = routesLookup();
+@if (lookup === undefined) {
+  <p class="text-body text-text-muted">Carregando as suas rotas…</p>
+} @else if (lookup.status === 'failed') {
+  <p role="alert" class="rounded-md border border-error bg-danger-soft p-4 text-body text-error">
+    Não foi possível carregar as suas rotas. Tente de novo.
+  </p>
+  <button
+    type="button"
+    class="btn btn-primary w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+    (click)="retry()"
+  >
+    Tentar de novo
+  </button>
+} @else if (lookup.routes.length > 0) {
+  <ul class="flex flex-col gap-3">
+    <!-- O id é a identidade estável de cada rota (ID7); a ordem é a que o servidor devolve. -->
+    @for (entry of lookup.routes; track entry.route.id) {
+      <li>
+        <app-route-card
+          [route]="entry.route"
+          [campus]="entry.campus"
+          (routeSelect)="openRoute($event)"
+        />
+      </li>
+    }
+  </ul>
+} @else {
+  <p class="text-body">Você ainda não publicou nenhuma rota</p>
+  <a
+    class="btn btn-primary w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+    routerLink="/minhas-rotas/nova"
+    >Publicar uma rota fixa</a
+  >
+}

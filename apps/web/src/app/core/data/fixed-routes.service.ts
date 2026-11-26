@@ -17,6 +17,18 @@ export type FixedRouteLookup =
 
 const FAILED: FixedRouteLookup = { status: 'failed' };
 
+// Uma rota com o campus dela: a rota só guarda o id do campus, e a tela mostra o nome.
+export interface FixedRouteWithCampus {
+  route: FixedRoute;
+  campus: Campus;
+}
+
+// O que a busca de "Minhas rotas" devolve: as rotas ativas do motorista, cada uma com o campus
+// dela, na ordem do servidor; ou `failed` quando a busca falha (CA16). A tela não recebe o erro
+// técnico (architecture.md §2.1).
+export type ActiveFixedRoutesLookup =
+  { status: 'found'; routes: FixedRouteWithCampus[] } | { status: 'failed' };
+
 // A rota que a pessoa quer publicar: o que ela informou no formulário, mais o motorista. O Service
 // não sabe de onde vem o id do motorista: quem chama o entrega.
 export type NewFixedRoute = Pick<
@@ -91,6 +103,20 @@ function toFoundLookup(route: FixedRoute, campuses: Campus[]): FixedRouteLookup 
   return campus ? { status: 'found', route, campus } : FAILED;
 }
 
+// Cada rota com o campus dela. Como no `findById`, um campus que não está na lista é dado
+// quebrado: para a tela, a busca inteira falhou.
+function toActiveRoutesLookup(routes: FixedRoute[], campuses: Campus[]): ActiveFixedRoutesLookup {
+  const found: FixedRouteWithCampus[] = [];
+  for (const route of routes) {
+    const campus = campuses.find(({ id }) => id === route.campusId);
+    if (!campus) {
+      return { status: 'failed' };
+    }
+    found.push({ route, campus });
+  }
+  return { status: 'found', routes: found };
+}
+
 @Service()
 export class FixedRoutesService {
   private readonly http = inject(HttpClient);
@@ -124,6 +150,20 @@ export class FixedRoutesService {
     return this.http
       .get<FixedRoute[]>(this.url, { params: { driverId, status: 'active' } })
       .pipe(map((records) => records.map(toFixedRoute)));
+  }
+
+  // As rotas ativas do motorista para "Minhas rotas", cada uma com o campus dela, porque o cartão
+  // mostra o nome do campus, e a rota só guarda o id. Na E3 as duas buscas viram uma consulta só,
+  // e a tela não muda. A falha de qualquer uma das duas é `failed` (CA16): até o
+  // `errorInterceptor` nascer, é aqui que a falha vira o resultado que a tela espera
+  // (architecture.md §2.1), e o Observable nunca termina em erro.
+  lookupActiveByDriver(driverId: string): Observable<ActiveFixedRoutesLookup> {
+    return this.findActiveByDriver(driverId).pipe(
+      switchMap((routes) =>
+        this.campuses.list().pipe(map((campuses) => toActiveRoutesLookup(routes, campuses))),
+      ),
+      catchError(() => of<ActiveFixedRoutesLookup>({ status: 'failed' })),
+    );
   }
 
   // Grava a rota ativa, sem rateio (RN16, que entra com a US11) e sem encerramento, com o instante
