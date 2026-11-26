@@ -161,6 +161,40 @@
     `features/driver/my-routes/route-card/route-card.{ts,html}`,
     `core/layout/app-shell/app-shell.ts` (link do menu)
 
+- [ ] **Tarefa 11 — Declarar a dívida no código e alinhar o architecture.md à tela da rota**
+  - Cobre: as três pendências da primeira auditoria final, sem mudar comportamento, e
+    três ajustes não bloqueantes que ela apontou no texto do fechamento.
+    (a) Cada premissa do "Assume que" da spec que ainda não tem marca ganha o
+    `TODO #<n>` da Issue que a fecha, no ponto do código que ela afeta (`<!-- TODO #n -->`
+    no HTML): **#3** no envio do `route-form.ts` (nada confere o veículo, RN02, antes de
+    publicar); **#20** no `FixedRoutesService`, onde a coleção `fixed_routes` é lida e o
+    conflito é conferido antes do POST (na E3 a conferência vai para o banco); **#6** no
+    `computed` das viagens do `route-detail.ts` (as viagens passam a ser gravadas em
+    `trips` com a assinatura); **#5** no ponto de encontro do `route-detail.html` (fica
+    escondido de quem não tem vaga, RN17, quando a busca levar outras pessoas à tela).
+    (b) `architecture.md` §5.1, "Geração de viagens (RN18)": na E2 as viagens não são
+    gravadas; a tela da rota as calcula a partir dos dias e do horário (a função pura
+    `upcomingTrips`), e a gravação em `trips` nasce com a assinatura (US07, #6); na E3 a
+    geração vai para uma função no banco, agendada. O nome do Service é
+    `FixedRoutesService`.
+    (c) `architecture.md` §4: na linha `/rotas/:routeId`, a coluna Resolver vira "—",
+    porque a própria tela trata a rota que não existe ("Não achamos esta rota" e o link
+    "Minhas rotas") e a falha (CA14); o texto sobre resolvers passa a valer para as telas
+    que precisam do dado para abrir (a edição da rota e o embarque).
+    (d) `architecture.md` §3, na nota sobre a US04: o `weekday-picker` e o
+    `segmented-control` moram em `shared/ui/` desde o primeiro uso, decidido no plano,
+    porque não conhecem domínio nenhum (recebem opções e devolvem um valor); o
+    `trip-list` ainda não nasceu (a lista de viagens é um `<ul>` na tela da rota). No
+    §6, a linha `driver` cita também o `AuthService` (a pessoa da sessão).
+    A versão do `architecture.md` sobe para 1.2.1, com linha no histórico.
+  - Teste primeiro: não há. A tarefa só acrescenta comentários e muda documentação; a
+    prova é a suíte, o lint e o build continuarem verdes, o `grep` achar `TODO #3`,
+    `TODO #5` e `TODO #6` em `apps/` e `TODO #20` no `fixed-routes.service.ts`, e o
+    `grep FixedRouteService` não achar mais nada no `architecture.md`.
+  - Arquivos previstos: `features/driver/route-form/route-form.ts`,
+    `core/data/fixed-routes.service.ts`, `features/search/route-detail/route-detail.{ts,html}`,
+    `docs/architecture.md`
+
 ## Critérios sem tarefa
 
 -
