@@ -57,40 +57,40 @@
 
 ## RA2 — Componentização e UI Declarativa Moderna
 
-- [ ] **ID4:** Desenvolver componentes utilizando estritamente a arquitetura Standalone (sem o uso de NgModules).
-- [ ] **ID5:** Incorporar e customizar componentes utilizando um Framework CSS moderno (ex: Tailwind CSS, PrimeNG).
-- [ ] **ID6:** Aplicar a nova sintaxe de fluxo de controle (@if / @switch) para exibição condicional de elementos.
-- [ ] **ID7:** Utilizar a nova sintaxe de fluxo de controle @for com a propriedade track obrigatória para a renderização dinâmica e otimizada de coleções.
-- [ ] **ID8:** Aplicar Pipes (nativos ou customizados) para formatar a apresentação de dados na interface.
-- [ ] **ID9:** Implementar Deferrable Views (@defer) para otimizar a performance, carregando componentes pesados apenas sob demanda.
+- [x] **ID4:** Desenvolver componentes utilizando estritamente a arquitetura Standalone (sem o uso de NgModules).
+- [x] **ID5:** Incorporar e customizar componentes utilizando um Framework CSS moderno (ex: Tailwind CSS, PrimeNG).
+- [x] **ID6:** Aplicar a nova sintaxe de fluxo de controle (@if / @switch) para exibição condicional de elementos.
+- [x] **ID7:** Utilizar a nova sintaxe de fluxo de controle @for com a propriedade track obrigatória para a renderização dinâmica e otimizada de coleções.
+- [x] **ID8:** Aplicar Pipes (nativos ou customizados) para formatar a apresentação de dados na interface.
+- [x] **ID9:** Implementar Deferrable Views (@defer) para otimizar a performance, carregando componentes pesados apenas sob demanda.
 
 ## RA3 — Reatividade e Gerenciamento de Estado (Signals)
 
-- [ ] **ID10:** Aplicar técnicas de one-way data binding (Interpolação {{ }} e Property Binding [ ]) para exibir e atualizar dados, utilizando estritamente Signals (writable e computed) como fonte de estado.
-- [ ] **ID11:** Aplicar técnicas de event binding ( ) para capturar interações do usuário e atualizar o estado da aplicação.
-- [ ] **ID12:** Aplicar técnicas de two-way data binding utilizando a função moderna model() para sincronização bidirecional.
-- [ ] **ID13:** Utilizar efeitos (effect()) para a manipulação segura de efeitos colaterais reativos.
+- [x] **ID10:** Aplicar técnicas de one-way data binding (Interpolação {{ }} e Property Binding [ ]) para exibir e atualizar dados, utilizando estritamente Signals (writable e computed) como fonte de estado.
+- [x] **ID11:** Aplicar técnicas de event binding ( ) para capturar interações do usuário e atualizar o estado da aplicação.
+- [x] **ID12:** Aplicar técnicas de two-way data binding utilizando a função moderna model() para sincronização bidirecional.
+- [x] **ID13:** Utilizar efeitos (effect()) para a manipulação segura de efeitos colaterais reativos.
 
 ## RA4 — Arquitetura de Software e Injeção de Dependências
 
-- [ ] **ID14:** Utilizar as funções modernas input() e output() para a comunicação segura e tipada entre componentes em uma hierarquia (pai/filho).
-- [ ] **ID15:** Criar comunicação entre componentes não relacionados hierarquicamente extraindo a lógica para Services, utilizando a função inject() em vez de injeção via construtor.
+- [x] **ID14:** Utilizar as funções modernas input() e output() para a comunicação segura e tipada entre componentes em uma hierarquia (pai/filho).
+- [x] **ID15:** Criar comunicação entre componentes não relacionados hierarquicamente extraindo a lógica para Services, utilizando a função inject() em vez de injeção via construtor.
 
 ## RA5 — Roteamento e Navegação SPA
 
-- [ ] **ID16:** Configurar rotas dinâmicas utilizando a API funcional moderna (provideRouter) e habilitar a passagem automática de parâmetros ativando a função withComponentInputBinding().
-- [ ] **ID17:** Passar e consumir dados entre telas capturando os parâmetros da rota (URL) diretamente através da função moderna Signal input() no componente de destino.
-- [ ] **ID18:** Criar uma estrutura de navegação aninhada (rotas filhas) para representar hierarquias de layout.
+- [x] **ID16:** Configurar rotas dinâmicas utilizando a API funcional moderna (provideRouter) e habilitar a passagem automática de parâmetros ativando a função withComponentInputBinding().
+- [x] **ID17:** Passar e consumir dados entre telas capturando os parâmetros da rota (URL) diretamente através da função moderna Signal input() no componente de destino.
+- [x] **ID18:** Criar uma estrutura de navegação aninhada (rotas filhas) para representar hierarquias de layout.
 - [ ] **ID19:** Aplicar Functional Route Guards para controle de acesso (autenticação) e Resolvers para pré-carregamento de dados antes da transição da tela.
 
 ## RA6 — Integração de APIs e Assincronismo (BaaS)
 
-- [ ] **ID20:** Realizar requisições assíncronas (GET) a uma API pública.
+- [x] **ID20:** Realizar requisições assíncronas (GET) a uma API pública.
 - [ ] **ID21:** Implementar o fluxo de Autenticação e Gerenciamento de Sessão (JWT) conectando a aplicação aos serviços de identidade do BaaS (ex: Supabase Auth).
 - [ ] **ID22:** Realizar o ciclo completo de operações CRUD (GET, POST, PUT, PATCH, DELETE) conectando a aplicação a um Backend-as-a-Service (ex: Supabase, PocketBase).
 - [ ] **ID23:** Implementar Functional Interceptors para injetar tokens de autenticação globalmente e tratar erros de forma centralizada.
-- [ ] **ID24:** Aplicar validações em Formulários Reativos, exibindo mensagens de erro claras e desabilitando o botão de submit com base na validade do formulário.
-- [ ] **ID25:** Fazer a ponte entre o assincronismo e a reatividade utilizando toSignal() e toObservable(), integrando RxJS com o ecossistema de Signals.
+- [x] **ID24:** Aplicar validações em Formulários Reativos, exibindo mensagens de erro claras e desabilitando o botão de submit com base na validade do formulário.
+- [x] **ID25:** Fazer a ponte entre o assincronismo e a reatividade utilizando toSignal() e toObservable(), integrando RxJS com o ecossistema de Signals.
 
 ## RA7 — Engenharia de Software, Versionamento e DevOps
 
@@ -104,7 +104,7 @@
 - [x] **ID30 — Fundações (PRD):** Apoiar-se na IA para estruturar o Documento de Requisitos do Produto (prd.md).
 - [x] **ID31 — Especificação Técnica:** A partir do PRD, instruir a IA a gerar um documento de especificação rigoroso (ssd.md — aqui, `docs/architecture.md`), detalhando explicitamente a arquitetura dos componentes Standalone e Services antes da geração do código fonte.
 - [ ] **ID32 — Orquestração (MCP e Skills):** Configurar a IDE (ex: Antigravity) ativando Servidores MCP (Model Context Protocol, ex: Figma, Supabase) e utilizando Skills de Angular 20+ para que o Agente gere o código com o contexto exato do projeto.
-- [ ] **ID33 — Validação e Testes (TDD):** Atuar como revisor técnico da IA. Orientar o agente a gerar testes unitários (.spec.ts) focados nas regras de negócio para validar rigorosamente a implementação gerada.
+- [x] **ID33 — Validação e Testes (TDD):** Atuar como revisor técnico da IA. Orientar o agente a gerar testes unitários (.spec.ts) focados nas regras de negócio para validar rigorosamente a implementação gerada.
 
 ---
 
