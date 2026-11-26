@@ -171,12 +171,13 @@ export class FixedRoutesService {
   // Os espaços das pontas do bairro e do ponto de encontro não contam (CA3 e CA4), e não são
   // gravados. Só os campos da rota são gravados: o CEP, que só ajuda a achar o bairro, não (CA8).
   // Antes de gravar, confere as rotas ativas do motorista: a que coincide com uma delas não é
-  // gravada, e o resultado é a rota que conflita (CA12). Na E2 a conferência é daqui; na E3 ela vai
-  // para o banco, e a tela não muda (architecture.md §2.1).
+  // gravada, e o resultado é a rota que conflita (CA12).
   // Sem conexão ou com erro do servidor, na conferência ou na gravação, o resultado é `failed`
   // (CA11): sem as rotas ativas não há como conferir, então nada é gravado. Até o
   // `errorInterceptor` nascer, é aqui que a falha vira o resultado que a tela espera
   // (architecture.md §2.1).
+  // TODO #20: na E2 o conflito é conferido aqui, sobre as rotas lidas da coleção `fixed_routes`
+  // do db.json; na E3 a conferência vai para o banco, e a tela não muda (architecture.md §2.1).
   publish({
     driverId,
     campusId,

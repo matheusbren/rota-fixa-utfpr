@@ -161,7 +161,7 @@
     `features/driver/my-routes/route-card/route-card.{ts,html}`,
     `core/layout/app-shell/app-shell.ts` (link do menu)
 
-- [ ] **Tarefa 11 — Declarar a dívida no código e alinhar o architecture.md à tela da rota**
+- [x] **Tarefa 11 — Declarar a dívida no código e alinhar o architecture.md à tela da rota**
   - Cobre: as três pendências da primeira auditoria final, sem mudar comportamento, e
     três ajustes não bloqueantes que ela apontou no texto do fechamento.
     (a) Cada premissa do "Assume que" da spec que ainda não tem marca ganha o

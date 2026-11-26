@@ -1,7 +1,7 @@
 # 🛠️ Architecture / SSD
 
 **Projeto:** Rota Fixa UTFPR
-**Versão:** 1.2.0
+**Versão:** 1.2.1
 **Última atualização:** 26/11/2026
 
 > 🤖 **O `prd.md` responde _o quê_ o produto faz. Este responde _onde as coisas
@@ -357,14 +357,16 @@ apps/web/src/
   com `loadChildren` (lazy loading por domínio).
 
 **Do Mapa de Componentes (Figma, Atividade 05) para as pastas.** Caixa que
-aparece em telas de mais de um domínio sobe para `shared/ui/`; caixa de um
-domínio só fica na feature; caixa da moldura do app vai para `core/layout/`.
-Os seletores são os do mapa.
+aparece em telas de mais de um domínio sobe para `shared/ui/`, e a que não
+conhece domínio nenhum (um controle genérico, que recebe e devolve valores)
+também, mesmo usada num domínio só; as outras caixas de um domínio só ficam
+na feature; caixa da moldura do app vai para `core/layout/`. Os seletores
+são os do mapa.
 
 | Onde mora | Componentes (`app-…`) | Por quê |
 | :-------- | :-------------------- | :------ |
 | `core/layout/` | `app-shell` (o seletor já é `app-shell`), `top-bar`, `side-nav`, `footer`, `offline-page` | Moldura do app: uma instância, presente em quase toda tela |
-| `shared/ui/` | `route-plate`, `weekday-strip`, `weekday-picker`, `segmented-control`, `seat-meter`, `status-tag`, `trip-list`, `form-field`, `banner`, `offline-banner` | Aparecem em dois ou mais domínios (ex.: `route-plate` na busca, no detalhe e em minhas rotas) |
+| `shared/ui/` | `route-plate`, `weekday-strip`, `weekday-picker`, `segmented-control`, `seat-meter`, `status-tag`, `trip-list`, `form-field`, `banner`, `offline-banner` | Aparecem em dois ou mais domínios (ex.: `route-plate` na busca, no detalhe e em minhas rotas) ou não conhecem domínio nenhum (ex.: `segmented-control`, que recebe as opções e devolve a escolhida) |
 | `features/auth/` | `sign-in`, `sign-up`, `brand-hero` | Só existem antes de entrar |
 | `features/agenda/` | `agenda`, `week-board`, `trip-card`, `release-seat-dialog` | Só na agenda (o `week-board` é a agenda no desktop largo) |
 | `features/search/` | `route-search`, `search-filters`, `route-list`, `route-detail`, `driver-card`, `contact-card`, `subscribe-panel` | Encontrar uma rota e decidir assinar |
@@ -372,14 +374,17 @@ Os seletores são os do mapa.
 | `features/profile/` | `profile`, `user-card`, `vehicle-form` | Perfil próprio e de terceiros |
 
 > 📌 **O que a US04 ratificou no mapa.** O `weekday-picker` (os dias da rota)
-> é um campo de formulário próprio: implementa `ControlValueAccessor` e entra
-> no formulário com `formControlName`, como um campo nativo, sem injetar
-> Service. O `segmented-control` ("Esta semana | 4 semanas") liga o valor com
-> `model()`. O `direction-toggle` e o `seat-stepper` do protótipo não
-> nasceram: o sentido e as vagas ficaram campos nativos do `route-form`
-> (rádio e número). O `route-card` é o cartão de "Minhas rotas"; quando a
-> busca (US05) também mostrar a rota, a parte comum sobe para o
-> `route-plate` de `shared/ui/`.
+> e o `segmented-control` ("Esta semana | 4 semanas") moram em `shared/ui/`
+> desde o primeiro uso, como decidido no plano da US04, pela regra acima da
+> caixa que não conhece domínio nenhum. O `weekday-picker` é um campo de
+> formulário próprio: implementa `ControlValueAccessor` e entra no formulário
+> com `formControlName`, como um campo nativo, sem injetar Service. O
+> `segmented-control` liga o valor com `model()`. O `trip-list` ainda não
+> nasceu: a lista das próximas viagens é um `<ul>` na tela da rota. O
+> `direction-toggle` e o `seat-stepper` do protótipo não nasceram: o sentido e
+> as vagas ficaram campos nativos do `route-form` (rádio e número). O
+> `route-card` é o cartão de "Minhas rotas"; quando a busca (US05) também
+> mostrar a rota, a parte comum sobe para o `route-plate` de `shared/ui/`.
 
 > 📌 **Pasta nasce com a história.** A árvore acima é o contrato, não uma lista
 > para criar agora: cada pasta aparece quando a primeira história que precisa
@@ -425,7 +430,7 @@ carregada só quando a pessoa entra nela (`loadChildren` / `loadComponent`).
 | `/criar-conta` | `sign-up` | `auth` | `guestGuard` | — |
 | `/agenda` | `agenda` | `agenda` | `authGuard` | — |
 | `/rotas` | `route-search` | `search` | público (visitante vê sem dado pessoal — RN17) | — |
-| `/rotas/:routeId` | `route-detail` | `search` | público, com as partes pessoais só para quem tem vaga | `fixedRouteResolver` |
+| `/rotas/:routeId` | `route-detail` | `search` | público, com as partes pessoais só para quem tem vaga | — |
 | `/minhas-rotas` | `my-routes` | `driver` | `authGuard` | — |
 | `/minhas-rotas/nova` | `route-form` | `driver` | `authGuard` (sem veículo, a tela convida a cadastrar — US03) | — |
 | `/minhas-rotas/:routeId/editar` | `route-form` | `driver` | `authGuard` + dono da rota | `fixedRouteResolver` |
@@ -446,9 +451,12 @@ classes (ID19), em `core/auth/` e ao lado da feature que os usa:
 - "Dono da rota" e "motorista da viagem" são guards da feature `driver`.
   **Guard é conforto de navegação, não segurança:** a regra de verdade é a
   RLS do Supabase na E3 (PRD §3, coluna "Não pode").
-- Resolver busca o dado pelo Service antes da tela abrir; se o registro não
-  existe (ou a rota foi encerrada), volta para a lista com aviso em vez de
-  abrir tela vazia.
+- Resolver só nas telas que precisam do dado para abrir (a edição da rota e
+  o embarque): ele busca o dado pelo Service antes da tela abrir; se o
+  registro não existe (ou a rota foi encerrada), volta para a lista com aviso
+  em vez de abrir tela vazia. A tela da rota (`/rotas/:routeId`) não tem
+  resolver: a própria tela trata a rota que não existe e a falha da busca
+  (CA14 da US04).
 
 > 📌 As folhas de **liberar vaga** e **cancelar viagem** são diálogos sobre a
 > tela de origem, não rotas: fechar o diálogo não pode mudar a URL.
@@ -514,9 +522,11 @@ classes (ID19), em `core/auth/` e ao lado da feature que os usa:
 - **Dinheiro:** inteiro em centavos, para não somar erro de ponto flutuante.
 - **Nada se apaga** do que o PRD declara imutável (RN15): viagem concluída,
   falta, avaliação e cancelamento mudam de `status`, nunca saem da tabela.
-- **Geração de viagens (RN18):** na E2 o `FixedRouteService` cria as viagens
-  das próximas 4 semanas ao publicar a rota; na E3 isso vai para uma função
-  no banco, agendada. A forma da tabela `trips` não muda.
+- **Geração de viagens (RN18):** na E2 as viagens não são gravadas: a tela da
+  rota as calcula a partir dos dias e do horário da rota que o
+  `FixedRoutesService` devolve (a função pura `upcomingTrips`), e a gravação
+  em `trips` nasce com a assinatura (US07, #6). Na E3 a geração vai para uma
+  função no banco, agendada. A forma da tabela `trips` não muda.
 
 ### 📊 5.2. Diagrama ER (Mermaid)
 
@@ -711,7 +721,7 @@ erDiagram
 | Domínio | Rota | Guard | Dados (service) | US |
 | :------ | :--- | :---- | :-------------- | :-- |
 | `auth` | `/criar-conta` | — (o `guestGuard` chega com a US02) | `AuthService` → `UsersService` (`/users`) | US01 |
-| `driver` | `/minhas-rotas` e `/minhas-rotas/nova` | — (o `authGuard` chega com a US02, `TODO #2`) | `FixedRoutesService` (`/fixed_routes`), `CampusesService` (`/campuses`), `PostalCodeService` (ViaCEP) | US04 |
+| `driver` | `/minhas-rotas` e `/minhas-rotas/nova` | — (o `authGuard` chega com a US02, `TODO #2`) | `FixedRoutesService` (`/fixed_routes`), `CampusesService` (`/campuses`), `PostalCodeService` (ViaCEP), `AuthService` (a pessoa da sessão) | US04 |
 | `search` | `/rotas/:routeId` | — (o motorista chega pelo envio do formulário ou por "Minhas rotas") | `FixedRoutesService`, `CampusesService` | US04 |
 
 ---
@@ -727,6 +737,7 @@ erDiagram
 | 22/11/2026 | 1.1.2 | US01 (#1): a §2.1 passa a dizer quando cada interceptor nasce — o `authInterceptor` com o Supabase (E3) e o `errorInterceptor` com a primeira história que traduza 401 ou falta de rede no app inteiro |
 | 22/11/2026 | 1.1.3 | US01 (#1), com o conteúdo da #21: a casca passa a ser uma só, o `AppShell` — a casca pública e a `bottom-nav` saem, e a navegação abaixo de `lg` é a gaveta do ☰ (§4); `app-shell` e `footer` entram em `core/layout/` (§3); a troca da E3 também registra o `authInterceptor` no `app.config.ts` (§2) |
 | 26/11/2026 | 1.2.0 | US04 (#4): id à mão no `db.json` não é só de dígitos (§2); a falha de API de terceiros é traduzida por quem chama, e os interceptors só agem no `environment.apiUrl` (§2.1); sufixos `.service.ts` e `.pipe.ts` (§2.3); `weekday-picker`, `segmented-control` e `route-card` no mapa, sem `direction-toggle` e `seat-stepper` (§3); nome do parâmetro da URL no `input()` (§4); o endereço fixo do ViaCEP mora no Service (§5.3); duas linhas da US04 no mapa (§6) |
+| 26/11/2026 | 1.2.1 | US04 (#4), pendências da auditoria final: a caixa que não conhece domínio nenhum também sobe para `shared/ui/`, como o `weekday-picker` e o `segmented-control`, desde o primeiro uso, e o `trip-list` ainda não nasceu (§3); a tela da rota não tem resolver, que fica para as telas que precisam do dado para abrir (§4); na E2 as viagens são calculadas na tela da rota, e a gravação em `trips` nasce com a assinatura, com o nome `FixedRoutesService` corrigido (§5.1); o `AuthService` na linha `driver` do mapa (§6) |
 
 ---
 

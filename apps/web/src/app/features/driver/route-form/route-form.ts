@@ -195,6 +195,8 @@ export class RouteForm {
 
   // O que vai para o envio são os campos da rota, com a pessoa da sessão como motorista. O CEP fica
   // de fora: ele só ajuda a achar o bairro e não é gravado (CA8).
+  // TODO #3: sem veículo cadastrado, a tela passa a convidar a cadastrá-lo em vez de mostrar o
+  // formulário (RN02, US03, architecture.md §4); até lá, nada confere o veículo antes de publicar.
   protected submit(): void {
     const { campusId, direction, neighborhood, meetingPoint, weekdays, departureTime, seats } =
       this.form.getRawValue();

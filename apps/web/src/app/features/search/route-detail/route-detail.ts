@@ -61,6 +61,9 @@ export class RouteDetail {
   // As viagens são calculadas, e não buscadas: saem dos dias e do horário da rota (spec, "Assume
   // que"). O "agora" é lido de novo a cada troca de recorte, para a viagem que passou com a tela
   // aberta sair da lista.
+  // TODO #6: as viagens passam a ser gravadas em `trips` quando a assinatura existir. Nessa hora,
+  // a geração (`upcomingTrips`) sobe para `core/`, porque o `core/` não importa de `features/`
+  // (architecture.md §3).
   protected readonly trips = computed(() => {
     const lookup = this.routeLookup();
     if (lookup?.status !== 'found') {
