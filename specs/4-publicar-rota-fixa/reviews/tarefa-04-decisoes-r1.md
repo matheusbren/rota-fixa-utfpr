@@ -10,3 +10,7 @@
 - **O comentário do endereço do ViaCEP cita o §5.3:** o fechamento da história registra no §5.3 que o endereço fixo de uma API pública mora no Service; a citação do comentário passa a valer.
 - **`markAsDirty()` sem teste:** fica para a US11 (#8), quando a edição da rota precisar saber o que mudou.
 - **Interceptors e a API de terceiros:** registrar no §2.1, no fechamento, que os interceptors conferem o endereço (`environment.apiUrl`) antes de agir.
+
+## Confirmação do Matheus
+
+Em 26/11/2026 li o apontamento 1 e a justificativa acima, e mantenho a recusa.

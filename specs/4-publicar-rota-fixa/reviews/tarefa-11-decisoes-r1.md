@@ -24,3 +24,7 @@ aceito na rodada 1, a tarefa volta ao implementador (rodada 2).
   (resolver na Atividade 15) e o ID19 ficou desmarcado no `docs/checklist.md`.
 - **O build não foi rodado pelo revisor de conformidade** (ele grava em `dist/`): o implementador
   e o revisor de código o rodaram, e passou.
+
+## Confirmação do Matheus
+
+Em 26/11/2026 li os quatro apontamentos (A, B, C e D) e as correções escolhidas, e aceito os quatro.

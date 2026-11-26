@@ -13,3 +13,7 @@ Não bloqueiam e não entram na triagem. Destino de cada uma:
 - **`/minhas-rotas` sem o `authGuard` e sem `TODO`:** adotada na Tarefa 5, que já mexe no `app.routes.ts`: um `// TODO #2` registra o guard que falta.
 - **`direction` sem o tipo do modelo:** adotada na Tarefa 5, quando o `FixedRoute` nascer.
 - **Ajudantes de teste repetidos, anel de foco repetido e o §3 com `direction-toggle`/`seat-stepper`:** candidatos a manutenção; o §3 é ratificado no fechamento da história.
+
+## Confirmação do Matheus
+
+Em 26/11/2026 li o apontamento 1 e a justificativa acima, e mantenho a recusa.
