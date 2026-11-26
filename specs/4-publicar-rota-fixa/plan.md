@@ -138,7 +138,7 @@
   - Arquivos previstos: `core/data/find-conflict.{ts,spec.ts}`,
     `core/data/fixed-routes.service.{ts,spec.ts}`, `route-form.{ts,html,spec.ts}`
 
-- [ ] **Tarefa 9 — Listar as próximas viagens da rota**
+- [x] **Tarefa 9 — Listar as próximas viagens da rota**
   - Cobre: CA15
   - Teste primeiro: `upcomingTrips` com o relógio parado numa quarta às 08:00 —
     a viagem das 07:30 de hoje fica de fora, a das 07:30 de sexta entra, e 4

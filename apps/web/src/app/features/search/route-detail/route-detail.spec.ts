@@ -3,7 +3,7 @@ import {
   TestRequest,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
+import { DeferBlockBehavior, DeferBlockState, TestBed } from '@angular/core/testing';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { environment } from '../../../../environments/environment';
 import { appConfig } from '../../../app.config';
@@ -43,16 +43,39 @@ const ROUTE_DETAILS = {
 
 const LOAD_FAILED = 'Não foi possível carregar a rota. Tente de novo.';
 
+// O relógio parado numa quarta, 25/11/2026, às 08:00. Em hora local, e não em UTC: o CI roda em
+// UTC, e a viagem sai na hora do relógio de quem dirige (ID33).
+const WEDNESDAY_8AM = new Date(2026, 10, 25, 8, 0);
+
+// As viagens da rota de seg, qua e sex às 07:30 nas 4 semanas a contar da quarta, 25/11, sem a
+// das 07:30 de hoje, que já passou: de sexta, 27/11, até segunda, 21/12 (CA15, RN18).
+const FOUR_WEEKS_OF_TRIPS = [
+  'sex., 27/11 às 07:30',
+  'seg., 30/11 às 07:30',
+  'qua., 02/12 às 07:30',
+  'sex., 04/12 às 07:30',
+  'seg., 07/12 às 07:30',
+  'qua., 09/12 às 07:30',
+  'sex., 11/12 às 07:30',
+  'seg., 14/12 às 07:30',
+  'qua., 16/12 às 07:30',
+  'sex., 18/12 às 07:30',
+  'seg., 21/12 às 07:30',
+];
+
 describe('RouteDetail', () => {
   let harness: RouterTestingHarness;
   let httpTesting: HttpTestingController;
   let page: HTMLElement;
 
   // A configuração do app inteiro (app.config.ts): é ela que entrega o `:routeId` da URL à tela
-  // como input. O teste faz o papel do servidor.
+  // como input. O teste faz o papel do servidor. As "Próximas viagens" só aparecem quando a pessoa
+  // desce até elas (`@defer (on viewport)`), e o jsdom não sabe o que está na tela (não tem
+  // `IntersectionObserver`): o próprio teste desenha o bloco quando a pessoa desce.
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [...appConfig.providers, provideHttpClientTesting()],
+      deferBlockBehavior: DeferBlockBehavior.Manual,
     });
     httpTesting = TestBed.inject(HttpTestingController);
   });
@@ -121,6 +144,41 @@ describe('RouteDetail', () => {
     return Array.from(page.querySelectorAll<T>(`main ${selector}`)).find(
       (candidate) => candidate.textContent?.trim() === text,
     );
+  }
+
+  // A parte "Próximas viagens" da tela, achada pelo título.
+  function upcomingTripsSection(): HTMLElement {
+    const section = Array.from(page.querySelectorAll<HTMLElement>('main section')).find(
+      (candidate) => candidate.querySelector('h2')?.textContent?.trim() === 'Próximas viagens',
+    );
+    expect(section, 'parte "Próximas viagens"').toBeDefined();
+    return section as HTMLElement;
+  }
+
+  // Descer até "Próximas viagens": no navegador, o bloco é desenhado quando entra na tela.
+  async function scrollToUpcomingTrips(): Promise<void> {
+    const [block] = await harness.fixture.getDeferBlocks();
+    expect(block, 'bloco das próximas viagens').toBeDefined();
+    await block.render(DeferBlockState.Complete);
+    await harness.fixture.whenStable();
+  }
+
+  // As viagens, uma por linha, como a pessoa as lê.
+  function tripLines(): string[] {
+    return Array.from(upcomingTripsSection().querySelectorAll('li')).map(
+      (line) => line.textContent?.trim() ?? '',
+    );
+  }
+
+  // As opções do seletor ("Esta semana" | "4 semanas"), achadas pelo texto.
+  function periodOption(label: string): HTMLButtonElement | undefined {
+    return Array.from(upcomingTripsSection().querySelectorAll('button')).find(
+      (button) => button.textContent?.trim() === label,
+    );
+  }
+
+  function isChosen(label: string): boolean {
+    return periodOption(label)?.getAttribute('aria-pressed') === 'true';
   }
 
   // CA13
@@ -241,4 +299,65 @@ describe('RouteDetail', () => {
       expect(details()).toEqual(ROUTE_DETAILS);
     },
   );
+
+  // CA15: as viagens são contadas a partir de agora, e o relógio fica parado numa quarta às 08:00.
+  describe('nas próximas viagens', () => {
+    beforeEach(() => vi.setSystemTime(WEDNESDAY_8AM));
+
+    afterEach(() => vi.useRealTimers());
+
+    // CA15: a semana vai de agora até domingo; a das 07:30 de hoje já passou, e a segunda, 30/11, já
+    // é a semana que vem.
+    it('mostra as viagens desta semana, de agora até domingo, uma por linha com o dia e o horário', async () => {
+      await open(`/rotas/${ROUTE_ID}`);
+      await answerWithRoute();
+      await scrollToUpcomingTrips();
+
+      expect(isChosen('Esta semana'), '"Esta semana" escolhida').toBe(true);
+      expect(isChosen('4 semanas'), '"4 semanas" escolhida').toBe(false);
+      expect(tripLines()).toEqual(['sex., 27/11 às 07:30']);
+    });
+
+    // CA15, RN18
+    it('mostra todas as viagens das próximas 4 semanas, a contar de hoje, quando escolho "4 semanas"', async () => {
+      await open(`/rotas/${ROUTE_ID}`);
+      await answerWithRoute();
+      await scrollToUpcomingTrips();
+
+      await tap(periodOption('4 semanas'));
+
+      expect(isChosen('4 semanas'), '"4 semanas" escolhida').toBe(true);
+      expect(isChosen('Esta semana'), '"Esta semana" escolhida').toBe(false);
+      expect(tripLines()).toEqual(FOUR_WEEKS_OF_TRIPS);
+
+      await tap(periodOption('Esta semana'));
+
+      expect(tripLines()).toEqual(['sex., 27/11 às 07:30']);
+    });
+
+    // CA15: uma rota de seg e qua às 07:30, olhada na quarta às 08:00, não tem mais viagem nesta
+    // semana. O caminho para as 4 semanas continua ali.
+    it('avisa "Nenhuma viagem nesta semana" e "4 semanas" mostra as viagens das semanas seguintes', async () => {
+      await open(`/rotas/${ROUTE_ID}`);
+      await answerRoute(ROUTE_ID, (request) => request.flush({ ...ROUTE, weekdays: [1, 3] }));
+      await answerCampuses();
+      await scrollToUpcomingTrips();
+
+      expect(tripLines()).toEqual([]);
+      expect(byText('p', 'Nenhuma viagem nesta semana')).toBeDefined();
+
+      await tap(periodOption('4 semanas'));
+
+      expect(byText('p', 'Nenhuma viagem nesta semana')).toBeUndefined();
+      expect(tripLines()).toEqual([
+        'seg., 30/11 às 07:30',
+        'qua., 02/12 às 07:30',
+        'seg., 07/12 às 07:30',
+        'qua., 09/12 às 07:30',
+        'seg., 14/12 às 07:30',
+        'qua., 16/12 às 07:30',
+        'seg., 21/12 às 07:30',
+      ]);
+    });
+  });
 });

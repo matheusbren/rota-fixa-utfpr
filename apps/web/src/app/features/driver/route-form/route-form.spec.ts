@@ -4,7 +4,7 @@ import {
   TestRequest,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
+import { DeferBlockBehavior, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { environment } from '../../../../environments/environment';
@@ -128,10 +128,13 @@ describe('RouteForm', () => {
 
   // O app inteiro, com a casca e o menu: a tela é aberta pelo menu, como a pessoa faz (CA1). A
   // configuração é a do app (app.config.ts), que entrega o id da URL à tela da rota aberta depois
-  // do envio (CA9). O teste faz o papel do servidor.
+  // do envio (CA9). O teste faz o papel do servidor. Na tela da rota, as "Próximas viagens" só são
+  // desenhadas quando a pessoa desce até elas (`@defer (on viewport)`), e o jsdom não sabe o que
+  // está na tela (não tem `IntersectionObserver`): aqui ninguém desce, e o bloco fica fechado.
   async function openApp(): Promise<void> {
     TestBed.configureTestingModule({
       providers: [...appConfig.providers, provideHttpClientTesting()],
+      deferBlockBehavior: DeferBlockBehavior.Manual,
     });
     httpTesting = TestBed.inject(HttpTestingController);
     harness = await RouterTestingHarness.create('/criar-conta');

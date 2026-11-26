@@ -34,6 +34,34 @@
       <dd class="text-body-strong">{{ route.seats | i18nPlural: seatsLabels }}</dd>
     </div>
   </dl>
+
+  <section class="flex flex-col gap-3" aria-labelledby="route-detail-trips-title">
+    <h2 id="route-detail-trips-title" class="text-title-2">Próximas viagens</h2>
+    <!-- A lista só é desenhada quando a pessoa desce até ela (ID9). -->
+    @defer (on viewport) {
+      <app-segmented-control
+        aria-label="Período das viagens"
+        [options]="periods"
+        [(value)]="period"
+      />
+      @let visibleTrips = trips();
+      @if (visibleTrips.length > 0) {
+        <ul
+          class="flex flex-col divide-y divide-base-300 rounded-lg border border-base-300 bg-base-100"
+        >
+          <!-- O instante, em número, é a identidade estável de cada viagem (ID7). -->
+          @for (trip of visibleTrips; track trip.getTime()) {
+            <li class="p-4 text-body-strong">{{ trip | date: tripFormat }}</li>
+          }
+        </ul>
+      } @else {
+        <!-- Só esta semana pode ficar vazia: em 4 semanas, todo dia da rota aparece. -->
+        <p class="text-body text-text-muted">Nenhuma viagem nesta semana</p>
+      }
+    } @placeholder {
+      <p class="text-body text-text-muted">Carregando as próximas viagens…</p>
+    }
+  </section>
 } @else if (lookup?.status === 'not-found') {
   <h1 class="text-title-1">Não achamos esta rota</h1>
   <!-- A tela "Minhas rotas" nasce na Tarefa 10 desta história; até lá, o endereço cai na rota coringa. -->
