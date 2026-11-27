@@ -35,11 +35,45 @@ As linhas de versão que a equipe segue estão no [docs/architecture.md](docs/ar
 
 ## Em produção
 
-_A partir da Entrega 2._
+_A partir da Entrega 3._
 
 ## Instruções de Execução
 
-_A partir da Entrega 2._
+Precisa do [Git](https://git-scm.com) e do [Node.js](https://nodejs.org) 22.22.3 ou mais
+novo na linha 22, ou 24.15 ou mais novo na linha 24 (o npm vem junto). Com uma versão mais
+velha, o Angular se recusa a rodar.
+
+```bash
+git clone https://github.com/matheusbren/rota-fixa-utfpr.git
+cd rota-fixa-utfpr
+git switch develop
+npm install
+```
+
+O `npm install` roda uma vez, na raiz, e instala também o app em `apps/web`: o repositório
+é um workspace do npm.
+
+Depois, abra dois terminais na raiz do repositório:
+
+| Terminal | Comando       | O que faz                                                                        |
+| -------- | ------------- | -------------------------------------------------------------------------------- |
+| 1        | `npm run api` | Sobe o json-server em `http://localhost:3000`, com os dados do `db.json`         |
+| 2        | `npm start`   | Compila o app e serve em `http://localhost:4200`; recompila a cada arquivo salvo |
+
+Abra `http://localhost:4200` no navegador. O app abre em "Criar conta", e o menu leva a
+"Minhas rotas" e a "Publicar uma rota fixa". Até o login chegar (Entrega 3), quem publica é
+uma pessoa de exemplo do `db.json`.
+
+Para conferir o código, num terceiro terminal, também na raiz:
+
+| Comando         | O que faz                                                                 |
+| --------------- | ------------------------------------------------------------------------- |
+| `npm test`      | Roda os testes de unidade (Vitest) e fica observando os arquivos; `q` sai |
+| `npm run lint`  | Confere o código com as regras do angular-eslint                          |
+| `npm run build` | Gera a versão de produção do app (a publicação é da Entrega 3)            |
+
+O json-server grava no `db.json` o que se cria pelo app (contas e rotas). Para voltar aos
+dados originais: `git restore db.json`.
 
 ## Telas da Aplicação
 
