@@ -1,0 +1,11 @@
+@for (weekday of weekdays; track weekday.isoDay) {
+  <label class="flex min-h-12 items-center gap-3 text-body">
+    <input
+      type="checkbox"
+      class="checkbox focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      [checked]="selected().includes(weekday.isoDay)"
+      (change)="toggle(weekday.isoDay)"
+    />
+    {{ weekday.label }}
+  </label>
+}

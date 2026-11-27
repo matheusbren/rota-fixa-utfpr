@@ -1,5 +1,6 @@
 # Índice de specs
 
-| Issue | Spec | Estado | Observação |
-| --- | --- | --- | --- |
-| #1 | 1-criar-conta | implementada | 11 tarefas feitas; aguarda o PR para a `develop` |
+| Issue | Spec                 | Estado       | Observação                                           |
+| ----- | -------------------- | ------------ | ---------------------------------------------------- |
+| #1    | 1-criar-conta        | implementada | 11 tarefas; na `develop` pelo PR #22                 |
+| #4    | 4-publicar-rota-fixa | implementada | 11 tarefas; vai para a `develop` pelo PR da história |

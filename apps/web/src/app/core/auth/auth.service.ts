@@ -1,4 +1,4 @@
-import { Service, inject } from '@angular/core';
+import { Service, inject, signal } from '@angular/core';
 import { Observable, catchError, map, of, switchMap } from 'rxjs';
 import { normalizeEmail } from '../../shared/validators/institutional-email';
 import { UsersService } from '../data/users.service';
@@ -14,6 +14,14 @@ export type SignUpResult = 'created' | 'active' | 'pending' | 'failed';
 @Service()
 export class AuthService {
   private readonly users = inject(UsersService);
+
+  // TODO #2: sem entrar e sair, a pessoa da sessão é sempre a pessoa de exemplo gravada em `users`
+  // no db.json: é ela quem publica as rotas e de quem são as "Minhas rotas" (spec da US04, "Assume
+  // que"). A sessão real nasce com a US02, que passa a trocar este id ao entrar e ao sair.
+  private readonly userId = signal('sample-user');
+
+  // Só o AuthService troca a pessoa da sessão; as telas apenas a leem (architecture.md §2.1).
+  readonly currentUserId = this.userId.asReadonly();
 
   // Antes de gravar, procura o e-mail: se ele já tem conta, ativa (CA6) ou pendente de
   // verificação (CA7), nenhuma outra é criada.

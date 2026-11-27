@@ -1,3 +1,29 @@
 {
-  "users": []
+  "users": [
+    {
+      "id": "sample-user",
+      "fullName": "Pessoa de Exemplo",
+      "email": "pessoa.exemplo@alunos.utfpr.edu.br",
+      "password": "carona2026",
+      "role": "member",
+      "emailVerified": true,
+      "createdAt": "2026-11-01T12:00:00.000Z"
+    }
+  ],
+  "campuses": [
+    { "id": "apucarana", "name": "Apucarana", "city": "Apucarana" },
+    { "id": "campo-mourao", "name": "Campo Mourão", "city": "Campo Mourão" },
+    { "id": "cornelio-procopio", "name": "Cornélio Procópio", "city": "Cornélio Procópio" },
+    { "id": "curitiba", "name": "Curitiba", "city": "Curitiba" },
+    { "id": "dois-vizinhos", "name": "Dois Vizinhos", "city": "Dois Vizinhos" },
+    { "id": "francisco-beltrao", "name": "Francisco Beltrão", "city": "Francisco Beltrão" },
+    { "id": "guarapuava", "name": "Guarapuava", "city": "Guarapuava" },
+    { "id": "londrina", "name": "Londrina", "city": "Londrina" },
+    { "id": "medianeira", "name": "Medianeira", "city": "Medianeira" },
+    { "id": "pato-branco", "name": "Pato Branco", "city": "Pato Branco" },
+    { "id": "ponta-grossa", "name": "Ponta Grossa", "city": "Ponta Grossa" },
+    { "id": "santa-helena", "name": "Santa Helena", "city": "Santa Helena" },
+    { "id": "toledo", "name": "Toledo", "city": "Toledo" }
+  ],
+  "fixed_routes": []
 }

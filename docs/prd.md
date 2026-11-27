@@ -1,8 +1,8 @@
 # 📄 Product Requirements Document (PRD)
 
 **Projeto:** Rota Fixa UTFPR
-**Versão:** 1.3.0
-**Última atualização:** 18/11/2026
+**Versão:** 1.4.0
+**Última atualização:** 26/11/2026
 
 > 🤖 **Este documento é a fonte da verdade sobre o QUE o produto faz.** Regra de
 > negócio que não estiver aqui não existe — nem para a equipe, nem para a IA.
@@ -153,7 +153,7 @@ que** as minhas caronas e os meus dados fiquem acessíveis só para mim.
 
 ---
 
-### US04 — Publicar uma rota fixa · `Must Have` · `M` · Status: `Ready`
+### US04 — Publicar uma rota fixa · `Must Have` · `M` · Status: `Live`
 
 **Como** motorista, **eu quero** publicar de uma vez o trajeto que faço toda
 semana **para que** eu não precise combinar carona de novo a cada viagem.
@@ -163,7 +163,8 @@ semana **para que** eu não precise combinar carona de novo a cada viagem.
 - [ ] **Dado** que informo origem, destino com um campus em uma das pontas, os
       dias da semana, o horário de saída, o ponto de encontro e de 1 a 4 vagas,
       **quando** publico, **então** a rota aparece em "Minhas rotas" e as viagens
-      das próximas quatro semanas ficam visíveis na busca.
+      das próximas quatro semanas ficam visíveis na tela da rota. Na busca, a
+      rota aparece com a US05.
 - [ ] **Dado** que nenhuma das pontas é um campus, **quando** tento publicar,
       **então** vejo "Uma das pontas precisa ser um campus da UTFPR" e nada é
       publicado.
@@ -612,6 +613,7 @@ basta.
 | 30/09/2026 | 1.1.0  | Pontos de desistência do protótipo (Atividade 05): novos critérios de aceite em US07 e US09.                |
 | 07/10/2026 | 1.2.0  | Revisão cruzada da Entrega 1: visitante não vê "foto" (o produto não guarda foto) e frase do administrador corrigida. |
 | 18/11/2026 | 1.3.0  | US01 entregue (`Live`, spec #1): o aviso de conta pendente ao entrar passa para a US02, e a US01 trata a conta pendente no novo cadastro, separada da conta ativa. |
+| 26/11/2026 | 1.4.0  | US04 entregue (`Live`, spec #4): as viagens das quatro semanas aparecem na tela da rota; na busca, a rota entra com a US05. |
 
 ---
 

@@ -1,0 +1,13 @@
+@for (option of options(); track option.value) {
+  @let chosen = option.value === value();
+  <!-- `aria-pressed` diz ao leitor de tela qual opção está escolhida; a cor diz aos olhos. -->
+  <button
+    type="button"
+    class="join-item btn flex-1 text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+    [class.btn-neutral]="chosen"
+    [attr.aria-pressed]="chosen"
+    (click)="value.set(option.value)"
+  >
+    {{ option.label }}
+  </button>
+}

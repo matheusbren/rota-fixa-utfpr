@@ -29,6 +29,14 @@ describe('AuthService', () => {
       .flush([]);
   }
 
+  // US04, CA9: sem entrar e sair, quem publica é a pessoa de exemplo gravada em `users` no
+  // db.json (spec, "Assume que"). A tela só lê o id: quem o troca, com a sessão da US02, é o
+  // próprio AuthService (architecture.md §2.1, estado compartilhado).
+  it('entrega, só para leitura, o id da pessoa de exemplo do db.json', () => {
+    expect(auth.currentUserId()).toBe('sample-user');
+    expect(auth.currentUserId).not.toHaveProperty('set');
+  });
+
   // CA3: o e-mail é gravado normalizado. Chama o service direto porque o
   // <input type="email"> da tela já tira os espaços sozinho e esconderia a falta do trim().
   it('grava o e-mail sem os espaços das pontas e em minúsculas', () => {

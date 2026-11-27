@@ -1,0 +1,196 @@
+<h1 class="text-title-1">Publicar uma rota fixa</h1>
+
+<form class="flex flex-col gap-3" [formGroup]="form" (ngSubmit)="submit()">
+  @let campusError = errorOf('campusId');
+  <app-form-field label="Campus" controlId="route-form-campus">
+    <select
+      id="route-form-campus"
+      class="select w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+      formControlName="campusId"
+      [attr.aria-invalid]="campusError ? true : null"
+      [attr.aria-describedby]="campusError ? 'route-form-campus-error' : null"
+    >
+      <option value="">Escolha o campus</option>
+      @for (campus of campuses(); track campus.id) {
+        <option [value]="campus.id">{{ campus.name }}</option>
+      }
+    </select>
+    @if (campusError) {
+      <p id="route-form-campus-error" class="text-caption text-error">{{ campusError }}</p>
+    }
+  </app-form-field>
+
+  <fieldset class="flex flex-col gap-1">
+    <legend class="mb-1 text-label">Sentido</legend>
+    <label class="flex min-h-12 items-center gap-3 text-body">
+      <input
+        type="radio"
+        class="radio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        name="direction"
+        value="to_campus"
+        formControlName="direction"
+      />
+      Vou para o campus
+    </label>
+    <label class="flex min-h-12 items-center gap-3 text-body">
+      <input
+        type="radio"
+        class="radio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        name="direction"
+        value="from_campus"
+        formControlName="direction"
+      />
+      Volto do campus
+    </label>
+  </fieldset>
+
+  <!-- O formato errado é erro do campo; o aviso da busca não é: não marca o campo (CA8). -->
+  @let postalCodeError = errorOf('postalCode');
+  @let postalCodeNotice = postalCodeLookupNotice();
+  <app-form-field label="CEP do bairro (opcional)" controlId="route-form-postal-code">
+    <input
+      id="route-form-postal-code"
+      class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+      type="text"
+      inputmode="numeric"
+      autocomplete="postal-code"
+      formControlName="postalCode"
+      [attr.aria-invalid]="postalCodeError ? true : null"
+      [attr.aria-describedby]="
+        postalCodeError
+          ? 'route-form-postal-code-error'
+          : postalCodeNotice
+            ? 'route-form-postal-code-notice'
+            : null
+      "
+    />
+    @if (postalCodeError) {
+      <p id="route-form-postal-code-error" class="text-caption text-error">
+        {{ postalCodeError }}
+      </p>
+    } @else if (postalCodeNotice) {
+      <p id="route-form-postal-code-notice" class="text-caption text-text-muted">
+        {{ postalCodeNotice }}
+      </p>
+    }
+  </app-form-field>
+
+  @let neighborhoodError = errorOf('neighborhood');
+  <app-form-field label="Bairro" controlId="route-form-neighborhood">
+    <input
+      id="route-form-neighborhood"
+      class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+      type="text"
+      [maxlength]="neighborhoodMaxLength"
+      formControlName="neighborhood"
+      [attr.aria-invalid]="neighborhoodError ? true : null"
+      [attr.aria-describedby]="neighborhoodError ? 'route-form-neighborhood-error' : null"
+    />
+    @if (neighborhoodError) {
+      <p id="route-form-neighborhood-error" class="text-caption text-error">
+        {{ neighborhoodError }}
+      </p>
+    }
+  </app-form-field>
+
+  <!-- A dica não é erro: aparece desde o início e continua ali junto com o aviso (CA4). -->
+  @let meetingPointError = errorOf('meetingPoint');
+  <app-form-field label="Ponto de encontro" controlId="route-form-meeting-point">
+    <input
+      id="route-form-meeting-point"
+      class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+      type="text"
+      maxlength="120"
+      formControlName="meetingPoint"
+      [attr.aria-invalid]="meetingPointError ? true : null"
+      [attr.aria-describedby]="
+        meetingPointError
+          ? 'route-form-meeting-point-hint route-form-meeting-point-error'
+          : 'route-form-meeting-point-hint'
+      "
+    />
+    <p id="route-form-meeting-point-hint" class="text-caption text-text-muted">
+      Um lugar público, como a frente de uma padaria. Nunca o endereço da sua casa.
+    </p>
+    @if (meetingPointError) {
+      <p id="route-form-meeting-point-error" class="text-caption text-error">
+        {{ meetingPointError }}
+      </p>
+    }
+  </app-form-field>
+
+  <!-- O aviso dos dias vale para o grupo inteiro, então é o grupo que fica marcado (CA5). -->
+  @let weekdaysError = errorOf('weekdays');
+  <fieldset
+    class="flex flex-col gap-1"
+    [attr.aria-invalid]="weekdaysError ? true : null"
+    [attr.aria-describedby]="weekdaysError ? 'route-form-weekdays-error' : null"
+  >
+    <legend class="mb-1 text-label">Dias da semana</legend>
+    <app-weekday-picker formControlName="weekdays" />
+    @if (weekdaysError) {
+      <p id="route-form-weekdays-error" class="text-caption text-error">{{ weekdaysError }}</p>
+    }
+  </fieldset>
+
+  @let departureTimeError = errorOf('departureTime');
+  <app-form-field label="Horário de saída" controlId="route-form-departure-time">
+    <input
+      id="route-form-departure-time"
+      class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+      type="time"
+      formControlName="departureTime"
+      [attr.aria-invalid]="departureTimeError ? true : null"
+      [attr.aria-describedby]="departureTimeError ? 'route-form-departure-time-error' : null"
+    />
+    @if (departureTimeError) {
+      <p id="route-form-departure-time-error" class="text-caption text-error">
+        {{ departureTimeError }}
+      </p>
+    }
+  </app-form-field>
+
+  @let seatsError = errorOf('seats');
+  <app-form-field label="Vagas" controlId="route-form-seats">
+    <input
+      id="route-form-seats"
+      class="input w-full text-body focus:outline-3 focus:outline-offset-2 focus:outline-focus"
+      type="number"
+      inputmode="numeric"
+      formControlName="seats"
+      [attr.aria-invalid]="seatsError ? true : null"
+      [attr.aria-describedby]="seatsError ? 'route-form-seats-error' : null"
+    />
+    @if (seatsError) {
+      <p id="route-form-seats-error" class="text-caption text-error">{{ seatsError }}</p>
+    }
+  </app-form-field>
+
+  <!-- Os campos continuam como a pessoa os deixou, para ela tocar de novo (CA11) ou decidir qual
+  rota manter: o aviso do conflito traz os dados da rota que coincide com a nova (CA12). -->
+  @let result = publication();
+  @if (result?.status === 'failed') {
+    <p role="alert" class="rounded-md border border-error bg-danger-soft p-4 text-body text-error">
+      Não foi possível publicar a rota. Tente de novo.
+    </p>
+  } @else if (result?.status === 'conflict') {
+    @let conflict = result.route;
+    @let conflictWeekdays = conflict.weekdays | weekdays;
+    <p role="alert" class="rounded-md border border-error bg-danger-soft p-4 text-body text-error">
+      Esta rota coincide com a sua rota de {{ conflict.neighborhood }} ({{ conflictWeekdays }} às
+      {{ conflict.departureTime }})
+    </p>
+  }
+  <button
+    type="submit"
+    class="btn btn-primary mt-3 w-full text-button focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:bg-disabled disabled:text-text-disabled"
+    [disabled]="form.invalid || submitting()"
+  >
+    @if (submitting()) {
+      <span class="loading loading-spinner" aria-hidden="true"></span>
+      Publicando…
+    } @else {
+      Publicar rota
+    }
+  </button>
+</form>
