@@ -77,4 +77,13 @@ dados originais: `git restore db.json`.
 
 ## Telas da Aplicação
 
-_A partir da Entrega 2._
+As telas das duas histórias desta fase, a US01 (criar conta) e a US04 (publicar uma rota
+fixa), no celular e no desktop. No celular, o menu fica numa gaveta que abre no ☰; no
+desktop, ele fica sempre aberto ao lado.
+
+| Tela                                                                       | Celular                                                                                                                               | Desktop                                                                                                                    |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Criar conta (US01)                                                         | <img src="docs/telas/celular-1-criar-conta.png" alt="Criar conta no celular" width="200">                                             | <img src="docs/telas/desktop-1-criar-conta.png" alt="Criar conta no desktop" width="480">                                  |
+| Publicar uma rota fixa (US04), no celular com os avisos dos campos errados | <img src="docs/telas/celular-2-publicar-rota-erros.png" alt="Formulário de publicar rota no celular, com avisos de erro" width="200"> | <img src="docs/telas/desktop-2-publicar-rota.png" alt="Formulário de publicar rota no desktop" width="480">                |
+| A rota publicada (US04), com as próximas viagens                           | <img src="docs/telas/celular-3-rota-publicada.png" alt="Tela da rota publicada no celular" width="200">                               | <img src="docs/telas/desktop-3-rota.png" alt="Tela da rota no desktop, com as viagens das próximas 4 semanas" width="480"> |
+| Minhas rotas (US04)                                                        | <img src="docs/telas/celular-4-minhas-rotas.png" alt="Minhas rotas no celular" width="200">                                           | <img src="docs/telas/desktop-4-minhas-rotas.png" alt="Minhas rotas no desktop" width="480">                                |
